@@ -13,4 +13,4 @@ CFD.prototype.draw = function(data, options) {
 
 CFD[Symbol.species] = CFD;
 
-module.exports = cfd;
+module.exports = CFD;
