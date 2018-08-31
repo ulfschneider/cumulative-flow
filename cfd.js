@@ -7,21 +7,16 @@ var {
 var d3 = require('d3');
 var moment = require('moment');
 
-function CFD(settings) {
-    this.settings = settings;
-}
-
-CFD[Symbol.species] = CFD;
-
-CFD.prototype.validateSettings = function() {
-    var self = this;
-
-    if (!self.settings) {
+function validateSettings(settings) {
+    if (!settings) {
         throw "No settings"
     }
+    prepareMargins(settings);
+}
 
-    if (!self.settings.margin) {
-        self.settings.margin = {
+function prepareMargins(settings) {
+    if (!settings.margin) {
+        settings.margin = {
             top: 0,
             right: 0,
             bottom: 0,
@@ -30,26 +25,39 @@ CFD.prototype.validateSettings = function() {
     } else {
         var marginKeys = ['top', 'right', 'bottom', 'left'];
         marginKeys.forEach(function(key) {
-            if (!(key in self.settings.margin)) {
+            if (!(key in settings.margin)) {
                 margin[key] = 0;
             }
         });
     }
 
-    if (!('width' in self.settings)) {
-        self.settings.width = 600;
+    if (!('width' in settings)) {
+        settings.width = 600;
     }
-    self.settings.innerWidth = self.settings.width - self.settings.margin.left - self.settings.margin.right;
+    settings.innerWidth = settings.width - settings.margin.left - settings.margin.right;
 
-    if (!('height' in self.settings)) {
-        self.settings.height = 400;
+    if (!('height' in settings)) {
+        settings.height = 400;
     }
-    self.settings.innerHeight = self.settings.height - self.settings.margin.top - self.settings.margin.left;
+    settings.innerHeight = settings.height - settings.margin.top - settings.margin.left;
+
 }
+
+function prepareScales(settings) {
+
+}
+
+
+
+function CFD(settings) {
+    this.settings = settings;
+}
+
+CFD[Symbol.species] = CFD;
 
 CFD.prototype.draw = function() {
     var self = this;
-    self.validateSettings();
+    validateSettings(self.settings);
 
     var dom = JSDOM.fragment('<svg></svg>');
     self.svg = d3.select(dom.firstChild);
