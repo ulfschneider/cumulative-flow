@@ -51,13 +51,10 @@ CFD.prototype.draw = function() {
     var self = this;
     self.validateSettings();
 
+    var dom = JSDOM.fragment('<svg></svg>');
+    self.svg = d3.select(dom.firstChild);
 
-
-
-    var dom = new JSDOM();
-    var d3Element = d3.select(dom.window.document.body);
-
-    self.svg = d3Element.append('svg')
+    self.svg
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('width', self.settings.width)
         .attr('height', self.settings.height);
@@ -67,10 +64,9 @@ CFD.prototype.draw = function() {
         g.attr("transform", "translate(" + self.settings.margin.left + "," + self.settings.margin.top + ")");
     }
 
-    console.log(dom.serialize());
-    console.log(dom.window.document.documentElement.outerHTML);
+    console.log(dom.firstChild.outerHTML);
 
-    return self.svg;
+    return dom.firstChild.outerHTML;
 }
 
 module.exports = CFD;
