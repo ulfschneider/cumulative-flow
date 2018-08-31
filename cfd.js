@@ -32,9 +32,12 @@ CFD.prototype.validateSettings = function() {
     if (! ('width' in self.settings)) {
         self.settings.width = 600;
     }
+    self.settings.innerWidth = self.settings.width - self.settings.margin.left - self.settings.margin.right;
+    
     if (! ('height' in self.settings)) {
-        self.settings.height = 400;
+        self.settings.height = 400;        
     }        
+    self.settings.innerHeight = self.settings.height - self.settings.margin.top - self.settings.margin.left;
 }
 
 CFD.prototype.draw = function()  {

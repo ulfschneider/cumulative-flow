@@ -19,10 +19,13 @@ test('validate settings', () => {
     var settings = {};
     cfd = new CFD(settings);
     
+    //no exception expected for empty settings
     cfd.draw();
     
     expect(settings.width).toBe(600);
     expect(settings.height).toBe(400);
+    expect(settings.innerWidth).toBe(600);
+    expect(settings.innerHeight).toBe(400);
     expect(settings.margin.top).toBe(0);
     expect(settings.margin.right).toBe(0);
     expect(settings.margin.bottom).toBe(0);
