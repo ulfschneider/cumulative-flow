@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ulfschneider/cfd#readme",
   "dependencies": {
     "d3": "^5.7.0",
+    "jsdom": "^12.0.0",
     "moment": "^2.22.2"
   },
   "devDependencies": {

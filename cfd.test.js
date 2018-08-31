@@ -1,3 +1,5 @@
+'use strict'
+
 var CFD = require('./cfd');
 
 //test the functions
@@ -8,15 +10,21 @@ test('species', () => {
 });
 
 test('validate settings', () => {
+
+    //no settings at all
     var cfd = new CFD();
+    expect(() => cfd.draw()).toThrow(/No settings/);
 
-    function noSettings() {
-        cfd.validateSettings();
-    }
-    expect(noSettings).toThrow(/Empty settings/);
-
-    function emptySettings() {
-        cfd.validateSettings({});
-    }
-    expect(emptySettings).toThrow(/No id defined/);
+    //empty settings
+    var settings = {};
+    cfd = new CFD(settings);
+    
+    cfd.draw();
+    
+    expect(settings.width).toBe(600);
+    expect(settings.height).toBe(400);
+    expect(settings.margin.top).toBe(0);
+    expect(settings.margin.right).toBe(0);
+    expect(settings.margin.bottom).toBe(0);
+    expect(settings.margin.left).toBe(0);  
 });
