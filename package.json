@@ -1,27 +1,28 @@
 {
-  "name": "cfd",
-  "version": "0.1.0",
-  "description": "Cumulative Flow Diagram",
-  "main": "cfd.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ulfschneider/cfd.git"
-  },
-  "author": "Ulf Schneider",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ulfschneider/cfd/issues"
-  },
-  "homepage": "https://github.com/ulfschneider/cfd#readme",
-  "dependencies": {
-    "d3": "^5.7.0",
-    "jsdom": "^12.0.0",
-    "moment": "^2.22.2"
-  },
-  "devDependencies": {
-    "jest": "^23.5.0"
-  }
+    "name": "cfd",
+    "version": "0.1.0",
+    "description": "Cumulative Flow Diagram",
+    "main": "cfd.js",
+    "scripts": {
+        "test": "jest",
+        "coverage": "jest --collectCoverageFrom=src/**.js --coverage"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ulfschneider/cfd.git"
+    },
+    "author": "Ulf Schneider",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ulfschneider/cfd/issues"
+    },
+    "homepage": "https://github.com/ulfschneider/cfd#readme",
+    "dependencies": {
+        "d3": "^5.7.0",
+        "jsdom": "^12.0.0",
+        "moment": "^2.22.2"
+    },
+    "devDependencies": {
+        "jest": "^23.5.0"
+    }
 }

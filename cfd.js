@@ -18,7 +18,23 @@ function validateSettings(settings) {
     //TODO check for existence of columns, fromData, toData
     //TODO check for doneState, indeterminateState, newState
 
+    validateData(settings);
     prepareMargins(settings);
+}
+
+function validateData(settings) {
+    if (!settings.data) {
+        throw "No data";
+    }
+
+    if (!Array.isArray(settings.data)) {
+        throw "Data is not an array";
+    }
+
+    if (!settings.data.length) {
+        throw "Empty data";
+    }
+
 }
 
 function prepareMargins(settings) {
@@ -125,11 +141,11 @@ CFD.prototype.draw = function(settings) {
     validateSettings(self.settings);
     prepareSVG(self.settings);
     prepareScales(self.settings);
-    //TODO after checks for data, call prepareDataFunctions(self.settings);
+    prepareDataFunctions(self.settings);
 
     console.log(self.settings.dom.firstChild.outerHTML);
 
-    return self.settings.dom.firstChild.outerHTML;
+    return self.settings.dom.firstChild;
 }
 
 module.exports = CFD;
