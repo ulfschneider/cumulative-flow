@@ -11,7 +11,8 @@ var moment = require('moment');
 const FONT_SIZE = 12;
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
-const DAY_FORMAT = 'YYYY-MM-DD';
+const DAY_FORMAT = 'dddd D-MMM YYYY HH:mm[, GMT]Z';
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 //Helper functions
 
@@ -264,7 +265,7 @@ function drawLegend(settings) {
         .attr('font-family', 'sans-serif')
         .style('text-anchor', 'start')
         .style('fill', settings.legendStyle.color)
-        .text('Cumulative Flow Diagram for ' + settings.title +
+        .text(settings.title +
             ' at ' +
             moment().format(DAY_FORMAT));
 
