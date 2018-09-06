@@ -8,7 +8,6 @@ var d3 = require('d3');
 var moment = require('moment');
 
 
-const FONT_SIZE = 12;
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
 const DAY_FORMAT = 'dddd D-MMM YYYY HH:mm[, GMT]Z';
@@ -23,6 +22,7 @@ function validateSettings(settings) {
 
     validateData(settings);
     validateMargins(settings);
+    validateStyles(settings);
 }
 
 function validateData(settings) {
@@ -47,7 +47,7 @@ function validateMargins(settings) {
             right: 210,
             bottom: 30,
             left: 80
-        };
+        }
     } else {
         var marginKeys = ['top', 'right', 'bottom', 'left'];
         marginKeys.forEach(function (key) {
@@ -66,7 +66,124 @@ function validateMargins(settings) {
         settings.height = DEFAULT_HEIGHT;
     }
     settings.innerHeight = settings.height - settings.margin.top - settings.margin.bottom;
+}
 
+function validateStyles(settings) {
+    if (!settings.style) {
+        settings.style = {
+            fontSize: 12,
+            fontFamily: 'sans-serif',
+            color: '#000',
+            axis: {
+                color: '#000'
+            },
+            toDo: {
+                fill: '#bec0c2',
+                stroke: '#fff',
+                color: '#bec0c2'
+            },
+            progress: {
+                fill: '#808285',
+                stroke: '#fff',
+                color: '#808285'
+            },
+            done: {
+                fill: '#000',
+                stroke: '#fff',
+                color: '#000'
+            },
+            legend: {
+                color: '#000'
+            },
+            marker: {
+                backgroundColor: '#fff',
+                color: '#000'
+            }
+        }
+    } else {
+        if (!settings.style.fontSize) {
+            settings.style.fontSize = 12;
+        }
+        if (!settings.style.fontFamily) {
+            settings.style.fontFamily = 'sans-serif';
+        }
+        if (!settings.style.color) {
+            settings.style.color = '#000';
+        }
+        if (!settings.style.axis) {
+            settings.style.axis = {
+                color: settings.style.color
+            }
+        } else {
+            if (!settings.style.axis.color) {
+                settings.style.axis.color = settings.style.color
+            }
+        }
+        if (!settings.style.toDo) {
+            settings.style.toDo = {
+                fill: '#bec0c2',
+                stroke: '#fff',
+                color: '#bec0c2'
+            }
+        } else {
+            if (!settings.style.toDo.fill) {
+                settings.style.toDo.fill = '#bec0c2'
+            }
+            if (!settings.style.toDo.stroke) {
+                settings.style.toDo.stroke = '#fff'
+            }
+            if (!settings.style.toDo.color) {
+                settings.style.toDo.color = '#bec0c2'
+            }
+        }
+        if (!settings.style.progress) {
+            settings.style.progress = {
+                fill: '#808285',
+                stroke: '#fff',
+                color: '#808285',
+            }
+        } else {
+            if (!settings.style.progress.fill) {
+                settings.style.progress.fill = '#808285'
+            }
+            if (!settings.style.progress.stroke) {
+                settings.style.progress.stroke = '#fff'
+            }
+            if (!settings.style.progress.color) {
+                settings.style.progress.color = '#808285'
+            }
+        }
+        if (!settings.style.done) {
+            settings.style.done = {
+                fill: '#000',
+                stroke: '#fff',
+                color: '#000',
+            }
+        } else {
+            if (!settings.style.done.fill) {
+                settings.style.done.fill = '#000'
+            }
+            if (!settings.style.done.stroke) {
+                settings.style.done.stroke = '#fff'
+            }
+            if (!settings.style.done.color) {
+                settings.style.done.color = '#000'
+            }
+        }
+        if (!settings.style.marker) {
+            settings.style.marker = {
+                backgroundColor: '#000',
+                color: '#fff'
+            }
+        } else {
+            if (!settings.style.marker.backgroundColor) {
+                settings.style.marker.backgroundColor = '#000'
+            }
+            if (!settings.style.marker.color) {
+                settings.style.marker.color = '#fff'
+            }
+        }        
+    }
 }
 
 function prepareSVG(settings) {
@@ -146,23 +263,21 @@ function isDoneStatus(status, settings) {
 
 
 function drawAxis(settings) {
-    settings.axisStyle = {
-        color: '#000'
-    }
+
     var xAxis = settings.g.append('g')
         .attr('transform', 'translate(0,' + settings.innerHeight + ')')
         .call(d3.axisBottom(settings.x));
     xAxis
         .selectAll('path')
-        .style('stroke', settings.axisStyle.color);
+        .style('stroke', settings.style.axis.color);
     xAxis
         .selectAll('line')
-        .style('stroke', settings.axisStyle.color);
+        .style('stroke', settings.style.axis.color);
     xAxis
         .selectAll('text')
-        .style('fill', settings.axisStyle.color)
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif');
+        .style('fill', settings.style.axis.color)
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily);
 
 
 
@@ -171,33 +286,18 @@ function drawAxis(settings) {
         .call(d3.axisRight(settings.y));
     yAxis
         .selectAll('path')
-        .style('stroke', settings.axisStyle.color);
+        .style('stroke', settings.style.axis.color);
     yAxis
         .selectAll('line')
-        .style('stroke', settings.axisStyle.color);
+        .style('stroke', settings.style.axis.color);
     yAxis
         .selectAll('text')
-        .style('fill', settings.axisStyle.color)
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif');
+        .style('fill', settings.style.axis.color)
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily);
 }
 
 function drawLayers(settings) {
-    settings.toDoStyle = {
-        fill: '#bec0c2',
-        stroke: '#fff',
-        color: '#bec0c2'
-    };
-    settings.progressStyle = {
-        fill: '#808285',
-        stroke: '#fff',
-        color: '#808285'
-    };
-    settings.doneStyle = {
-        fill: '#000',
-        stroke: '#fff',
-        color: '#000'
-    };
 
     let layer = settings.g.selectAll('.layer')
         .data(settings.stack(settings.data))
@@ -209,25 +309,25 @@ function drawLayers(settings) {
         .attr('class', 'area')
         .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
-                return settings.progressStyle.fill;
+                return settings.style.progress.fill;
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.doneStyle.fill;
+                return settings.style.done.fill;
             }
-            return settings.toDoStyle.fill;
+            return settings.style.toDo.fill;
         })
         .style('stroke', function (d) {
             if (isProgressStatus(d.key, settings)) {
-                return settings.progressStyle.stroke;
+                return settings.style.progress.stroke;
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.doneStyle.stroke;
+                return settings.style.done.stroke;
             }
-            return settings.toDoStyle.stroke;
+            return settings.style.toDo.stroke;
         })
         .style('stroke-width', '.5')
         .attr('d', settings.area)
 
     layer.filter(function (d) {
-            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= FONT_SIZE;
+            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
         })
         .append('text')
         .attr('x', settings.innerWidth + 50)
@@ -235,36 +335,169 @@ function drawLayers(settings) {
             return settings.y(d[d.length - 1][1]);
         })
         .attr('dy', '.35em')
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
         .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
-                return settings.progressStyle.color;
+                return settings.style.progress.color;
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.doneStyle.color;
+                return settings.style.done.color;
             }
-            return settings.toDoStyle.color;
+            return settings.style.toDo.color;
         })
         .text(function (d) {
             return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
         });
 }
 
+function drawPrediction(settings) {
+    let summarizeDone = function(date) {
+        for (let entry of settings.data) {
+            if (entry.date.isSame(date, 'day')) {
+                let sum = 0;
+                for (let key of settings.keys) {
+                    if (BreakdownUtil.isDoneStatus(key)) {
+                        sum += entry[key];
+                    }
+                }
+                return sum;
+            }
+        }
+        return 0;
+    }
+
+    if (settings.data.length) {
+        settings.predict = BreakdownEnvironment.getSettings()
+            .predict;
+        var startDate = settings.predict;
+        var currentDate = settings.data[settings.data.length - 1].date;
+        if (startDate && startDate.isBefore(currentDate) && this.isDateInRange(startDate, settings)) {
+            let x1 = settings.x(startDate);
+            let x2 = settings.x(currentDate);
+            let y1 = settings.y(summarizeDone(startDate));
+            let y2 = settings.y(summarizeDone(currentDate));
+            let m = (y2 - y1) / (x2 - x1);
+
+            let predictX = function() {
+                return -y1 / m + x1;
+            }
+
+            let dateFromX = function(x) {
+                let m = (x2 - x1) / (currentDate - startDate);
+                let c = x1 - m * startDate;
+                return moment((x - c) / m);
+            }
+
+            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
+            let y3 = y1 + m * (x3 - x1);
+            if (y3 < 0) {
+                x3 = -y1 / m + x1;
+                y3 = y1 + m * (x3 - x1);
+            }
+
+            settings.predictStyle = BreakdownUtil.getStyleDeclaration('.breakdown-statistics .predict');
+            settings.g.append('line')
+                .attr('x1', x1)
+                .attr('y1', y1)
+                .attr('x2', x3)
+                .attr('y2', y3)
+                .style('stroke-width', '3')
+                .style('stroke', settings.predictStyle['background-color']);
+            settings.g.append('line')
+                .attr('x1', x1)
+                .attr('y1', y1)
+                .attr('x2', x3)
+                .attr('y2', y3)
+                .style('stroke-width', '1')
+                .style('stroke', settings.predictStyle.stroke);
+
+            settings.g.append('text')
+                .attr('x', x3)
+                .attr('y', -35)
+                .attr('dy', '.35em')
+                .style('font', FONT_SIZE + 'px sans-serif')
+                .style('text-anchor', 'middle')
+                .style('fill', settings.predictStyle.color)
+                .text(BreakdownUtil.formatDate(dateFromX(predictX())));
+        }
+    }
+}
+
+function isDateInRange(date, settings) {
+    let dataFromDate, dataToDate;
+    if (settings.data.length) {
+        dataFromDate = settings.data[0].date;
+        dataToDate = settings.data[settings.data.length - 1].date;
+    }
+
+    if (settings.fromDate && date.isBefore(settings.fromDate)) {
+        return false;
+    } else if (!settings.fromDate && dataFromDate && date.isBefore(dataFromDate)) {
+        return false;
+    }
+
+    if (settings.toDate && date.isAfter(settings.toDate)) {
+        return false;
+    } else if (!settings.toDate && dataToDate && date.isAfter(dataToDate)) {
+        return false;
+    }
+    return true;
+}
+
+
+function drawMarkers(settings) {
+
+    var mark = function(date, label) {
+        var x1 = settings.x(date);
+        var y1 = settings.innerHeight;
+        var y2 = 0;
+        settings.g.append('line')
+            .attr('x1', x1)
+            .attr('y1', y1)
+            .attr('x2', x1)
+            .attr('y2', y2)
+            .style('stroke-width', '3')
+            .style('stroke', settings.style.marker.backgroundColor);
+        settings.g.append('line')
+            .attr('x1', x1)
+            .attr('y1', y1)
+            .attr('x2', x1)
+            .attr('y2', y2)
+            .style('stroke-width', '1')
+            .style('stroke', settings.style.marker.color);
+
+        settings.g.append('text')
+            .attr('x', x1)
+            .attr('y', -15)
+            .attr('dy', '.35em')
+            .attr('font-size', settings.style.fontSize)
+            .attr('font-family', settings.style.fontFamily)
+            .style('text-anchor', 'middle')
+            .style('fill', settings.style.marker.color)
+            .text(label ? label : moment(date).format(DATE_FORMAT));
+    }
+
+    if (settings.markers) {
+        settings.markers.forEach(m => {
+            if (isDateInRange(m.date, settings)) {
+                mark(m.date, m.label);
+            }
+        });
+    }
+}
+
 function drawLegend(settings) {
-    settings.legendStyle = {
-        color: '#000'
-    };
 
     //title 
     settings.g.append('text')
         .attr('x', 5)
         .attr('y', -55)
         .attr('dy', '.35em')
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.legendStyle.color)
+        .style('fill', settings.style.legend.color)
         .text(settings.title +
             ' at ' +
             moment().format(DAY_FORMAT));
@@ -273,33 +506,33 @@ function drawLegend(settings) {
     settings.g.append('text')
         .attr('x', 5)
         .attr('y', 0)
-        .attr('dy', FONT_SIZE + 'px')
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif')
+        .attr('dy', settings.style.fontSize + 'px')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.toDoStyle.color)
+        .style('fill', settings.style.toDo.color)
         .text('To Do');
 
     //progress legend
     settings.g.append('text')
         .attr('x', 5)
         .attr('y', 15)
-        .attr('dy', FONT_SIZE + 'px')
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif')
+        .attr('dy', settings.style.fontSize + 'px')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.progressStyle.color)
+        .style('fill', settings.style.progress.color)
         .text('In Progress');
 
     //done legend
     settings.g.append('text')
         .attr('x', 5)
         .attr('y', 30)
-        .attr('dy', FONT_SIZE + 'px')
-        .attr('font-size', FONT_SIZE + 'px')
-        .attr('font-family', 'sans-serif')
+        .attr('dy', settings.style.fontSize + 'px')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.doneStyle.color)
+        .style('fill', settings.style.done.color)
         .text('Done');
 
     /*
@@ -307,9 +540,10 @@ function drawLegend(settings) {
         .attr('x', settings.width + 50)
         .attr('y', -35)
         .attr('dy', '.35em')
-        .style('font', FONT_SIZE + 'px sans-serif')
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.legendStyle.color)
+        .style('fill', settings.style.legend.color)
         .text(BreakdownUtil.hasOption(BreakdownUtil.OPTION_CFD_POINTS) ? 'Story Points' : 'Issues');
         */
 }
@@ -336,6 +570,7 @@ CFD.prototype.draw = function (settings) {
     prepareDataFunctions(self.settings);
 
     drawLayers(self.settings);
+    drawMarkers(self.settings);
     drawAxis(self.settings);
     drawLegend(self.settings);
 

@@ -9,7 +9,7 @@ var data = makeTestData();
 // helper functions
 function makeTestData() {
     var testData = [];
-    var now = moment();    
+    var now = moment();
     testData.toDo = ['new'];
     testData.progress = ['dev', 'test'];
     testData.done = ['done'];
@@ -71,14 +71,12 @@ function writeTestFile(path, content) {
     fs.writeFile(path, content);
 }
 
-
 //test the functions
 test('species', () => {
     var cfd = new CFD();
     expect(cfd instanceof CFD)
         .toBeTruthy();
 });
-
 
 test('validate settings', () => {
 
@@ -106,6 +104,13 @@ test('validate settings', () => {
 
 
     settings.data = data;
+    settings.markers = [{
+        date: settings.data[1].date
+    }, {
+        date: settings.data[3].date
+    }, {
+        date: settings.data[5].date
+    }]
     var now = moment();
     settings.title = 'Testing the CFD'
     settings.fromDate = moment(now).subtract(8, 'days');
