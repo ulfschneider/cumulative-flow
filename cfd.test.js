@@ -11,7 +11,7 @@ function makeTestData() {
     var testData = [];
     var now = moment();
     testData.toDo = ['new'];
-    testData.progress = ['dev', 'test'];
+    testData.progress = ['test', 'dev'];
     testData.done = ['done'];
     testData.push({
             date: moment(now).subtract(8, 'days'),
