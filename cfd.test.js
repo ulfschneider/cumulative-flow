@@ -9,8 +9,7 @@ var data = makeTestData();
 // helper functions
 function makeTestData() {
     var testData = [];
-    var now = moment();
-    testData.columns = ['new', 'dev', 'test', 'done'];
+    var now = moment();    
     testData.toDo = ['new'];
     testData.progress = ['dev', 'test'];
     testData.done = ['done'];
@@ -107,6 +106,10 @@ test('validate settings', () => {
 
 
     settings.data = data;
+    var now = moment();
+    settings.title = 'Testing the CFD'
+    settings.fromDate = moment(now).subtract(8, 'days');
+    settings.toDate = moment(now).add(1, 'days');
     var domTree = cfd.draw();
     var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n' + domTree.outerHTML;
     writeTestFile('./cfd.html', testFileContent);

@@ -8,9 +8,10 @@ var d3 = require('d3');
 var moment = require('moment');
 
 
-const FONT_SIZE = '16';
+const FONT_SIZE = 12;
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
+const DAY_FORMAT = 'YYYY-MM-DD';
 
 //Helper functions
 
@@ -107,6 +108,11 @@ function prepareDataFunctions(settings) {
     var xRange = d3.extent(settings.data, function (d) {
         return d.date;
     });
+
+    settings.fromDate = settings.fromDate ? moment(settings.fromDate)
+        .startOf('day') : settings.fromDate;
+    settings.toDate = settings.toDate ? moment(settings.toDate)
+        .startOf('day') : settings.toDate;
     if (settings.fromDate) {
         xRange[0] = settings.fromDate;
     }
@@ -114,7 +120,7 @@ function prepareDataFunctions(settings) {
         xRange[1] = settings.toDate;
     }
     settings.x.domain(xRange);
-    //settings.keys = settings.data.columns.slice(1);
+
     settings.keys = settings.data.done;
     settings.keys = settings.keys.concat(settings.data.progress);
     settings.keys = settings.keys.concat(settings.data.toDo);
@@ -154,7 +160,10 @@ function drawAxis(settings) {
     xAxis
         .selectAll('text')
         .style('fill', settings.axisStyle.color)
-        .style('font', FONT_SIZE + 'px sans-serif');
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif');
+
+
 
     var yAxis = settings.g.append('g')
         .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
@@ -168,7 +177,8 @@ function drawAxis(settings) {
     yAxis
         .selectAll('text')
         .style('fill', settings.axisStyle.color)
-        .style('font', FONT_SIZE + 'px sans-serif');
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif');
 }
 
 function drawLayers(settings) {
@@ -213,18 +223,19 @@ function drawLayers(settings) {
             return settings.toDoStyle.stroke;
         })
         .style('stroke-width', '.5')
-        .attr('d', settings.area);
+        .attr('d', settings.area)
 
     layer.filter(function (d) {
-            return settings.data.length && settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= FONT_SIZE;
+            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= FONT_SIZE;
         })
         .append('text')
-        .attr('x', settings.width + 50)
+        .attr('x', settings.innerWidth + 50)
         .attr('y', function (d) {
             return settings.y(d[d.length - 1][1]);
         })
         .attr('dy', '.35em')
-        .style('font', FONT_SIZE + 'px sans-serif')
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif')
         .style('text-anchor', 'start')
         .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
@@ -237,6 +248,69 @@ function drawLayers(settings) {
         .text(function (d) {
             return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
         });
+}
+
+function drawLegend(settings) {
+    settings.legendStyle = {
+        color: '#000'
+    };
+
+    //title 
+    settings.g.append('text')
+        .attr('x', 5)
+        .attr('y', -55)
+        .attr('dy', '.35em')
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif')
+        .style('text-anchor', 'start')
+        .style('fill', settings.legendStyle.color)
+        .text('Cumulative Flow Diagram for ' + settings.title +
+            ' at ' +
+            moment().format(DAY_FORMAT));
+
+    //toDo legend
+    settings.g.append('text')
+        .attr('x', 5)
+        .attr('y', 0)
+        .attr('dy', FONT_SIZE + 'px')
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif')
+        .style('text-anchor', 'start')
+        .style('fill', settings.toDoStyle.color)
+        .text('To Do');
+
+    //progress legend
+    settings.g.append('text')
+        .attr('x', 5)
+        .attr('y', 15)
+        .attr('dy', FONT_SIZE + 'px')
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif')
+        .style('text-anchor', 'start')
+        .style('fill', settings.progressStyle.color)
+        .text('In Progress');
+
+    //done legend
+    settings.g.append('text')
+        .attr('x', 5)
+        .attr('y', 30)
+        .attr('dy', FONT_SIZE + 'px')
+        .attr('font-size', FONT_SIZE + 'px')
+        .attr('font-family', 'sans-serif')
+        .style('text-anchor', 'start')
+        .style('fill', settings.doneStyle.color)
+        .text('Done');
+
+    /*
+    let counting = settings.g.append('text')
+        .attr('x', settings.width + 50)
+        .attr('y', -35)
+        .attr('dy', '.35em')
+        .style('font', FONT_SIZE + 'px sans-serif')
+        .style('text-anchor', 'start')
+        .style('fill', settings.legendStyle.color)
+        .text(BreakdownUtil.hasOption(BreakdownUtil.OPTION_CFD_POINTS) ? 'Story Points' : 'Issues');
+        */
 }
 
 
@@ -262,6 +336,7 @@ CFD.prototype.draw = function (settings) {
 
     drawLayers(self.settings);
     drawAxis(self.settings);
+    drawLegend(self.settings);
 
     return self.settings.dom.firstChild;
 }
