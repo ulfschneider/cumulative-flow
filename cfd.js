@@ -182,7 +182,7 @@ function validateStyles(settings) {
             if (!settings.style.marker.color) {
                 settings.style.marker.color = '#fff'
             }
-        }        
+        }
     }
 }
 
@@ -213,7 +213,7 @@ function prepareDataFunctions(settings) {
     settings.stack = d3.stack();
     settings.area = d3.area()
         //.curve(d3.curveStepAfter) - this kind of interpolation is more correct, but not very readable
-        .x(function (d, i) {
+        .x(function (d) {
             return settings.x(d.data.date);
         })
         .y0(function (d) {
@@ -223,14 +223,16 @@ function prepareDataFunctions(settings) {
             return settings.y(d[1]);
         });
 
-    var xRange = d3.extent(settings.data, function (d) {
-        return d.date;
-    });
-
     settings.fromDate = settings.fromDate ? moment(settings.fromDate)
         .startOf('day') : settings.fromDate;
     settings.toDate = settings.toDate ? moment(settings.toDate)
         .startOf('day') : settings.toDate;
+
+
+    var xRange = d3.extent(settings.data, function (d) {
+        return d.date;
+    });
+
     if (settings.fromDate) {
         xRange[0] = settings.fromDate;
     }
@@ -298,14 +300,16 @@ function drawAxis(settings) {
 }
 
 function drawLayers(settings) {
-
     let layer = settings.g.selectAll('.layer')
-        .data(settings.stack(settings.data))
+        .data(settings.stack(settings.data.filter(function (d) {
+            return isDateInRange(d.date, settings);
+        })))
         .enter()
         .append('g')
         .attr('class', 'layer');
 
-    layer.append('path')
+    layer
+        .append('path')
         .attr('class', 'area')
         .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
@@ -352,7 +356,7 @@ function drawLayers(settings) {
 }
 
 function drawPrediction(settings) {
-    let summarizeDone = function(date) {
+    let summarizeDone = function (date) {
         for (let entry of settings.data) {
             if (entry.date.isSame(date, 'day')) {
                 let sum = 0;
@@ -379,11 +383,11 @@ function drawPrediction(settings) {
             let y2 = settings.y(summarizeDone(currentDate));
             let m = (y2 - y1) / (x2 - x1);
 
-            let predictX = function() {
+            let predictX = function () {
                 return -y1 / m + x1;
             }
 
-            let dateFromX = function(x) {
+            let dateFromX = function (x) {
                 let m = (x2 - x1) / (currentDate - startDate);
                 let c = x1 - m * startDate;
                 return moment((x - c) / m);
@@ -425,21 +429,23 @@ function drawPrediction(settings) {
 }
 
 function isDateInRange(date, settings) {
-    let dataFromDate, dataToDate;
+    var dataFromDate, dataToDate;
+    var momentDate = moment(date);
+
     if (settings.data.length) {
         dataFromDate = settings.data[0].date;
         dataToDate = settings.data[settings.data.length - 1].date;
     }
 
-    if (settings.fromDate && date.isBefore(settings.fromDate)) {
+    if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
         return false;
-    } else if (!settings.fromDate && dataFromDate && date.isBefore(dataFromDate)) {
+    } else if (!settings.fromDate && dataFromDate && momentDate.isBefore(dataFromDate)) {
         return false;
     }
 
-    if (settings.toDate && date.isAfter(settings.toDate)) {
+    if (settings.toDate && momentDate.isAfter(settings.toDate)) {
         return false;
-    } else if (!settings.toDate && dataToDate && date.isAfter(dataToDate)) {
+    } else if (!settings.toDate && dataToDate && momentDate.isAfter(dataToDate)) {
         return false;
     }
     return true;
@@ -448,7 +454,7 @@ function isDateInRange(date, settings) {
 
 function drawMarkers(settings) {
 
-    var mark = function(date, label) {
+    var mark = function (date, label) {
         var x1 = settings.x(date);
         var y1 = settings.innerHeight;
         var y2 = 0;
