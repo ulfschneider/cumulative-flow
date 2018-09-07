@@ -113,7 +113,7 @@ test('validate settings', () => {
     }]
     var now = moment();
     settings.title = 'Testing the CFD'
-    settings.fromDate = moment(now).subtract(3, 'days');
+    settings.fromDate = moment(now).subtract(8, 'days');
     settings.toDate = moment(now).add(1, 'days');
     var domTree = cfd.draw();
     var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n' + domTree.outerHTML;
