@@ -95,6 +95,10 @@ function validateStyles(settings) {
             legend: {
                 color: '#000'
             },
+            predict: {
+                backgroundColor: '#fff',
+                color: '#000'
+            },            
             marker: {
                 backgroundColor: '#fff',
                 color: '#000'
@@ -170,6 +174,19 @@ function validateStyles(settings) {
                 settings.style.done.color = '#000'
             }
         }
+        if (!settings.style.predict) {
+            settings.style.predict = {
+                backgroundColor: '#000',
+                color: '#fff'
+            }
+        } else {
+            if (!settings.style.predict.backgroundColor) {
+                settings.style.predict.backgroundColor = '#000'
+            }
+            if (!settings.style.predict.color) {
+                settings.style.predict.color = '#fff'
+            }
+        }        
         if (!settings.style.marker) {
             settings.style.marker = {
                 backgroundColor: '#000',
@@ -357,11 +374,11 @@ function drawLayers(settings) {
 
 function drawPrediction(settings) {
     let summarizeDone = function (date) {
-        for (let entry of settings.data) {
-            if (entry.date.isSame(date, 'day')) {
-                let sum = 0;
-                for (let key of settings.keys) {
-                    if (BreakdownUtil.isDoneStatus(key)) {
+        for (var entry of settings.data) {
+            if (moment(entry.date).isSame(date, 'day')) {
+                var sum = 0;
+                for (var key of settings.keys) {
+                    if (isDoneStatus(key, settings)) {
                         sum += entry[key];
                     }
                 }
@@ -371,59 +388,59 @@ function drawPrediction(settings) {
         return 0;
     }
 
-    if (settings.data.length) {
-        settings.predict = BreakdownEnvironment.getSettings()
-            .predict;
-        var startDate = settings.predict;
-        var currentDate = settings.data[settings.data.length - 1].date;
-        if (startDate && startDate.isBefore(currentDate) && this.isDateInRange(startDate, settings)) {
-            let x1 = settings.x(startDate);
-            let x2 = settings.x(currentDate);
-            let y1 = settings.y(summarizeDone(startDate));
-            let y2 = settings.y(summarizeDone(currentDate));
-            let m = (y2 - y1) / (x2 - x1);
+    if (settings.predict) {
+        
+        var startDate = moment(settings.predict);
+        var currentDate = moment(settings.data[settings.data.length - 1].date);
+        if (startDate && startDate.isBefore(currentDate) && isDateInRange(startDate, settings)) {
+            var x1 = settings.x(startDate);
+            var x2 = settings.x(currentDate);
+            var y1 = settings.y(summarizeDone(startDate));
+            var y2 = settings.y(summarizeDone(currentDate));
+            var m = (y2 - y1) / (x2 - x1);
 
-            let predictX = function () {
+            var predictX = function () {
                 return -y1 / m + x1;
             }
 
-            let dateFromX = function (x) {
+            var dateFromX = function (x) {
                 let m = (x2 - x1) / (currentDate - startDate);
                 let c = x1 - m * startDate;
                 return moment((x - c) / m);
             }
 
-            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
-            let y3 = y1 + m * (x3 - x1);
+            var x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
+            var y3 = y1 + m * (x3 - x1);
             if (y3 < 0) {
                 x3 = -y1 / m + x1;
                 y3 = y1 + m * (x3 - x1);
             }
 
-            settings.predictStyle = BreakdownUtil.getStyleDeclaration('.breakdown-statistics .predict');
+            
             settings.g.append('line')
                 .attr('x1', x1)
                 .attr('y1', y1)
                 .attr('x2', x3)
                 .attr('y2', y3)
                 .style('stroke-width', '3')
-                .style('stroke', settings.predictStyle['background-color']);
+                .style('stroke', settings.style.predict.backgroundColor);
             settings.g.append('line')
                 .attr('x1', x1)
                 .attr('y1', y1)
                 .attr('x2', x3)
                 .attr('y2', y3)
                 .style('stroke-width', '1')
-                .style('stroke', settings.predictStyle.stroke);
+                .style('stroke', settings.style.predict.color);
 
             settings.g.append('text')
                 .attr('x', x3)
                 .attr('y', -35)
                 .attr('dy', '.35em')
-                .style('font', FONT_SIZE + 'px sans-serif')
+                .attr('font-size', settings.style.fontSize)
+                .attr('font-family', settings.style.fontFamily)    
                 .style('text-anchor', 'middle')
-                .style('fill', settings.predictStyle.color)
-                .text(BreakdownUtil.formatDate(dateFromX(predictX())));
+                .style('fill', settings.style.predict.color)
+                .text(dateFromX(predictX()).format(DATE_FORMAT));
         }
     }
 }
@@ -576,7 +593,8 @@ CFD.prototype.draw = function (settings) {
     prepareDataFunctions(self.settings);
 
     drawLayers(self.settings);
-    drawMarkers(self.settings);
+    drawPrediction(self.settings);
+    drawMarkers(self.settings);    
     drawAxis(self.settings);
     drawLegend(self.settings);
 

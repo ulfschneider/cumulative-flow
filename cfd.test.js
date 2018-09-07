@@ -104,6 +104,7 @@ test('validate settings', () => {
 
 
     settings.data = data;
+    settings.predict = settings.data[0].date;
     settings.markers = [{
         date: settings.data[1].date
     }, {
