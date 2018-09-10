@@ -57,7 +57,7 @@ function validateMargins(settings) {
             top: 75,
             right: 210,
             bottom: 30,
-            left: 80
+            left: 40
         }
     } else {
         var marginKeys = ['top', 'right', 'bottom', 'left'];

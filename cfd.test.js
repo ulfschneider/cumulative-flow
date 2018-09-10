@@ -137,5 +137,5 @@ test('validate settings', () => {
     expect(settings.margin.bottom)
         .toBe(30);
     expect(settings.margin.left)
-        .toBe(80);
+        .toBe(40);
 });
