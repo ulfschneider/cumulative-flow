@@ -7,7 +7,6 @@ var {
 var d3 = require('d3');
 var moment = require('moment');
 
-
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
 const DAY_FORMAT = 'dddd D-MMM YYYY HH:mm[, GMT]Z';
@@ -36,6 +35,18 @@ function validateData(settings) {
 
     if (!settings.data.length) {
         throw "Empty data";
+    }
+
+    if (!settings.data.toDo) {
+        throw "No toDo status defined"
+    }
+
+    if (!settings.data.progress) {
+        throw "No progress status defined"
+    }
+
+    if (!settings.data.done) {
+        throw "No done status defined"
     }
 
 }
@@ -98,7 +109,7 @@ function validateStyles(settings) {
             predict: {
                 backgroundColor: '#fff',
                 color: '#000'
-            },            
+            },
             marker: {
                 backgroundColor: '#fff',
                 color: '#000'
@@ -186,7 +197,7 @@ function validateStyles(settings) {
             if (!settings.style.predict.color) {
                 settings.style.predict.color = '#fff'
             }
-        }        
+        }
         if (!settings.style.marker) {
             settings.style.marker = {
                 backgroundColor: '#000',
@@ -258,9 +269,16 @@ function prepareDataFunctions(settings) {
     }
     settings.x.domain(xRange);
 
-    settings.keys = settings.data.done;
-    settings.keys = settings.keys.concat(settings.data.progress);
-    settings.keys = settings.keys.concat(settings.data.toDo);
+    settings.keys = [];
+    if (settings.data.done) {
+        settings.keys = settings.data.done;
+    }
+    if (settings.data.progress) {
+        settings.keys = settings.keys.concat(settings.data.progress);
+    }
+    if (settings.data.toDo) {
+        settings.keys = settings.keys.concat(settings.data.toDo);
+    }
     settings.stack.keys(settings.keys);
     settings.y.domain([0, d3.max(settings.data, function (d) {
         var sum = 0;
@@ -389,7 +407,7 @@ function drawPrediction(settings) {
     }
 
     if (settings.predict) {
-        
+
         var startDate = moment(settings.predict);
         var currentDate = moment(settings.data[settings.data.length - 1].date);
         if (startDate && startDate.isBefore(currentDate) && isDateInRange(startDate, settings)) {
@@ -416,7 +434,7 @@ function drawPrediction(settings) {
                 y3 = y1 + m * (x3 - x1);
             }
 
-            
+
             settings.g.append('line')
                 .attr('x1', x1)
                 .attr('y1', y1)
@@ -437,7 +455,7 @@ function drawPrediction(settings) {
                 .attr('y', -35)
                 .attr('dy', '.35em')
                 .attr('font-size', settings.style.fontSize)
-                .attr('font-family', settings.style.fontFamily)    
+                .attr('font-family', settings.style.fontFamily)
                 .style('text-anchor', 'middle')
                 .style('fill', settings.style.predict.color)
                 .text(dateFromX(predictX()).format(DATE_FORMAT));
@@ -567,12 +585,18 @@ function drawLegend(settings) {
         .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
         .style('fill', settings.style.legend.color)
-        .text(settings.data.unit == 'points' ? 'Story Points' : 'Issues');        
+        .text(settings.data.unit == 'points' ? 'Story Points' : 'Issues');
 }
 
 
 //Object with API
 
+/**
+ * A Cumulative Flow Diagram instance
+ * @class
+ * @constructor
+ * @param {*} settings - the configuration 
+ */
 function CFD(settings) {
     this.settings = settings;
     this.defaultWidth = DEFAULT_WIDTH;
@@ -581,23 +605,54 @@ function CFD(settings) {
 
 CFD[Symbol.species] = CFD;
 
-CFD.prototype.draw = function (settings) {
-    var self = this;
-    if (settings) {
-        self.settings = settings;
+
+/**
+ * Will draw a Cumulative Flow Diagram by using the data provided in the constructor.
+ * If the domParent is given, all children of that domParent are removed
+ * and the current drawing result will be added as a child to the domParent.
+ * @param {*} domParent 
+ */
+CFD.prototype.draw = function (domParent) {
+    validateSettings(this.settings);
+    prepareSVG(this.settings);
+    prepareScales(this.settings);
+    prepareDataFunctions(this.settings);
+    drawLayers(this.settings);
+    drawPrediction(this.settings);
+    drawMarkers(this.settings);
+    drawAxis(this.settings);
+    drawLegend(this.settings);
+
+    if (domParent) {
+        this.remove();
+        domParent.add(this.settings.dom.firstChild);
+        this.settings.domParent = domParent;
     }
-    validateSettings(self.settings);
-    prepareSVG(self.settings);
-    prepareScales(self.settings);
-    prepareDataFunctions(self.settings);
+}
 
-    drawLayers(self.settings);
-    drawPrediction(self.settings);
-    drawMarkers(self.settings);    
-    drawAxis(self.settings);
-    drawLegend(self.settings);
+/**
+ * In case a Cumulative Flow Diagram has already been attached to a
+ * domParent with the draw method, all children of that domParent are
+ * being removed by this method.
+ */
+CFD.prototype.remove = function () {
+    if (this.settings.domParent) {
+        while (this.settings.domParent.firstChild) {
+            this.settings.domParent.removeChild(this.settings.domParent.firstChild);
+        }
+    }
+}
 
-    return self.settings.dom.firstChild;
+/**
+ * By using the data from the settings object, the method will draw a 
+ * Cumulative Flow Diagram and return the result as a string which can be 
+ * assigned to the src attribute of an HTML img tag
+ * @returns {string}
+ */
+CFD.prototype.image = function () {
+    this.draw();
+    var svg = this.settings.dom.firstChild.outerHTML;
+    return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
 }
 
 module.exports = CFD;

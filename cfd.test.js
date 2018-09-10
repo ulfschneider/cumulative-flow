@@ -83,24 +83,24 @@ test('validate settings', () => {
 
     //no settings at all
     var cfd = new CFD();
-    expect(() => cfd.draw())
+    expect(() => cfd.image())
         .toThrow(/No settings/);
 
     //empty settings
     var settings = {};
     cfd = new CFD(settings);
     expect(() => {
-        cfd.draw()
+        cfd.image()
     }).toThrow(/No data/);
 
     settings.data = [];
     expect(() => {
-        cfd.draw()
+        cfd.image()
     }).toThrow(/Empty data/);
 
     settings.data = {}
     expect(() => {
-        cfd.draw()
+        cfd.image()
     }).toThrow(/Data is not an array/);
 
 
@@ -116,9 +116,9 @@ test('validate settings', () => {
     var now = moment();
     settings.title = 'Testing the CFD'
     settings.fromDate = moment(now).subtract(8, 'days');
-    settings.toDate = moment(now).add(1, 'days');
-    var domTree = cfd.draw();
-    var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n' + domTree.outerHTML;
+    settings.toDate = moment(now).add(3, 'days');
+    var svg = cfd.image();
+    var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n<img src="'  + svg + '"/>';
     writeTestFile('./cfd.html', testFileContent);
 
     //now the defaults must be set
