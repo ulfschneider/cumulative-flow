@@ -1,11 +1,11 @@
-'use strict'
+'use babel';
 
-var jsdom = require('jsdom');
-var {
+let jsdom = require('jsdom');
+let {
     JSDOM
 } = jsdom;
-var d3 = require('d3');
-var moment = require('moment');
+let d3 = require('d3');
+let moment = require('moment');
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
@@ -60,7 +60,7 @@ function validateMargins(settings) {
             left: 40
         }
     } else {
-        var marginKeys = ['top', 'right', 'bottom', 'left'];
+        let marginKeys = ['top', 'right', 'bottom', 'left'];
         marginKeys.forEach(function (key) {
             if (!(key in settings.margin)) {
                 margin[key] = 0;
@@ -257,7 +257,7 @@ function prepareDataFunctions(settings) {
         .startOf('day') : settings.toDate;
 
 
-    var xRange = d3.extent(settings.data, function (d) {
+    let xRange = d3.extent(settings.data, function (d) {
         return d.date;
     });
 
@@ -281,8 +281,8 @@ function prepareDataFunctions(settings) {
     }
     settings.stack.keys(settings.keys);
     settings.y.domain([0, d3.max(settings.data, function (d) {
-        var sum = 0;
-        for (var i = 0, n = settings.keys.length; i < n; i++) {
+        let sum = 0;
+        for (let i = 0, n = settings.keys.length; i < n; i++) {
             sum += d[settings.keys[i]];
         }
         return sum;
@@ -301,7 +301,7 @@ function isDoneStatus(status, settings) {
 
 function drawAxis(settings) {
 
-    var xAxis = settings.g.append('g')
+    let xAxis = settings.g.append('g')
         .attr('transform', 'translate(0,' + settings.innerHeight + ')')
         .call(d3.axisBottom(settings.x));
     xAxis
@@ -318,7 +318,7 @@ function drawAxis(settings) {
 
 
 
-    var yAxis = settings.g.append('g')
+    let yAxis = settings.g.append('g')
         .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
         .call(d3.axisRight(settings.y));
     yAxis
@@ -392,10 +392,10 @@ function drawLayers(settings) {
 
 function drawPrediction(settings) {
     let summarizeDone = function (date) {
-        for (var entry of settings.data) {
+        for (let entry of settings.data) {
             if (moment(entry.date).isSame(date, 'day')) {
-                var sum = 0;
-                for (var key of settings.keys) {
+                let sum = 0;
+                for (let key of settings.keys) {
                     if (isDoneStatus(key, settings)) {
                         sum += entry[key];
                     }
@@ -408,27 +408,27 @@ function drawPrediction(settings) {
 
     if (settings.predict) {
 
-        var startDate = moment(settings.predict);
-        var currentDate = moment(settings.data[settings.data.length - 1].date);
+        let startDate = moment(settings.predict);
+        let currentDate = moment(settings.data[settings.data.length - 1].date);
         if (startDate && startDate.isBefore(currentDate) && isDateInRange(startDate, settings)) {
-            var x1 = settings.x(startDate);
-            var x2 = settings.x(currentDate);
-            var y1 = settings.y(summarizeDone(startDate));
-            var y2 = settings.y(summarizeDone(currentDate));
-            var m = (y2 - y1) / (x2 - x1);
+            let x1 = settings.x(startDate);
+            let x2 = settings.x(currentDate);
+            let y1 = settings.y(summarizeDone(startDate));
+            let y2 = settings.y(summarizeDone(currentDate));
+            let m = (y2 - y1) / (x2 - x1);
 
-            var predictX = function () {
+            let predictX = function () {
                 return -y1 / m + x1;
             }
 
-            var dateFromX = function (x) {
+            let dateFromX = function (x) {
                 let m = (x2 - x1) / (currentDate - startDate);
                 let c = x1 - m * startDate;
                 return moment((x - c) / m);
             }
 
-            var x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
-            var y3 = y1 + m * (x3 - x1);
+            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
+            let y3 = y1 + m * (x3 - x1);
             if (y3 < 0) {
                 x3 = -y1 / m + x1;
                 y3 = y1 + m * (x3 - x1);
@@ -464,8 +464,8 @@ function drawPrediction(settings) {
 }
 
 function isDateInRange(date, settings) {
-    var dataFromDate, dataToDate;
-    var momentDate = moment(date);
+    let dataFromDate, dataToDate;
+    let momentDate = moment(date);
 
     if (settings.data.length) {
         dataFromDate = settings.data[0].date;
@@ -489,10 +489,10 @@ function isDateInRange(date, settings) {
 
 function drawMarkers(settings) {
 
-    var mark = function (date, label) {
-        var x1 = settings.x(date);
-        var y1 = settings.innerHeight;
-        var y2 = 0;
+    let mark = function (date, label) {
+        let x1 = settings.x(date);
+        let y1 = settings.innerHeight;
+        let y2 = 0;
         settings.g.append('line')
             .attr('x1', x1)
             .attr('y1', y1)
@@ -651,7 +651,7 @@ CFD.prototype.remove = function () {
  */
 CFD.prototype.image = function () {
     this.draw();
-    var svg = this.settings.dom.firstChild.outerHTML;
+    let svg = this.settings.dom.firstChild.outerHTML;
     return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
 }
 
