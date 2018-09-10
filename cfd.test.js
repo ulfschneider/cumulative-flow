@@ -13,6 +13,7 @@ function makeTestData() {
     testData.toDo = ['new'];
     testData.progress = ['test', 'dev'];
     testData.done = ['done'];
+    testData.unit = 'points';
     testData.push({
             date: moment(now).subtract(8, 'days'),
             new: 0,

@@ -558,17 +558,16 @@ function drawLegend(settings) {
         .style('fill', settings.style.done.color)
         .text('Done');
 
-    /*
+    //unit
     let counting = settings.g.append('text')
-        .attr('x', settings.width + 50)
+        .attr('x', settings.innerWidth + 50)
         .attr('y', -35)
         .attr('dy', '.35em')
         .attr('font-size', settings.style.fontSize + 'px')
         .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
         .style('fill', settings.style.legend.color)
-        .text(BreakdownUtil.hasOption(BreakdownUtil.OPTION_CFD_POINTS) ? 'Story Points' : 'Issues');
-        */
+        .text(settings.data.unit == 'points' ? 'Story Points' : 'Issues');        
 }
 
 
