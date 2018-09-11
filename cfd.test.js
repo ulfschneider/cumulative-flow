@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var CFD = require('cumulative-flow');
+var cfd = require('cumulative-flow');
 var moment = require('moment');
 var data = makeTestData();
 
@@ -78,27 +78,27 @@ function writeTestFile(path, content) {
 test('validate settings', () => {
 
     //no settings at all
-    var cfd = CFD();
-    expect(() => cfd.image())
+    var diagram = cfd();
+    expect(() => diagram.image())
         .toThrow(/No settings/);
 
     //empty settings
     var settings = {};
-    cfd = CFD(settings);
+    diagram = cfd(settings);
     expect(() => {
-        cfd.image()
+        diagram.image()
     }).toThrow(/No data/);
 
     settings.data = {
         entries: []
     }
     expect(() => {
-        cfd.image()
+        diagram.image()
     }).toThrow(/Empty data entries/);
 
     settings.data.entries = {}
     expect(() => {
-        cfd.image()
+        diagram.image()
     }).toThrow(/Data entries not an array/);
 
 
@@ -112,22 +112,22 @@ test('validate settings', () => {
         date: settings.data.entries[5].date
     }]
     var now = moment();
-    settings.title = 'Testing the CFD'
+    settings.title = 'Testing the cfd'
     settings.fromDate = moment(now).subtract(8, 'days');
     settings.toDate = moment(now).add(3, 'days');
-    var svg = cfd.image();
+    var svg = diagram.image();
     var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n<img src="'  + svg + '"/>';
     writeTestFile('./cfd.html', testFileContent);
 
     //now the defaults must be set
     expect(settings.width)
-        .toBe(cfd.defaultWidth);
+        .toBe(diagram.defaultWidth);
     expect(settings.height)
-        .toBe(cfd.defaultHeight);
+        .toBe(diagram.defaultHeight);
     expect(settings.innerWidth)
-        .toBe(cfd.defaultWidth - settings.margin.left - settings.margin.right);
+        .toBe(diagram.defaultWidth - settings.margin.left - settings.margin.right);
     expect(settings.innerHeight)
-        .toBe(cfd.defaultHeight - settings.margin.top - settings.margin.bottom);
+        .toBe(diagram.defaultHeight - settings.margin.top - settings.margin.bottom);
     expect(settings.margin.top)
         .toBe(75);
     expect(settings.margin.right)
