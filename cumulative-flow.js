@@ -662,3 +662,5 @@ CFD.prototype.image = function () {
 module.exports = function(settings) {
     return new CFD(settings);
 }
+
+
