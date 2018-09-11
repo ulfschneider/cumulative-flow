@@ -1,5 +1,3 @@
-'use babel';
-
 let jsdom = require('jsdom');
 let {
     JSDOM
@@ -660,7 +658,7 @@ CFD.prototype.image = function () {
 }
 
 module.exports = function(settings) {
-    return new CFD(settings);
+     console.log('hello cfd');//new CFD(settings);
 }
 
 
