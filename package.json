@@ -1,6 +1,6 @@
 {
   "name": "cumulative-flow",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Draw Cumulative Flow Diagrams",
   "main": "cfd.js",
   "scripts": {
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ulfschneider/cfd.git"
+    "url": "git+https://github.com/ulfschneider/cumulative-flow.git"
   },
   "author": "Ulf Schneider",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ulfschneider/cfd/issues"
+    "url": "https://github.com/ulfschneider/cumulative-flow/issues"
   },
-  "homepage": "https://github.com/ulfschneider/cfd#readme",
+  "homepage": "https://github.com/ulfschneider/cumulative-flow#readme",
   "dependencies": {
     "d3": "^5.7.0",
     "jsdom": "^12.0.0",

@@ -1,9 +1,9 @@
 'use strict'
 
 var fs = require('fs');
-
 var cfd = require('cumulative-flow');
 var moment = require('moment');
+
 var data = makeTestData();
 
 // helper functions
