@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var CFD = require('./cfd');
+var CFD = require('cumulative-flow');
 var moment = require('moment');
 var data = makeTestData();
 
