@@ -1,8 +1,9 @@
 {
   "name": "cumulative-flow",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Draw Cumulative Flow Diagrams",
-  "main": "cumulative-flow.js",
+  "main": "cfd.js",
+  "typings": "cfd.d.ts",
   "scripts": {
     "test": "jest",
     "coverage": "jest --collectCoverageFrom=src/**.js --coverage"
