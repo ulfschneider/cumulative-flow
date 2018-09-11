@@ -29,12 +29,16 @@ function validateData(settings) {
         throw "No data";
     }
 
-    if (!Array.isArray(settings.data)) {
-        throw "Data is not an array";
+    if (!settings.data.entries) {
+        throw "No data entries";
     }
 
-    if (!settings.data.length) {
-        throw "Empty data";
+    if (!Array.isArray(settings.data.entries)) {
+        throw "Data entries not an array";
+    }
+
+    if (!settings.data.entries.length) {
+        throw "Empty data entries";
     }
 
     if (!settings.data.toDo) {
@@ -242,7 +246,7 @@ function prepareDataFunctions(settings) {
     settings.area = d3.area()
         //.curve(d3.curveStepAfter) - this kind of interpolation is more correct, but not very readable
         .x(function (d) {
-            return settings.x(d.data.date);
+            return settings.x(moment(d.data.date));
         })
         .y0(function (d) {
             return settings.y(d[0]);
@@ -257,8 +261,8 @@ function prepareDataFunctions(settings) {
         .startOf('day') : settings.toDate;
 
 
-    let xRange = d3.extent(settings.data, function (d) {
-        return d.date;
+    let xRange = d3.extent(settings.data.entries, function (d) {
+        return moment(d.date);
     });
 
     if (settings.fromDate) {
@@ -280,7 +284,7 @@ function prepareDataFunctions(settings) {
         settings.keys = settings.keys.concat(settings.data.toDo);
     }
     settings.stack.keys(settings.keys);
-    settings.y.domain([0, d3.max(settings.data, function (d) {
+    settings.y.domain([0, d3.max(settings.data.entries, function (d) {
         let sum = 0;
         for (let i = 0, n = settings.keys.length; i < n; i++) {
             sum += d[settings.keys[i]];
@@ -336,7 +340,7 @@ function drawAxis(settings) {
 
 function drawLayers(settings) {
     let layer = settings.g.selectAll('.layer')
-        .data(settings.stack(settings.data.filter(function (d) {
+        .data(settings.stack(settings.data.entries.filter(function (d) {
             return isDateInRange(d.date, settings);
         })))
         .enter()
@@ -392,7 +396,7 @@ function drawLayers(settings) {
 
 function drawPrediction(settings) {
     let summarizeDone = function (date) {
-        for (let entry of settings.data) {
+        for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
                 for (let key of settings.keys) {
@@ -409,7 +413,7 @@ function drawPrediction(settings) {
     if (settings.predict) {
 
         let startDate = moment(settings.predict);
-        let currentDate = moment(settings.data[settings.data.length - 1].date);
+        let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
         if (startDate && startDate.isBefore(currentDate) && isDateInRange(startDate, settings)) {
             let x1 = settings.x(startDate);
             let x2 = settings.x(currentDate);
@@ -468,8 +472,8 @@ function isDateInRange(date, settings) {
     let momentDate = moment(date);
 
     if (settings.data.length) {
-        dataFromDate = settings.data[0].date;
-        dataToDate = settings.data[settings.data.length - 1].date;
+        dataFromDate = moment(settings.data[0].date);
+        dataToDate = moment(settings.data[settings.data.length - 1].date);
     }
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {

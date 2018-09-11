@@ -6,15 +6,17 @@ var CFD = require('./cfd');
 var moment = require('moment');
 var data = makeTestData();
 
+console.log(JSON.stringify(data));
 // helper functions
 function makeTestData() {
-    var testData = [];
+    var testData = {};
     var now = moment();
     testData.toDo = ['new'];
     testData.progress = ['test', 'dev'];
     testData.done = ['done'];
     testData.unit = 'points';
-    testData.push({
+    testData.entries = [];
+    testData.entries.push({
             date: moment(now).subtract(8, 'days'),
             new: 0,
             dev: 0,
@@ -93,25 +95,27 @@ test('validate settings', () => {
         cfd.image()
     }).toThrow(/No data/);
 
-    settings.data = [];
+    settings.data = {
+        entries: []
+    }
     expect(() => {
         cfd.image()
-    }).toThrow(/Empty data/);
+    }).toThrow(/Empty data entries/);
 
-    settings.data = {}
+    settings.data.entries = {}
     expect(() => {
         cfd.image()
-    }).toThrow(/Data is not an array/);
+    }).toThrow(/Data entries not an array/);
 
 
     settings.data = data;
-    settings.predict = settings.data[0].date;
+    settings.predict = settings.data.entries[0].date;
     settings.markers = [{
-        date: settings.data[1].date
+        date: settings.data.entries[1].date
     }, {
-        date: settings.data[3].date
+        date: settings.data.entries[3].date
     }, {
-        date: settings.data[5].date
+        date: settings.data.entries[5].date
     }]
     var now = moment();
     settings.title = 'Testing the CFD'
