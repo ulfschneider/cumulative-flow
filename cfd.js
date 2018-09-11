@@ -659,4 +659,6 @@ CFD.prototype.image = function () {
     return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
 }
 
-module.exports = CFD;
+module.exports = function(settings) {
+    return new CFD(settings);
+}

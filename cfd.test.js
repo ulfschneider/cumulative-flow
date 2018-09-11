@@ -6,7 +6,6 @@ var CFD = require('./cfd');
 var moment = require('moment');
 var data = makeTestData();
 
-console.log(JSON.stringify(data));
 // helper functions
 function makeTestData() {
     var testData = {};
@@ -75,22 +74,17 @@ function writeTestFile(path, content) {
 }
 
 //test the functions
-test('species', () => {
-    var cfd = new CFD();
-    expect(cfd instanceof CFD)
-        .toBeTruthy();
-});
 
 test('validate settings', () => {
 
     //no settings at all
-    var cfd = new CFD();
+    var cfd = CFD();
     expect(() => cfd.image())
         .toThrow(/No settings/);
 
     //empty settings
     var settings = {};
-    cfd = new CFD(settings);
+    cfd = CFD(settings);
     expect(() => {
         cfd.image()
     }).toThrow(/No data/);
