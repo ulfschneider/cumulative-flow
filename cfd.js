@@ -65,12 +65,18 @@ function validateMargins(settings) {
             left: 40
         }
     } else {
-        let marginKeys = ['top', 'right', 'bottom', 'left'];        
-        marginKeys.forEach(function (key) {
-            if (!(key in settings.margin)) {
-                settings.margin[key] = 0;
-            }
-        });
+        if (!('top' in settings.margin)) {
+            settings.margin.top = 75;
+        }
+        if (!('right' in settings.margin)) {
+            settings.margin.right = 210;
+        }
+        if (!('bottom' in settings.margin)) {
+            settings.margin.bottom = 30;
+        }
+        if (!('left' in settings.margin)) {
+            settings.margin.left = 40;
+        }
     }
 
     if (!('width' in settings)) {
