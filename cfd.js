@@ -23,6 +23,7 @@ function validateSettings(settings) {
     validateData(settings);
     validateMargins(settings);
     validateStyles(settings);
+    validateDraw(settings);
 }
 
 function validateData(settings) {
@@ -233,8 +234,14 @@ function validateStyles(settings) {
         } else {
             if (!settings.style.legend.color) {
                 settings.style.legend.color = settings.style.color;
-            }          
+            }
         }
+    }
+}
+
+function validateDraw(settings) {
+    if (!settings.draw) {
+        settings.draw = ['axis', 'legend', 'markers', 'predict'];
     }
 }
 
@@ -388,29 +395,31 @@ function drawLayers(settings) {
         .style('stroke-width', '.5')
         .attr('d', settings.area)
 
-    layer.filter(function (d) {
-        return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
-    })
-        .append('text')
-        .attr('x', settings.innerWidth + 50)
-        .attr('y', function (d) {
-            return settings.y(d[d.length - 1][1]);
+    if (this.settings.draw.includes('legend')) {
+        layer.filter(function (d) {
+            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
         })
-        .attr('dy', '.35em')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', function (d) {
-            if (isProgressStatus(d.key, settings)) {
-                return settings.style.progress.color;
-            } else if (isDoneStatus(d.key, settings)) {
-                return settings.style.done.color;
-            }
-            return settings.style.toDo.color;
-        })
-        .text(function (d) {
-            return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
-        });
+            .append('text')
+            .attr('x', settings.innerWidth + 50)
+            .attr('y', function (d) {
+                return settings.y(d[d.length - 1][1]);
+            })
+            .attr('dy', '.35em')
+            .attr('font-size', settings.style.fontSize + 'px')
+            .attr('font-family', settings.style.fontFamily)
+            .style('text-anchor', 'start')
+            .style('fill', function (d) {
+                if (isProgressStatus(d.key, settings)) {
+                    return settings.style.progress.color;
+                } else if (isDoneStatus(d.key, settings)) {
+                    return settings.style.done.color;
+                }
+                return settings.style.toDo.color;
+            })
+            .text(function (d) {
+                return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
+            });
+    }
 }
 
 function drawPrediction(settings) {
@@ -638,10 +647,19 @@ CFD.prototype.draw = function () {
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
     drawLayers(this.settings);
-    drawPrediction(this.settings);
-    drawMarkers(this.settings);
-    drawAxis(this.settings);
-    drawLegend(this.settings);
+
+    if (this.settings.draw.includes('predict')) {
+        drawPrediction(this.settings);
+    }
+    if (this.settings.draw.includes('markers')) {
+        drawMarkers(this.settings);
+    }
+    if (this.settings.draw.includes('axis')) {
+        drawAxis(this.settings);
+    }
+    if (this.settings.draw.includes('legend')) {
+        drawLegend(this.settings);
+    }
 }
 
 /**
