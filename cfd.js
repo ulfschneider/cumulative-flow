@@ -438,7 +438,6 @@ function drawPrediction(settings) {
                 y3 = y1 + m * (x3 - x1);
             }
 
-
             settings.g.append('line')
                 .attr('x1', x1)
                 .attr('y1', y1)
@@ -535,17 +534,17 @@ function drawMarkers(settings) {
 function drawLegend(settings) {
 
     //title 
-    settings.g.append('text')
-        .attr('x', 5)
-        .attr('y', -55)
-        .attr('dy', '.35em')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', settings.style.legend.color)
-        .text(settings.title +
-            ' at ' +
-            moment().format(DAY_FORMAT));
+    if (settings.title) {
+        settings.g.append('text')
+            .attr('x', 5)
+            .attr('y', -55)
+            .attr('dy', '.35em')
+            .attr('font-size', settings.style.fontSize + 'px')
+            .attr('font-family', settings.style.fontFamily)
+            .style('text-anchor', 'start')
+            .style('fill', settings.style.legend.color)
+            .text(settings.title);
+    }
 
     //toDo legend
     settings.g.append('text')
@@ -609,26 +608,21 @@ function CFD(settings) {
 
 CFD[Symbol.species] = CFD;
 
-
 /**
  * Will draw a Cumulative Flow Diagram by using the data provided in the constructor.
  * All contents of the svg are removed before drawing.
  */
 CFD.prototype.draw = function () {
-    try {
-        validateSettings(this.settings);
-        this.remove();
-        prepareSVG(this.settings);
-        prepareScales(this.settings);
-        prepareDataFunctions(this.settings);
-        drawLayers(this.settings);
-        drawPrediction(this.settings);
-        drawMarkers(this.settings);
-        drawAxis(this.settings);
-        drawLegend(this.settings);
-    } catch (err) {
-        console.error(err, err.stack);
-    }
+    validateSettings(this.settings);
+    this.remove();
+    prepareSVG(this.settings);
+    prepareScales(this.settings);
+    prepareDataFunctions(this.settings);
+    drawLayers(this.settings);
+    drawPrediction(this.settings);
+    drawMarkers(this.settings);
+    drawAxis(this.settings);
+    drawLegend(this.settings);
 }
 
 /**
