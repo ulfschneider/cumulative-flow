@@ -219,17 +219,24 @@ function validateStyles(settings) {
 }
 
 function prepareSVG(settings) {
-    
-    settings.d3svg = d3.select(settings.svg.firstChild);
+    try {
+        console.log('prepareSVG');
+        settings.d3svg = d3.select(settings.svg.firstChild);
 
-    settings.d3svg
-        .attr('xmlns', 'http://www.w3.org/2000/svg')
-        .attr('width', settings.width)
-        .attr('height', settings.height);
+        settings.d3svg
+            .attr('xmlns', 'http://www.w3.org/2000/svg')
+            .attr('width', settings.width)
+            .attr('height', settings.height);
 
-    settings.g = settings.d3svg.append("g");
-    if (settings.margin.left || settings.margin.top) {
-        settings.g.attr("transform", "translate(" + settings.margin.left + "," + settings.margin.top + ")");
+        settings.g = settings.d3svg.append("g");
+        if (settings.margin.left || settings.margin.top) {
+            settings.g.attr("transform", "translate(" + settings.margin.left + "," + settings.margin.top + ")");
+        }
+        console.log(settings.svg.firstChild.outerHTML);
+    } catch (err) {
+        console.log('failure with prepare SVG');
+        console.log(err);
+
     }
 }
 
@@ -645,7 +652,7 @@ CFD.prototype.remove = function () {
 
 CFD.prototype.image = function () {
     this.draw();
-    let html = this.settings.svg.firstChild.outerHTML;    
+    let html = this.settings.svg.firstChild.outerHTML;
     return 'data:image/svg+xml;base64,' + Buffer.from(html).toString('base64');
 }
 
