@@ -15,7 +15,7 @@ function validateSettings(settings) {
         throw "No settings";
     }
 
-    if (!settings.svg || !settings.svg.firstChild || (settings.svg.firstChild.tagName !== 'svg')) {
+    if (!settings.svg || settings.svg.tagName !== 'svg') {
         throw "No svg";
     }
 
@@ -219,7 +219,7 @@ function validateStyles(settings) {
 }
 
 function prepareSVG(settings) {
-    settings.d3svg = d3.select(settings.svg.firstChild);
+    settings.d3svg = d3.select(settings.svg);
 
     settings.d3svg
         .attr('xmlns', 'http://www.w3.org/2000/svg')
@@ -646,7 +646,7 @@ CFD.prototype.image = function () {
     try {
         console.log('creating an image');
         this.draw();
-        let html = this.settings.svg.firstChild.outerHTML;
+        let html = this.settings.svg.outerHTML;
         return 'data:image/svg+xml;base64,' + Buffer.from(html).toString('base64');
     } catch (err) {
         console.log('error with image');

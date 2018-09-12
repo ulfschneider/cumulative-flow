@@ -94,13 +94,13 @@ test('validate settings', () => {
         diagram.draw()
     }).toThrow(/No svg/);
 
-    settings.svg =  JSDOM.fragment('<div></div>');
+    settings.svg =  JSDOM.fragment('<div></div>').firstChild;
 
     expect(() => {
         diagram.draw()
     }).toThrow(/No svg/);
 
-    settings.svg =  JSDOM.fragment('<svg></svg>');
+    settings.svg =  JSDOM.fragment('<svg></svg>').firstChild;
 
     expect(() => {
         diagram.draw()
