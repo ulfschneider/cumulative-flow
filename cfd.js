@@ -220,6 +220,15 @@ function validateStyles(settings) {
                 settings.style.marker.color = settings.style.color;
             }
         }
+        if (!settings.style.legend) {
+            settings.style.legend = {
+                color: settings.style.color
+            }
+        } else {
+            if (!settings.style.legend.color) {
+                settings.style.legend.color = settings.style.color;
+            }          
+        }
     }
 }
 
