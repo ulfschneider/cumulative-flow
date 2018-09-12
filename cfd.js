@@ -2,6 +2,7 @@
 
 let d3 = require('d3');
 let moment = require('moment');
+let Base64 = require('js-base64').Base64;
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
@@ -614,16 +615,20 @@ CFD[Symbol.species] = CFD;
  * All contents of the svg are removed before drawing.
  */
 CFD.prototype.draw = function () {
-    validateSettings(this.settings);
-    this.remove();
-    prepareSVG(this.settings);
-    prepareScales(this.settings);
-    prepareDataFunctions(this.settings);
-    drawLayers(this.settings);
-    drawPrediction(this.settings);
-    drawMarkers(this.settings);
-    drawAxis(this.settings);
-    drawLegend(this.settings);
+    try {
+        validateSettings(this.settings);
+        this.remove();
+        prepareSVG(this.settings);
+        prepareScales(this.settings);
+        prepareDataFunctions(this.settings);
+        drawLayers(this.settings);
+        drawPrediction(this.settings);
+        drawMarkers(this.settings);
+        drawAxis(this.settings);
+        drawLegend(this.settings);
+    } catch (err) {
+        console.error(err, err.stack);
+    }
 }
 
 /**
@@ -643,17 +648,10 @@ CFD.prototype.remove = function () {
  */
 
 CFD.prototype.image = function () {
-    try {
-        console.log('creating an image');
-        this.draw();
-        let html = this.settings.svg.outerHTML;
-        return 'data:image/svg+xml;base64,' + Buffer.from(html).toString('base64');
-    } catch (err) {
-        console.log('error with image');
-        console.log(err);
-    }
+    this.draw();
+    let html = this.settings.svg.outerHTML;
+    return 'data:image/svg+xml;base64,' + Base64.encode(html);
 }
-
 
 module.exports = function (settings) {
     return new CFD(settings);
