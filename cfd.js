@@ -395,7 +395,7 @@ function drawLayers(settings) {
         .style('stroke-width', '.5')
         .attr('d', settings.area)
 
-    if (this.settings.draw.includes('legend')) {
+    if (settings.draw.includes('legend')) {
         layer.filter(function (d) {
             return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
         })
