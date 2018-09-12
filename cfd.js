@@ -1,9 +1,5 @@
 'use babel';
 
-let jsdom = require('jsdom');
-let {
-    JSDOM
-} = jsdom;
 let d3 = require('d3');
 let moment = require('moment');
 
@@ -17,6 +13,10 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 function validateSettings(settings) {
     if (!settings) {
         throw "No settings";
+    }
+
+    if (!settings.svg || !settings.svg.firstChild || (settings.svg.firstChild.tagName !== 'svg')) {
+        throw "No svg";
     }
 
     validateData(settings);
@@ -219,15 +219,15 @@ function validateStyles(settings) {
 }
 
 function prepareSVG(settings) {
-    settings.dom = JSDOM.fragment('<svg></svg>');
-    settings.svg = d3.select(settings.dom.firstChild);
+    
+    settings.d3svg = d3.select(settings.svg.firstChild);
 
-    settings.svg
+    settings.d3svg
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('width', settings.width)
         .attr('height', settings.height);
 
-    settings.g = settings.svg.append("g");
+    settings.g = settings.d3svg.append("g");
     if (settings.margin.left || settings.margin.top) {
         settings.g.attr("transform", "translate(" + settings.margin.left + "," + settings.margin.top + ")");
     }
@@ -370,8 +370,8 @@ function drawLayers(settings) {
         .attr('d', settings.area)
 
     layer.filter(function (d) {
-            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
-        })
+        return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
+    })
         .append('text')
         .attr('x', settings.innerWidth + 50)
         .attr('y', function (d) {
@@ -612,12 +612,11 @@ CFD[Symbol.species] = CFD;
 
 /**
  * Will draw a Cumulative Flow Diagram by using the data provided in the constructor.
- * If the domParent is given, all children of that domParent are removed
- * and the current drawing result will be added as a child to the domParent.
- * @param {*} domParent 
+ * All children of the svg are removed before drawing.
  */
-CFD.prototype.draw = function (domParent) {
+CFD.prototype.draw = function () {
     validateSettings(this.settings);
+    this.remove();
     prepareSVG(this.settings);
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
@@ -626,24 +625,14 @@ CFD.prototype.draw = function (domParent) {
     drawMarkers(this.settings);
     drawAxis(this.settings);
     drawLegend(this.settings);
-
-    if (domParent) {
-        this.remove();
-        domParent.add(this.settings.dom.firstChild);
-        this.settings.domParent = domParent;
-    }
 }
 
 /**
- * In case a Cumulative Flow Diagram has already been attached to a
- * domParent with the draw method, all children of that domParent are
- * being removed by this method.
+ * Clear the diagram
  */
 CFD.prototype.remove = function () {
-    if (this.settings.domParent) {
-        while (this.settings.domParent.firstChild) {
-            this.settings.domParent.removeChild(this.settings.domParent.firstChild);
-        }
+    if (this.settings.d3svg) {
+        this.settings.d3svg.selectAll("*").remove();
     }
 }
 
@@ -653,14 +642,16 @@ CFD.prototype.remove = function () {
  * assigned to the src attribute of an HTML img tag
  * @returns {string}
  */
+
 CFD.prototype.image = function () {
     this.draw();
-    let svg = this.settings.dom.firstChild.outerHTML;
-    return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
+    let html = this.settings.svg.firstChild.outerHTML;    
+    return 'data:image/svg+xml;base64,' + Buffer.from(html).toString('base64');
 }
 
-module.exports = function(settings) {
-     return new CFD(settings);
+
+module.exports = function (settings) {
+    return new CFD(settings);
 }
 
 

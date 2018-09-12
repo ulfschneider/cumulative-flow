@@ -1,6 +1,6 @@
 {
   "name": "cumulative-flow",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Draw Cumulative Flow Diagrams",
   "main": "cfd.js",
   "scripts": {
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "fs": "0.0.1-security",
-    "jest": "^23.5.0"
+    "jest": "^23.5.0",
+    "jsdoc": "^3.5.5"
   }
 }

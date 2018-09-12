@@ -1,6 +1,10 @@
 'use strict'
 
 var fs = require('fs');
+var jsdom = require('jsdom');
+var {
+    JSDOM
+} = jsdom;
 var cfd = require('cumulative-flow');
 var moment = require('moment');
 
@@ -79,26 +83,39 @@ test('validate settings', () => {
 
     //no settings at all
     var diagram = cfd();
-    expect(() => diagram.image())
+    expect(() => diagram.draw())
         .toThrow(/No settings/);
 
     //empty settings
     var settings = {};
     diagram = cfd(settings);
+
     expect(() => {
-        diagram.image()
+        diagram.draw()
+    }).toThrow(/No svg/);
+
+    settings.svg =  JSDOM.fragment('<div></div>');
+
+    expect(() => {
+        diagram.draw()
+    }).toThrow(/No svg/);
+
+    settings.svg =  JSDOM.fragment('<svg></svg>');
+
+    expect(() => {
+        diagram.draw()
     }).toThrow(/No data/);
 
     settings.data = {
         entries: []
     }
     expect(() => {
-        diagram.image()
+        diagram.draw()
     }).toThrow(/Empty data entries/);
 
     settings.data.entries = {}
     expect(() => {
-        diagram.image()
+        diagram.draw()
     }).toThrow(/Data entries not an array/);
 
 
