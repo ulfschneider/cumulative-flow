@@ -131,6 +131,9 @@ function validateStyles(settings) {
         if (!settings.style.color) {
             settings.style.color = '#222';
         }
+        if (!settings.style.backgoundColor) {
+            settings.style.backgroundColor = '#fff';
+        }
         if (!settings.style.axis) {
             settings.style.axis = {
                 color: settings.style.color
@@ -193,8 +196,8 @@ function validateStyles(settings) {
         }
         if (!settings.style.predict) {
             settings.style.predict = {
-                backgroundColor: settings.style.color,
-                color: settings.style.backgroundColor
+                backgroundColor: settings.style.backgroundColor,
+                color: settings.style.color
             }
         } else {
             if (!settings.style.predict.backgroundColor) {
@@ -206,15 +209,15 @@ function validateStyles(settings) {
         }
         if (!settings.style.marker) {
             settings.style.marker = {
-                backgroundColor: settings.style.color,
-                color: settings.style.backgroundColor
+                backgroundColor: settings.style.backgroundColor,
+                color: settings.style.color
             }
         } else {
             if (!settings.style.marker.backgroundColor) {
-                settings.style.marker.backgroundColor = settings.style.color;
+                settings.style.marker.backgroundColor = settings.style.backgroundColor;
             }
             if (!settings.style.marker.color) {
-                settings.style.marker.color = settings.style.backgroundColor;
+                settings.style.marker.color = settings.style.color;
             }
         }
     }
