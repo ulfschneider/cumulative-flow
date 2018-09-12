@@ -65,10 +65,10 @@ function validateMargins(settings) {
             left: 40
         }
     } else {
-        let marginKeys = ['top', 'right', 'bottom', 'left'];
+        let marginKeys = ['top', 'right', 'bottom', 'left'];        
         marginKeys.forEach(function (key) {
             if (!(key in settings.margin)) {
-                margin[key] = 0;
+                settings.margin[key] = 0;
             }
         });
     }
