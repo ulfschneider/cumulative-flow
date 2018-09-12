@@ -1,9 +1,13 @@
 'use babel';
 
+/*
 let jsdom = require('jsdom');
 let {
     JSDOM
 } = jsdom;
+*/
+let jsdom, JSDOM;
+
 let d3 = require('d3');
 let moment = require('moment');
 
