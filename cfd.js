@@ -89,37 +89,38 @@ function validateStyles(settings) {
         settings.style = {
             fontSize: 12,
             fontFamily: 'sans-serif',
-            color: '#000',
-            axis: {
-                color: '#000'
-            },
-            toDo: {
-                fill: '#bec0c2',
-                stroke: '#fff',
-                color: '#bec0c2'
-            },
-            progress: {
-                fill: '#808285',
-                stroke: '#fff',
-                color: '#808285'
-            },
-            done: {
-                fill: '#000',
-                stroke: '#fff',
-                color: '#000'
-            },
-            legend: {
-                color: '#000'
-            },
-            predict: {
-                backgroundColor: '#fff',
-                color: '#000'
-            },
-            marker: {
-                backgroundColor: '#fff',
-                color: '#000'
-            }
-        }
+            color: '#222',
+            backgroundColor: '#fff'
+        };
+        settings.style.axis = {
+            color: settings.style.color,
+        };
+        settings.style.toDo = {
+            fill: '#bec0c2',
+            stroke: settings.style.backgroundColor,
+            color: '#bec0c2'
+        };
+        settings.style.progress = {
+            fill: '#808285',
+            stroke: settings.style.backgroundColor,
+            color: '#808285'
+        };
+        settings.style.done = {
+            fill: '#222',
+            stroke: settings.style.backgroundColor,
+            color: '#222'
+        };
+        settings.style.legend = {
+            color: settings.style.color
+        };
+        settings.style.predict = {
+            backgroundColor: settings.style.backgroundColor,
+            color: settings.style.color
+        };
+        settings.style.marker = {
+            backgroundColor: settings.style.backgroundColor,
+            color: settings.style.color
+        };
     } else {
         if (!settings.style.fontSize) {
             settings.style.fontSize = 12;
@@ -128,7 +129,7 @@ function validateStyles(settings) {
             settings.style.fontFamily = 'sans-serif';
         }
         if (!settings.style.color) {
-            settings.style.color = '#000';
+            settings.style.color = '#222';
         }
         if (!settings.style.axis) {
             settings.style.axis = {
@@ -142,78 +143,78 @@ function validateStyles(settings) {
         if (!settings.style.toDo) {
             settings.style.toDo = {
                 fill: '#bec0c2',
-                stroke: '#fff',
+                stroke: settings.style.backgroundColor,
                 color: '#bec0c2'
             }
         } else {
             if (!settings.style.toDo.fill) {
-                settings.style.toDo.fill = '#bec0c2'
+                settings.style.toDo.fill = '#bec0c2';
             }
             if (!settings.style.toDo.stroke) {
-                settings.style.toDo.stroke = '#fff'
+                settings.style.toDo.stroke = settings.style.backgroundColor;
             }
             if (!settings.style.toDo.color) {
-                settings.style.toDo.color = '#bec0c2'
+                settings.style.toDo.color = '#bec0c2';
             }
         }
         if (!settings.style.progress) {
             settings.style.progress = {
                 fill: '#808285',
-                stroke: '#fff',
+                stroke: settings.style.backgroundColor,
                 color: '#808285',
             }
         } else {
             if (!settings.style.progress.fill) {
-                settings.style.progress.fill = '#808285'
+                settings.style.progress.fill = '#808285';
             }
             if (!settings.style.progress.stroke) {
-                settings.style.progress.stroke = '#fff'
+                settings.style.progress.stroke = settings.style.backgroundColor;
             }
             if (!settings.style.progress.color) {
-                settings.style.progress.color = '#808285'
+                settings.style.progress.color = '#808285';
             }
         }
         if (!settings.style.done) {
             settings.style.done = {
                 fill: '#000',
-                stroke: '#fff',
+                stroke: settings.style.backgroundColor,
                 color: '#000',
             }
         } else {
             if (!settings.style.done.fill) {
-                settings.style.done.fill = '#000'
+                settings.style.done.fill = '#000';
             }
             if (!settings.style.done.stroke) {
-                settings.style.done.stroke = '#fff'
+                settings.style.done.stroke = settings.style.backgroundColor;
             }
             if (!settings.style.done.color) {
-                settings.style.done.color = '#000'
+                settings.style.done.color = '#000';
             }
         }
         if (!settings.style.predict) {
             settings.style.predict = {
-                backgroundColor: '#000',
-                color: '#fff'
+                backgroundColor: settings.style.color,
+                color: settings.style.backgroundColor
             }
         } else {
             if (!settings.style.predict.backgroundColor) {
-                settings.style.predict.backgroundColor = '#000'
+                settings.style.predict.backgroundColor = settings.style.color;
             }
             if (!settings.style.predict.color) {
-                settings.style.predict.color = '#fff'
+                settings.style.predict.color = settings.style.backgroundColor;
             }
         }
         if (!settings.style.marker) {
             settings.style.marker = {
-                backgroundColor: '#000',
-                color: '#fff'
+                backgroundColor: settings.style.color,
+                color: settings.style.backgroundColor
             }
         } else {
             if (!settings.style.marker.backgroundColor) {
-                settings.style.marker.backgroundColor = '#000'
+                settings.style.marker.backgroundColor = settings.style.color;
             }
             if (!settings.style.marker.color) {
-                settings.style.marker.color = '#fff'
+                settings.style.marker.color = settings.style.backgroundColor;
             }
         }
     }
