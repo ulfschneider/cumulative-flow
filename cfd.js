@@ -481,15 +481,31 @@ function drawPrediction(settings) {
                 .style('stroke-width', '1')
                 .style('stroke', settings.style.predict.color);
 
+            settings.g.append('line')
+                .attr('x1', x3)
+                .attr('y1', y3)
+                .attr('x2', x3)
+                .attr('y2', -35)
+                .style('stroke-width', '3')
+                .style('stroke', settings.style.predict.backgroundColor);
+            settings.g.append('line')
+                .attr('x1', x3)
+                .attr('y1', y3)
+                .attr('x2', x3)
+                .attr('y2', -35)
+                .style('stroke-width', '1')
+                .style('stroke', settings.style.predict.color);
+
             settings.g.append('text')
-                .attr('x', x3)
+                .attr('x', x3 - 5)
                 .attr('y', -35)
                 .attr('dy', '.35em')
                 .attr('font-size', settings.style.fontSize)
                 .attr('font-family', settings.style.fontFamily)
-                .style('text-anchor', 'middle')
+                .style('text-anchor', 'end')
                 .style('fill', settings.style.predict.color)
                 .text(dateFromX(predictX()).format(DATE_FORMAT));
+
         }
     }
 }
