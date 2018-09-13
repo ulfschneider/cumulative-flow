@@ -333,7 +333,7 @@ function drawAxis(settings) {
 
     let xAxis = settings.g.append('g')
         .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-        .call(d3.axisBottom(settings.x));
+        .call(d3.axisBottom(settings.x).ticks(d3.timeWeek));
     xAxis
         .selectAll('path')
         .style('stroke', settings.style.axis.color);
@@ -350,7 +350,7 @@ function drawAxis(settings) {
 
     let yAxis = settings.g.append('g')
         .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
-        .call(d3.axisRight(settings.y));
+        .call(d3.axisRight(settings.y).ticks(5));
     yAxis
         .selectAll('path')
         .style('stroke', settings.style.axis.color);
