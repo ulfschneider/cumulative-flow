@@ -138,7 +138,7 @@ function validateStyles(settings) {
         if (!settings.style.color) {
             settings.style.color = '#222';
         }
-        if (!settings.style.backgoundColor) {
+        if (!settings.style.backgroundColor) {
             settings.style.backgroundColor = '#fff';
         }
         if (!settings.style.axis) {
@@ -186,19 +186,19 @@ function validateStyles(settings) {
         }
         if (!settings.style.done) {
             settings.style.done = {
-                fill: '#000',
+                fill: '#222',
                 stroke: settings.style.backgroundColor,
-                color: '#000',
+                color: '#222',
             }
         } else {
             if (!settings.style.done.fill) {
-                settings.style.done.fill = '#000';
+                settings.style.done.fill = '#222';
             }
             if (!settings.style.done.stroke) {
                 settings.style.done.stroke = settings.style.backgroundColor;
             }
             if (!settings.style.done.color) {
-                settings.style.done.color = '#000';
+                settings.style.done.color = '#222';
             }
         }
         if (!settings.style.predict) {

@@ -7,10 +7,29 @@ var {
 } = jsdom;
 var cfd = require('cumulative-flow');
 var moment = require('moment');
+var settings = makeTestSettings();
 
-var data = makeTestData();
 
 // helper functions
+function makeTestSettings() {
+    settings = {};
+    settings.data = makeTestData();
+    settings.svg = JSDOM.fragment('<svg></svg>').firstChild;
+    settings.predict = settings.data.entries[0].date;
+    settings.markers = [{
+        date: settings.data.entries[1].date
+    }, {
+        date: settings.data.entries[3].date
+    }, {
+        date: settings.data.entries[5].date
+    }]
+    var now = moment();
+    settings.title = 'Testing the cfd'
+    settings.fromDate = moment(now).subtract(8, 'days');
+    settings.toDate = moment(now).add(3, 'days');
+    return settings;
+}
+
 function makeTestData() {
     var testData = {};
     var now = moment();
@@ -20,12 +39,12 @@ function makeTestData() {
     testData.unit = 'points';
     testData.entries = [];
     testData.entries.push({
-            date: moment(now).subtract(8, 'days'),
-            new: 0,
-            dev: 0,
-            test: 0,
-            done: 0,
-        }, {
+        date: moment(now).subtract(8, 'days'),
+        new: 0,
+        dev: 0,
+        test: 0,
+        done: 0,
+    }, {
             date: moment(now).subtract(7, 'days'),
             new: 1,
             dev: 0,
@@ -73,11 +92,16 @@ function makeTestData() {
     return testData;
 }
 
+
 function writeTestFile(path, content) {
     fs.writeFile(path, content);
 }
 
 //test the functions
+
+beforeEach(() => {
+    settings = makeTestSettings();
+});
 
 test('validate settings', () => {
 
@@ -94,13 +118,101 @@ test('validate settings', () => {
         diagram.draw()
     }).toThrow(/No svg/);
 
-    settings.svg =  JSDOM.fragment('<div></div>').firstChild;
+    settings.svg = JSDOM.fragment('<div></div>').firstChild;
 
     expect(() => {
         diagram.draw()
     }).toThrow(/No svg/);
+});
 
-    settings.svg =  JSDOM.fragment('<svg></svg>').firstChild;
+test('margins', () => {
+    var diagram = cfd(settings);
+    diagram.draw();
+    expect(settings.width)
+        .toBe(800);
+    expect(settings.height)
+        .toBe(400);
+    expect(settings.innerWidth)
+        .toBe(800 - settings.margin.left - settings.margin.right);
+    expect(settings.innerHeight)
+        .toBe(400 - settings.margin.top - settings.margin.bottom);
+    expect(settings.margin.top)
+        .toBe(75);
+    expect(settings.margin.right)
+        .toBe(210);
+    expect(settings.margin.bottom)
+        .toBe(30);
+    expect(settings.margin.left)
+        .toBe(40);
+});
+
+test('validate style', () => {
+    var diagram = cfd(settings);
+    diagram.draw();
+    var color = '#222';
+    var background = '#fff';
+    var toDo = '#bec0c2';
+    var progress = '#808285';
+    var done = '#222';
+    expect(settings.style.fontSize).toBe(12);
+    expect(settings.style.fontFamily).toBe('sans-serif');
+    expect(settings.style.color).toBe(color);
+    expect(settings.style.backgroundColor).toBe(background);
+    expect(settings.style.axis.color).toBe(color);
+    expect(settings.style.toDo.fill).toBe(toDo);
+    expect(settings.style.toDo.color).toBe(toDo);
+    expect(settings.style.toDo.stroke).toBe(background);
+    expect(settings.style.progress.fill).toBe(progress);
+    expect(settings.style.progress.color).toBe(progress);
+    expect(settings.style.progress.stroke).toBe(background);
+    expect(settings.style.done.fill).toBe(done);
+    expect(settings.style.done.color).toBe(done);
+    expect(settings.style.done.stroke).toBe(background);
+    expect(settings.style.legend.color).toBe(color);
+    expect(settings.style.predict.backgroundColor).toBe(background);
+    expect(settings.style.predict.color).toBe(color);
+    expect(settings.style.marker.backgroundColor).toBe(background);
+    expect(settings.style.marker.color).toBe(color);
+
+    color = 'red';
+    background = 'lightgray';
+    diagram.settings.style = {
+        fontSize: 16,
+        fontFamily: 'serif',
+        color: color,
+        backgroundColor: background,        
+    };
+    
+    diagram.draw();
+    expect(settings.style.fontSize).toBe(16);
+    expect(settings.style.fontFamily).toBe('serif');
+    expect(settings.style.color).toBe(color);
+    expect(settings.style.backgroundColor).toBe(background);
+    expect(settings.style.axis.color).toBe(color);
+    expect(settings.style.toDo.fill).toBe(toDo);
+    expect(settings.style.toDo.color).toBe(toDo);
+    expect(settings.style.toDo.stroke).toBe(background);
+    expect(settings.style.progress.fill).toBe(progress);
+    expect(settings.style.progress.color).toBe(progress);
+    expect(settings.style.progress.stroke).toBe(background);
+    expect(settings.style.done.fill).toBe(done);
+    expect(settings.style.done.color).toBe(done);
+    expect(settings.style.done.stroke).toBe(background);
+    expect(settings.style.legend.color).toBe(color);
+    expect(settings.style.predict.backgroundColor).toBe(background);
+    expect(settings.style.predict.color).toBe(color);
+    expect(settings.style.marker.backgroundColor).toBe(background);
+    expect(settings.style.marker.color).toBe(color);
+
+    //TODO test more styles
+
+});
+
+
+test('validate data', () => {
+    delete settings.data;
+
+    var diagram = cfd(settings);    
 
     expect(() => {
         diagram.draw()
@@ -117,40 +229,17 @@ test('validate settings', () => {
     expect(() => {
         diagram.draw()
     }).toThrow(/Data entries not an array/);
+});
 
-
-    settings.data = data;
-    settings.predict = settings.data.entries[0].date;
-    settings.markers = [{
-        date: settings.data.entries[1].date
-    }, {
-        date: settings.data.entries[3].date
-    }, {
-        date: settings.data.entries[5].date
-    }]
-    var now = moment();
-    settings.title = 'Testing the cfd'
-    settings.fromDate = moment(now).subtract(8, 'days');
-    settings.toDate = moment(now).add(3, 'days');
+test('image', () => {
+    var diagram = cfd(settings);
     var svg = diagram.image();
-    var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n<img src="'  + svg + '"/>';
+    var testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n<img src="' + svg + '"/>';
     writeTestFile('./cfd.html', testFileContent);
 
-    //now the defaults must be set
-    expect(settings.width)
-        .toBe(diagram.defaultWidth);
-    expect(settings.height)
-        .toBe(diagram.defaultHeight);
-    expect(settings.innerWidth)
-        .toBe(diagram.defaultWidth - settings.margin.left - settings.margin.right);
-    expect(settings.innerHeight)
-        .toBe(diagram.defaultHeight - settings.margin.top - settings.margin.bottom);
-    expect(settings.margin.top)
-        .toBe(75);
-    expect(settings.margin.right)
-        .toBe(210);
-    expect(settings.margin.bottom)
-        .toBe(30);
-    expect(settings.margin.left)
-        .toBe(40);
+    expect(typeof svg).toBe('string');
+    expect(svg.length).toBeGreaterThan(1000);
+
+    //TODO use static testdata and compare the result string with the expected string.
+    
 });
