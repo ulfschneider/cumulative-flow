@@ -23,7 +23,7 @@ function validateSettings(settings) {
     validateData(settings);
     validateMargins(settings);
     validateStyles(settings);
-    validateDraw(settings);
+    validateDrawOptions(settings);
 }
 
 function validateData(settings) {
@@ -103,26 +103,20 @@ function validateStyles(settings) {
             color: settings.style.color,
         };
         settings.style.toDo = {
-            fill: '#bec0c2',
+            color: '#bec0c2',
             stroke: settings.style.backgroundColor,
-            color: '#bec0c2'
         };
         settings.style.progress = {
-            fill: '#808285',
+            color: '#808285',
             stroke: settings.style.backgroundColor,
-            color: '#808285'
         };
         settings.style.done = {
-            fill: '#222',
+            color: '#222',
             stroke: settings.style.backgroundColor,
-            color: '#222'
-        };
-        settings.style.legend = {
-            color: settings.style.color
         };
         settings.style.predict = {
             backgroundColor: settings.style.backgroundColor,
-            color: settings.style.color
+            color: settings.style.done.color
         };
         settings.style.marker = {
             backgroundColor: settings.style.backgroundColor,
@@ -152,66 +146,54 @@ function validateStyles(settings) {
         }
         if (!settings.style.toDo) {
             settings.style.toDo = {
-                fill: '#bec0c2',
-                stroke: settings.style.backgroundColor,
-                color: '#bec0c2'
+                color: '#bec0c2',
+                stroke: settings.style.backgroundColor
             }
         } else {
-            if (!settings.style.toDo.fill) {
-                settings.style.toDo.fill = '#bec0c2';
+            if (!settings.style.toDo.color) {
+                settings.style.toDo.color = '#bec0c2';
             }
             if (!settings.style.toDo.stroke) {
                 settings.style.toDo.stroke = settings.style.backgroundColor;
             }
-            if (!settings.style.toDo.color) {
-                settings.style.toDo.color = '#bec0c2';
-            }
         }
         if (!settings.style.progress) {
             settings.style.progress = {
-                fill: '#808285',
-                stroke: settings.style.backgroundColor,
                 color: '#808285',
+                stroke: settings.style.backgroundColor
             }
         } else {
-            if (!settings.style.progress.fill) {
-                settings.style.progress.fill = '#808285';
+            if (!settings.style.progress.color) {
+                settings.style.progress.color = '#808285';
             }
             if (!settings.style.progress.stroke) {
                 settings.style.progress.stroke = settings.style.backgroundColor;
             }
-            if (!settings.style.progress.color) {
-                settings.style.progress.color = '#808285';
-            }
         }
         if (!settings.style.done) {
             settings.style.done = {
-                fill: '#222',
-                stroke: settings.style.backgroundColor,
                 color: '#222',
+                stroke: settings.style.backgroundColor
             }
         } else {
-            if (!settings.style.done.fill) {
-                settings.style.done.fill = '#222';
+            if (!settings.style.done.color) {
+                settings.style.done.color = '#222';
             }
             if (!settings.style.done.stroke) {
                 settings.style.done.stroke = settings.style.backgroundColor;
-            }
-            if (!settings.style.done.color) {
-                settings.style.done.color = '#222';
             }
         }
         if (!settings.style.predict) {
             settings.style.predict = {
                 backgroundColor: settings.style.backgroundColor,
-                color: settings.style.color
+                color: settings.style.done.color
             }
         } else {
             if (!settings.style.predict.backgroundColor) {
-                settings.style.predict.backgroundColor = settings.style.color;
+                settings.style.predict.backgroundColor = settings.style.backgroundColor;
             }
             if (!settings.style.predict.color) {
-                settings.style.predict.color = settings.style.backgroundColor;
+                settings.style.predict.color = settings.style.done.color;
             }
         }
         if (!settings.style.marker) {
@@ -227,21 +209,12 @@ function validateStyles(settings) {
                 settings.style.marker.color = settings.style.color;
             }
         }
-        if (!settings.style.legend) {
-            settings.style.legend = {
-                color: settings.style.color
-            }
-        } else {
-            if (!settings.style.legend.color) {
-                settings.style.legend.color = settings.style.color;
-            }
-        }
     }
 }
 
-function validateDraw(settings) {
-    if (!settings.draw) {
-        settings.draw = ['axis', 'legend', 'markers', 'predict'];
+function validateDrawOptions(settings) {
+    if (!settings.drawOptions) {
+        settings.drawOptions = ['axis', 'legend', 'markers', 'predict'];
     }
 }
 
@@ -378,11 +351,11 @@ function drawLayers(settings) {
         .attr('class', 'area')
         .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
-                return settings.style.progress.fill;
+                return settings.style.progress.color;
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.style.done.fill;
+                return settings.style.done.color;
             }
-            return settings.style.toDo.fill;
+            return settings.style.toDo.color;
         })
         .style('stroke', function (d) {
             if (isProgressStatus(d.key, settings)) {
@@ -395,7 +368,7 @@ function drawLayers(settings) {
         .style('stroke-width', '.5')
         .attr('d', settings.area)
 
-    if (settings.draw.includes('legend')) {
+    if (settings.drawOptions.includes('legend')) {
         layer.filter(function (d) {
             return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
         })
@@ -586,7 +559,7 @@ function drawLegend(settings) {
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
-            .style('fill', settings.style.legend.color)
+            .style('fill', settings.style.color)
             .text(settings.title);
     }
 
@@ -631,7 +604,7 @@ function drawLegend(settings) {
         .attr('font-size', settings.style.fontSize + 'px')
         .attr('font-family', settings.style.fontFamily)
         .style('text-anchor', 'start')
-        .style('fill', settings.style.legend.color)
+        .style('fill', settings.style.color)
         .text(settings.data.unit == 'points' ? 'Story Points' : 'Issues');
 }
 
@@ -664,16 +637,16 @@ CFD.prototype.draw = function () {
     prepareDataFunctions(this.settings);
     drawLayers(this.settings);
 
-    if (this.settings.draw.includes('predict')) {
+    if (this.settings.drawOptions.includes('predict')) {
         drawPrediction(this.settings);
     }
-    if (this.settings.draw.includes('markers')) {
+    if (this.settings.drawOptions.includes('markers')) {
         drawMarkers(this.settings);
     }
-    if (this.settings.draw.includes('axis')) {
+    if (this.settings.drawOptions.includes('axis')) {
         drawAxis(this.settings);
     }
-    if (this.settings.draw.includes('legend')) {
+    if (this.settings.drawOptions.includes('legend')) {
         drawLegend(this.settings);
     }
 }
