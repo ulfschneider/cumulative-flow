@@ -1,30 +1,36 @@
 {
-  "name": "cumulative-flow",
-  "version": "0.5.0",
-  "description": "Draw Cumulative Flow Diagrams",
-  "main": "cfd.js",
-  "scripts": {
-    "test": "jest",
-    "coverage": "jest --collectCoverageFrom=src/**.js --coverage"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ulfschneider/cumulative-flow.git"
-  },
-  "author": "Ulf Schneider",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ulfschneider/cumulative-flow/issues"
-  },
-  "homepage": "https://github.com/ulfschneider/cumulative-flow#readme",
-  "dependencies": {
-    "d3": "^5.7.0",
-    "js-base64": "^2.4.9",
-    "moment": "^2.22.2"
-  },
-  "devDependencies": {
-    "fs": "0.0.1-security",
-    "jest": "^23.5.0",
-    "jsdom": "^12.0.0"
-  }
+    "name": "cumulative-flow",
+    "version": "0.5.0",
+    "description": "Draw Cumulative Flow Diagrams",
+    "main": "cfd.js",
+    "scripts": {
+        "test": "jest",
+        "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    },
+    "jest": {
+        "verbose": true,
+        "testURL": "http://localhost/",
+        "collectCoverage": true
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ulfschneider/cumulative-flow.git"
+    },
+    "author": "Ulf Schneider",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ulfschneider/cumulative-flow/issues"
+    },
+    "homepage": "https://github.com/ulfschneider/cumulative-flow#readme",
+    "dependencies": {
+        "d3": "^5.7.0",
+        "js-base64": "^2.4.9",
+        "moment": "^2.22.2"
+    },
+    "devDependencies": {
+        "fs": "0.0.1-security",
+        "jest": "^23.5.0",
+        "jsdom": "^12.0.0",
+        "coveralls": "^3.0.2"
+    }
 }

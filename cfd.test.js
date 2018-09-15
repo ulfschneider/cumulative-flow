@@ -301,7 +301,6 @@ test('validate style', () => {
     expect(settings.style.predict.color).toBe(color);
     expect(settings.style.marker.backgroundColor).toBe(background);
     expect(settings.style.marker.color).toBe(color);
-
 });
 
 
@@ -335,5 +334,5 @@ test('validate image', () => {
 
     expect(svg).toBe(IMAGE);
 
-    //look at ./cfd.html to view the result
+    //have a look at ./cfd.html to view the result
 });
