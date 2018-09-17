@@ -232,6 +232,10 @@ function prepareSVG(settings) {
     }
 }
 
+function dy(settings) {
+    return settings.style.fontSize / 3 + 'px';
+}
+
 function prepareScales(settings) {
     settings.x = d3.scaleTime()
         .range([0, settings.innerWidth]);
@@ -272,16 +276,10 @@ function prepareDataFunctions(settings) {
     }
     settings.x.domain(xRange);
 
-    settings.keys = [];
-    if (settings.data.done) {
-        settings.keys = settings.data.done;
-    }
-    if (settings.data.progress) {
-        settings.keys = settings.keys.concat(settings.data.progress);
-    }
-    if (settings.data.toDo) {
-        settings.keys = settings.keys.concat(settings.data.toDo);
-    }
+    settings.keys = settings.data.done;
+    settings.keys = settings.keys.concat(settings.data.progress);
+    settings.keys = settings.keys.concat(settings.data.toDo);
+
     settings.stack.keys(settings.keys);
     settings.y.domain([0, d3.max(settings.data.entries, function (d) {
         let sum = 0;
@@ -377,7 +375,7 @@ function drawLayers(settings) {
             .attr('y', function (d) {
                 return settings.y(d[d.length - 1][1]);
             })
-            .attr('dy', '.35em')
+            .attr('dy', dy(settings))
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
@@ -472,7 +470,7 @@ function drawPrediction(settings) {
             settings.g.append('text')
                 .attr('x', x3 - 5)
                 .attr('y', -35)
-                .attr('dy', '.35em')
+                .attr('dy', dy(settings))
                 .attr('font-size', settings.style.fontSize)
                 .attr('font-family', settings.style.fontFamily)
                 .style('text-anchor', 'end')
@@ -487,9 +485,9 @@ function isDateInRange(date, settings) {
     let dataFromDate, dataToDate;
     let momentDate = moment(date);
 
-    if (settings.data.length) {
-        dataFromDate = moment(settings.data[0].date);
-        dataToDate = moment(settings.data[settings.data.length - 1].date);
+    if (settings.data.entries.length) {
+        dataFromDate = moment(settings.data.entries[0].date);
+        dataToDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
     }
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
@@ -531,7 +529,7 @@ function drawMarkers(settings) {
         settings.g.append('text')
             .attr('x', x1)
             .attr('y', -15)
-            .attr('dy', '.35em')
+            .attr('dy', dy(settings))
             .attr('font-size', settings.style.fontSize)
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'middle')
@@ -550,62 +548,63 @@ function drawMarkers(settings) {
 
 function drawLegend(settings) {
 
-    //title 
-    if (settings.title) {
+    const X = 5;
+    const lineHeight = settings.style.fontSize;
+
+    const drawLegendItem = function ({ text, x, y, fill }) {
         settings.g.append('text')
-            .attr('x', 5)
-            .attr('y', -55)
-            .attr('dy', '.35em')
+            .attr('x', x)
+            .attr('y', y)
+            .attr('dy', dy(settings))
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
-            .style('fill', settings.style.color)
-            .text(settings.title);
+            .style('fill', fill)
+            .text(text);
+    }
+
+    //title 
+    if (settings.title) {
+        drawLegendItem({
+            text: settings.title,
+            x: X,
+            y: -55,
+            fill: settings.style.color
+        });
     }
 
     //toDo legend
-    settings.g.append('text')
-        .attr('x', 5)
-        .attr('y', 0)
-        .attr('dy', settings.style.fontSize + 'px')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', settings.style.toDo.color)
-        .text('To Do');
+    drawLegendItem({
+        text: 'To Do',
+        x: X,
+        y: lineHeight,
+        fill: settings.style.toDo.color
+    });
 
     //progress legend
-    settings.g.append('text')
-        .attr('x', 5)
-        .attr('y', 15)
-        .attr('dy', settings.style.fontSize + 'px')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', settings.style.progress.color)
-        .text('In Progress');
+    drawLegendItem({
+        text: 'In Progress',
+        x: X,
+        y: lineHeight * 2,
+        fill: settings.style.progress.color
+    });
 
     //done legend
-    settings.g.append('text')
-        .attr('x', 5)
-        .attr('y', 30)
-        .attr('dy', settings.style.fontSize + 'px')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', settings.style.done.color)
-        .text('Done');
+    drawLegendItem({
+        text: 'Done',
+        x: X,
+        y: lineHeight * 3,
+        fill: settings.style.done.color
+    });
 
     //unit
-    let counting = settings.g.append('text')
-        .attr('x', settings.innerWidth + 50)
-        .attr('y', -35)
-        .attr('dy', '.35em')
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
-        .style('fill', settings.style.color)
-        .text(settings.data.unit == 'points' ? 'Story Points' : 'Issues');
+    drawLegendItem({
+        text: settings.data.unit == 'points' ? 'Story Points' : 'Issues',
+        x: settings.innerWidth + 50,
+        y: -35,
+        fill: settings.style.color
+
+    });
 }
 
 
