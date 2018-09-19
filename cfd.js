@@ -1,8 +1,8 @@
 'use babel';
 
-let d3 = require('d3');
-let moment = require('moment');
-let Base64 = require('js-base64').Base64;
+const d3 = require('d3');
+const moment = require('moment');
+const Base64 = require('js-base64').Base64;
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
@@ -304,7 +304,7 @@ function drawAxis(settings) {
 
     let xAxis = settings.g.append('g')
         .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-        .call(d3.axisBottom(settings.x).ticks(d3.timeWeek));
+        .call(d3.axisBottom(settings.x));
     xAxis
         .selectAll('path')
         .style('stroke', settings.style.axis.color);
@@ -413,7 +413,7 @@ function drawPrediction(settings) {
 
         let startDate = moment(settings.predict);
         let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-        if (startDate && startDate.isBefore(currentDate) && isDateInRange(startDate, settings)) {
+        if (startDate && startDate.isBefore(currentDate)) {
             let x1 = settings.x(startDate);
             let x2 = settings.x(currentDate);
             let y1 = settings.y(summarizeDone(startDate));
@@ -430,6 +430,14 @@ function drawPrediction(settings) {
                 return moment((x - c) / m);
             }
 
+            //x0 and y0 in case the predict date is not in date range
+            let x0 = x1;
+            let y0 = y1;
+            if (!isDateInRange(startDate, settings)  && startDate.isBefore(currentDate)) {
+                x0 = settings.x(settings.fromDate ? settings.fromDate : settings.data.entries[0].date);
+                y0 = y1 + m * (x0 - x1);                                
+            }
+
             let x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
             let y3 = y1 + m * (x3 - x1);
             if (y3 < 0) {
@@ -438,15 +446,15 @@ function drawPrediction(settings) {
             }
 
             settings.g.append('line')
-                .attr('x1', x1)
-                .attr('y1', y1)
+                .attr('x1', x0)
+                .attr('y1', y0)
                 .attr('x2', x3)
                 .attr('y2', y3)
                 .style('stroke-width', '3')
                 .style('stroke', settings.style.predict.backgroundColor);
             settings.g.append('line')
-                .attr('x1', x1)
-                .attr('y1', y1)
+                .attr('x1', x0)
+                .attr('y1', y0)
                 .attr('x2', x3)
                 .attr('y2', y3)
                 .style('stroke-width', '1')
@@ -485,10 +493,8 @@ function isDateInRange(date, settings) {
     let dataFromDate, dataToDate;
     let momentDate = moment(date);
 
-    if (settings.data.entries.length) {
-        dataFromDate = moment(settings.data.entries[0].date);
-        dataToDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-    }
+    dataFromDate = moment(settings.data.entries[0].date);
+    dataToDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
         return false;
