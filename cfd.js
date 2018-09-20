@@ -214,7 +214,7 @@ function validateStyles(settings) {
 
 function validateDrawOptions(settings) {
     if (!settings.drawOptions) {
-        settings.drawOptions = ['axis', 'legend', 'markers', 'predict'];
+        settings.drawOptions = ['title', 'axis', 'legend', 'markers', 'predict'];
     }
 }
 
@@ -302,37 +302,39 @@ function isDoneStatus(status, settings) {
 
 function drawAxis(settings) {
 
-    let xAxis = settings.g.append('g')
-        .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-        .call(d3.axisBottom(settings.x));
-    xAxis
-        .selectAll('path')
-        .style('stroke', settings.style.axis.color);
-    xAxis
-        .selectAll('line')
-        .style('stroke', settings.style.axis.color);
-    xAxis
-        .selectAll('text')
-        .style('fill', settings.style.axis.color)
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily);
+    if (settings.drawOptions.includes('axis')) {
+        let xAxis = settings.g.append('g')
+            .attr('transform', 'translate(0,' + settings.innerHeight + ')')
+            .call(d3.axisBottom(settings.x));
+        xAxis
+            .selectAll('path')
+            .style('stroke', settings.style.axis.color);
+        xAxis
+            .selectAll('line')
+            .style('stroke', settings.style.axis.color);
+        xAxis
+            .selectAll('text')
+            .style('fill', settings.style.axis.color)
+            .attr('font-size', settings.style.fontSize + 'px')
+            .attr('font-family', settings.style.fontFamily);
 
 
 
-    let yAxis = settings.g.append('g')
-        .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
-        .call(d3.axisRight(settings.y).ticks(5));
-    yAxis
-        .selectAll('path')
-        .style('stroke', settings.style.axis.color);
-    yAxis
-        .selectAll('line')
-        .style('stroke', settings.style.axis.color);
-    yAxis
-        .selectAll('text')
-        .style('fill', settings.style.axis.color)
-        .attr('font-size', settings.style.fontSize + 'px')
-        .attr('font-family', settings.style.fontFamily);
+        let yAxis = settings.g.append('g')
+            .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
+            .call(d3.axisRight(settings.y).ticks(5));
+        yAxis
+            .selectAll('path')
+            .style('stroke', settings.style.axis.color);
+        yAxis
+            .selectAll('line')
+            .style('stroke', settings.style.axis.color);
+        yAxis
+            .selectAll('text')
+            .style('fill', settings.style.axis.color)
+            .attr('font-size', settings.style.fontSize + 'px')
+            .attr('font-family', settings.style.fontFamily);
+    }
 }
 
 function drawLayers(settings) {
@@ -409,72 +411,68 @@ function drawPrediction(settings) {
         return 0;
     }
 
-    if (settings.predict) {
+    if (settings.drawOptions.includes('predict') && settings.predict) {
 
-        let startDate = moment(settings.predict);
+        let predictStart = moment(settings.predict);
         let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-        if (startDate && startDate.isBefore(currentDate)) {
-            let x1 = settings.x(startDate);
+        if (predictStart.isBefore(currentDate)) {
+            //x1, x2, y1, y2 to calculate the line parameters
+            let x1 = settings.x(predictStart);
             let x2 = settings.x(currentDate);
-            let y1 = settings.y(summarizeDone(startDate));
+            let y1 = settings.y(summarizeDone(predictStart));
             let y2 = settings.y(summarizeDone(currentDate));
             let m = (y2 - y1) / (x2 - x1);
+            const X_TRIM = 2; //do not draw the prediction line direct on to of y axis
 
             let predictX = function () {
                 return -y1 / m + x1;
             }
 
+            let yFromX = function (x) {
+                return y1 + m * (x - x1);
+            }
+
             let dateFromX = function (x) {
-                let m = (x2 - x1) / (currentDate - startDate);
-                let c = x1 - m * startDate;
+                let m = (x2 - x1) / (currentDate - predictStart);
+                let c = x1 - m * predictStart;
                 return moment((x - c) / m);
             }
 
-            //x0 and y0 in case the predict date is not in date range
+            //x0 and y0 to be used for the real start point of the line
             let x0 = x1;
             let y0 = y1;
-            if (!isDateInRange(startDate, settings)  && startDate.isBefore(currentDate)) {
+            if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
                 x0 = settings.x(settings.fromDate ? settings.fromDate : settings.data.entries[0].date);
-                y0 = y1 + m * (x0 - x1);                                
+                y0 = yFromX(x0);
             }
 
-            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate);
-            let y3 = y1 + m * (x3 - x1);
+            //x3 and y3 to be used for the real end point of the line
+            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
+            let y3 = yFromX(x3);
             if (y3 < 0) {
-                x3 = -y1 / m + x1;
-                y3 = y1 + m * (x3 - x1);
+                x3 = -y1 / m + x1 - X_TRIM;
+                y3 = yFromX(x3);
             }
 
-            settings.g.append('line')
-                .attr('x1', x0)
-                .attr('y1', y0)
-                .attr('x2', x3)
-                .attr('y2', y3)
+            let pathData = [{ x: x0, y: y0 }, { x: x3, y: y3 }, { x: x3, y: -35 }];
+            let lineFunction = d3.line()
+                .x(function (d) { return d.x; })
+                .y(function (d) { return d.y; });
+
+            settings.g.append('path')
+                .attr('d', lineFunction(pathData))
+                .attr('fill', 'none')
                 .style('stroke-width', '3')
                 .style('stroke', settings.style.predict.backgroundColor);
-            settings.g.append('line')
-                .attr('x1', x0)
-                .attr('y1', y0)
-                .attr('x2', x3)
-                .attr('y2', y3)
+
+            settings.g.append('path')
+                .attr('d', lineFunction(pathData))
+                .attr('fill', 'none')
                 .style('stroke-width', '1')
                 .style('stroke', settings.style.predict.color);
 
-            settings.g.append('line')
-                .attr('x1', x3)
-                .attr('y1', y3)
-                .attr('x2', x3)
-                .attr('y2', -35)
-                .style('stroke-width', '3')
-                .style('stroke', settings.style.predict.backgroundColor);
-            settings.g.append('line')
-                .attr('x1', x3)
-                .attr('y1', y3)
-                .attr('x2', x3)
-                .attr('y2', -35)
-                .style('stroke-width', '1')
-                .style('stroke', settings.style.predict.color);
-
+            let predictDate = dateFromX(predictX());
+            let futureHint = predictX() - X_TRIM > x3 ? ' →' : '';
             settings.g.append('text')
                 .attr('x', x3 - 5)
                 .attr('y', -35)
@@ -483,7 +481,7 @@ function drawPrediction(settings) {
                 .attr('font-family', settings.style.fontFamily)
                 .style('text-anchor', 'end')
                 .style('fill', settings.style.predict.color)
-                .text(dateFromX(predictX()).format(DATE_FORMAT));
+                .text(predictDate.format(DATE_FORMAT) + futureHint);
 
         }
     }
@@ -498,13 +496,13 @@ function isDateInRange(date, settings) {
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
         return false;
-    } else if (!settings.fromDate && dataFromDate && momentDate.isBefore(dataFromDate)) {
+    } else if (!settings.fromDate && momentDate.isBefore(dataFromDate)) {
         return false;
     }
 
     if (settings.toDate && momentDate.isAfter(settings.toDate)) {
         return false;
-    } else if (!settings.toDate && dataToDate && momentDate.isAfter(dataToDate)) {
+    } else if (!settings.toDate && momentDate.isAfter(dataToDate)) {
         return false;
     }
     return true;
@@ -543,7 +541,7 @@ function drawMarkers(settings) {
             .text(label ? label : moment(date).format(DATE_FORMAT));
     }
 
-    if (settings.markers) {
+    if (settings.drawOptions.includes('markers') && settings.markers) {
         settings.markers.forEach(m => {
             if (isDateInRange(m.date, settings)) {
                 mark(m.date, m.label);
@@ -569,48 +567,52 @@ function drawLegend(settings) {
             .text(text);
     }
 
-    //title 
-    if (settings.title) {
-        drawLegendItem({
-            text: settings.title,
-            x: X,
-            y: -55,
-            fill: settings.style.color
-        });
+    if (settings.drawOptions.includes('title')) {
+        //title 
+        if (settings.title) {
+            drawLegendItem({
+                text: settings.title,
+                x: X,
+                y: -55,
+                fill: settings.style.color
+            });
+        }
     }
 
-    //toDo legend
-    drawLegendItem({
-        text: 'To Do',
-        x: X,
-        y: lineHeight,
-        fill: settings.style.toDo.color
-    });
+    if (settings.drawOptions.includes('legend')) {
+        //toDo legend
+        drawLegendItem({
+            text: 'To Do',
+            x: X,
+            y: lineHeight,
+            fill: settings.style.toDo.color
+        });
 
-    //progress legend
-    drawLegendItem({
-        text: 'In Progress',
-        x: X,
-        y: lineHeight * 2,
-        fill: settings.style.progress.color
-    });
+        //progress legend
+        drawLegendItem({
+            text: 'In Progress',
+            x: X,
+            y: lineHeight * 2,
+            fill: settings.style.progress.color
+        });
 
-    //done legend
-    drawLegendItem({
-        text: 'Done',
-        x: X,
-        y: lineHeight * 3,
-        fill: settings.style.done.color
-    });
+        //done legend
+        drawLegendItem({
+            text: 'Done',
+            x: X,
+            y: lineHeight * 3,
+            fill: settings.style.done.color
+        });
 
-    //unit
-    drawLegendItem({
-        text: settings.data.unit == 'points' ? 'Story Points' : 'Issues',
-        x: settings.innerWidth + 50,
-        y: -35,
-        fill: settings.style.color
+        //unit
+        drawLegendItem({
+            text: settings.data.unit == 'points' ? 'Story Points' : 'Issues',
+            x: settings.innerWidth + 50,
+            y: -35,
+            fill: settings.style.color
 
-    });
+        });
+    }
 }
 
 
@@ -641,19 +643,10 @@ CFD.prototype.draw = function () {
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
     drawLayers(this.settings);
-
-    if (this.settings.drawOptions.includes('predict')) {
-        drawPrediction(this.settings);
-    }
-    if (this.settings.drawOptions.includes('markers')) {
-        drawMarkers(this.settings);
-    }
-    if (this.settings.drawOptions.includes('axis')) {
-        drawAxis(this.settings);
-    }
-    if (this.settings.drawOptions.includes('legend')) {
-        drawLegend(this.settings);
-    }
+    drawPrediction(this.settings);
+    drawMarkers(this.settings);
+    drawAxis(this.settings);
+    drawLegend(this.settings);
 }
 
 /**
