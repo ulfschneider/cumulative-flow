@@ -305,7 +305,7 @@ function drawAxis(settings) {
     if (settings.drawOptions.includes('axis')) {
         let xAxis = settings.g.append('g')
             .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-            .call(d3.axisBottom(settings.x));
+            .call(d3.axisBottom(settings.x).ticks(Math.floor(settings.innerWidth / 100)));
         xAxis
             .selectAll('path')
             .style('stroke', settings.style.axis.color);
@@ -322,7 +322,7 @@ function drawAxis(settings) {
 
         let yAxis = settings.g.append('g')
             .attr('transform', 'translate(' + settings.innerWidth + ' ,0)')
-            .call(d3.axisRight(settings.y).ticks(5));
+            .call(d3.axisRight(settings.y).ticks(Math.floor(settings.innerHeight / 50)));
         yAxis
             .selectAll('path')
             .style('stroke', settings.style.axis.color);
