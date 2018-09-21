@@ -563,6 +563,23 @@ test('image 1 with default test data', () => {
     expect(actual1).toBe(EXPECT1);
 });
 
+test('ISO 6801 date strings', () => {
+    let settings = makeTestSettings();
+    settings.title = 'Testing CFD';
+    settings.fromDate = moment(settings.fromDate).format('YYYY-MM-DD');
+    settings.toDate = moment(settings.toDate).format('YYYY-MM-DD');
+    settings.predict = moment(settings.predict).format('YYYY-MM-DD');
+    settings.markers.forEach(marker => {
+        marker.date = moment(marker.date).format('YYYY-MM-DD');
+    });
+    settings.data.entries.forEach(d => {
+        d.date = moment(d.date).format('YYYY-MM-DD');
+    });
+    let diagram = cfd(settings);
+    let actual1 = diagram.image();
+    expect(actual1).toBe(EXPECT1);
+});
+
 test('image 2 without fromDate and toDate', () => {
     let settings = makeTestSettings();
     delete settings.fromDate

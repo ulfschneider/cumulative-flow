@@ -512,7 +512,7 @@ function isDateInRange(date, settings) {
 function drawMarkers(settings) {
 
     let mark = function (date, label) {
-        let x1 = settings.x(date);
+        let x1 = settings.x(moment(date));
         let y1 = settings.innerHeight;
         let y2 = 0;
         settings.g.append('line')
