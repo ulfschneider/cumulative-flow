@@ -118,7 +118,7 @@ function validateStyles(settings) {
             backgroundColor: settings.style.backgroundColor,
             color: settings.style.done.color
         };
-        settings.style.marker = {
+        settings.style.markers = {
             backgroundColor: settings.style.backgroundColor,
             color: settings.style.color
         };
@@ -196,17 +196,17 @@ function validateStyles(settings) {
                 settings.style.predict.color = settings.style.done.color;
             }
         }
-        if (!settings.style.marker) {
-            settings.style.marker = {
+        if (!settings.style.markers) {
+            settings.style.markers = {
                 backgroundColor: settings.style.backgroundColor,
                 color: settings.style.color
             }
         } else {
-            if (!settings.style.marker.backgroundColor) {
-                settings.style.marker.backgroundColor = settings.style.backgroundColor;
+            if (!settings.style.markers.backgroundColor) {
+                settings.style.markers.backgroundColor = settings.style.backgroundColor;
             }
-            if (!settings.style.marker.color) {
-                settings.style.marker.color = settings.style.color;
+            if (!settings.style.markers.color) {
+                settings.style.markers.color = settings.style.color;
             }
         }
     }
@@ -521,14 +521,14 @@ function drawMarkers(settings) {
             .attr('x2', x1)
             .attr('y2', y2)
             .style('stroke-width', '3')
-            .style('stroke', settings.style.marker.backgroundColor);
+            .style('stroke', settings.style.markers.backgroundColor);
         settings.g.append('line')
             .attr('x1', x1)
             .attr('y1', y1)
             .attr('x2', x1)
             .attr('y2', y2)
             .style('stroke-width', '1')
-            .style('stroke', settings.style.marker.color);
+            .style('stroke', settings.style.markers.color);
 
         settings.g.append('text')
             .attr('x', x1)
@@ -537,7 +537,7 @@ function drawMarkers(settings) {
             .attr('font-size', settings.style.fontSize)
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'middle')
-            .style('fill', settings.style.marker.color)
+            .style('fill', settings.style.markers.color)
             .text(label ? label : moment(date).format(DATE_FORMAT));
     }
 

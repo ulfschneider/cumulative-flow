@@ -355,8 +355,8 @@ test('default style', () => {
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
     expect(settings.style.predict.color).toBe(done);
-    expect(settings.style.marker.backgroundColor).toBe(background);
-    expect(settings.style.marker.color).toBe(color);
+    expect(settings.style.markers.backgroundColor).toBe(background);
+    expect(settings.style.markers.color).toBe(color);
 });
 
 test('fontSize, fontFamily, default color and default background', () => {
@@ -390,8 +390,8 @@ test('fontSize, fontFamily, default color and default background', () => {
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
     expect(settings.style.predict.color).toBe(done);
-    expect(settings.style.marker.backgroundColor).toBe(background);
-    expect(settings.style.marker.color).toBe(color);
+    expect(settings.style.markers.backgroundColor).toBe(background);
+    expect(settings.style.markers.color).toBe(color);
 });
 
 test('colors toDo, progress, done, axis, default color and background', () => {
@@ -420,7 +420,7 @@ test('colors toDo, progress, done, axis, default color and background', () => {
     settings.style.predict = {
         color: progress
     };
-    settings.style.marker = {
+    settings.style.markers = {
         color: toDo
     }
     settings.style.axis = {
@@ -440,8 +440,8 @@ test('colors toDo, progress, done, axis, default color and background', () => {
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
     expect(settings.style.predict.color).toBe(progress);
-    expect(settings.style.marker.backgroundColor).toBe(background);
-    expect(settings.style.marker.color).toBe(toDo);
+    expect(settings.style.markers.backgroundColor).toBe(background);
+    expect(settings.style.markers.color).toBe(toDo);
 });
 
 test('stroke colors, empty axis color', () => {
@@ -466,7 +466,7 @@ test('stroke colors, empty axis color', () => {
     settings.style.predict = {
         backgroundColor: color
     };
-    settings.style.marker = {
+    settings.style.markers = {
         backgroundColor: color
     };
     settings.style.axis = {};
@@ -485,8 +485,8 @@ test('stroke colors, empty axis color', () => {
     expect(settings.style.done.stroke).toBe(done);
     expect(settings.style.predict.backgroundColor).toBe(color);
     expect(settings.style.predict.color).toBe(color);
-    expect(settings.style.marker.backgroundColor).toBe(color);
-    expect(settings.style.marker.color).toBe(color);
+    expect(settings.style.markers.backgroundColor).toBe(color);
+    expect(settings.style.markers.color).toBe(color);
 });
 
 test('no data', () => {
