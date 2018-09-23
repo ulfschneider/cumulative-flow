@@ -8,41 +8,121 @@ Draw SVG Cumulative Flow Diagrams and use the option to indicate the anticipated
 
 ## Usage
 
-Install in your Node project with <code>npm i cumulative-flow</code> and use it inside your code via <code>const cfd = require('cumulative-flow');</code> or, alternatively <code>import cfd from 'cfd';</code>
+Install in your Node project with 
+```
+npm i cumulative-flow
+``` 
+and use it inside your code via 
+```
+const cfd = require('cumulative-flow');
+```
+or, alternatively 
+```
+import cfd from 'cfd';
+```
 
-## Draw a Diagram
+Create then new cfd objects via
+```
+let cfd = cfd(settings);
+```
+Where settings is the configuration object for the drawing.
 
-Drawing on the client, where you have access to the DOM tree of your document.
-<pre><code>
-let settings = {
-    title: 'My CFD Diagram', //optional
-    svg: document.getElementById('cfd-diagram'),
-    fromDate: '2018-09-01', 
-    toDate: '2018-09-15', 
-    predict: '2018-09-01', 
-    marker: \[
-        {date: '2018-09-03', label: 'm1'},
-        {date: '2018-09-10', label: 'm2'}
-    \],
-    data: {
+## Settings
+
+-   `settings` **[Object][6]** The configuration object for the diagram.
+    All data for the diagram is provided with this object.
+    In this configuration object, whenever a date is to be given, it can be an
+    [ISO 8601 String][7]
+    or a JavaScript [Date][8] object.
+    A [Moment][9] object is also fine.
+    -   `settings.title` **[String][10]?** The title for the diagram.
+    -   `settings.svg` **[Object][6]** The DOM tree element, wich must be an svg tag.
+        The diagram will be attached to this DOM tree element. Example:<pre><code>settings.svg= document.getElementById('cfd-diagram');
+        </code></pre>'cfd-diagram' is the id of a svg tag.
+    -   `settings.fromDate` **([String][10] \| [Date][11])?** The start date for the diagram. Example:<pre><code>settings.fromDate = '2018-09-01';</code></pre>
+    -   `settings.toDate` **([String][10] \| [Date][11])?** The end date for the diagram. Example:<pre><code>settings.fromDate = '2018-09-05';</code></pre>
+    -   `settings.predict` **([String][10] \| [Date][11])?** To draw an indication line for the completion of work.
+        The predict argument determines at what date to start drawing the line. Example:<pre><code>settings.fromDate = '2018-09-01';</code></pre>
+    -   `settings.markers` **[Array][12]&lt;{date: ([String][10] \| [Date][11]), label: [String][10]}>?** Highlight specific dates of inside of the diagram
+        with a markers, where each marker is an object with a date for the marker
+        and an optional label for the marker. Example:<pre><code>settings.markers = [
+        { date: '2018-09-03', label: 'M1' },
+        { date: '2018-09-10', label: 'M2' }];</code></pre>
+    -   `settings.data` **{toDo: [Array][12]&lt;[String][10]>, progress: [Array][12]&lt;[String][10]>, done: [Array][12]&lt;[String][10]>, unit: [String][10], entries: [Array][12]&lt;[Object][6]>}** The data for the diagram. Example:<pre><code>settings.data = {
         toDo: ['new'],
-        progress: ['test', 'dev'], 
-        done: ['done'], 
-        unit: 'points', 
-        entries: \[
-            { date: '2018-09-03', new: 0, dev: 0, test: 0, done: 0 },  
-            { date: '2018-09-04', new: 1, dev: 0, test: 0, done: 0 },             
-            { date: '2018-09-05', new: 1, dev: 1, test: 0, done: 0 },            
-            { date: '2018-09-06', new: 1, dev: 0, test: 1, done: 1 },                        
-            { date: '2018-09-07', new: 2, dev: 1, test: 0, done: 2 },            
-            { date: '2018-09-08', new: 1, dev: 1, test: 2, done: 2 },                        
-            { date: '2018-09-09', new: 0, dev: 0, test: 1, done: 5 },                                    
-            { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 },                                                
-        \]
-    }
-};
-let diagram = cfd(settings);
-diagram.draw();
-</code></pre>
+        progress: ['test', 'dev'],
+        done: ['done'],
+        unit: 'points',
+        entries: [
+        { date: '2018-09-03', new: 0, dev: 0, test: 0, done: 0 },
+        { date: '2018-09-04', new: 1, dev: 0, test: 0, done: 0 },
+        { date: '2018-09-05', new: 1, dev: 1, test: 0, done: 0 },
+        { date: '2018-09-06', new: 1, dev: 0, test: 1, done: 1 },
+        { date: '2018-09-07', new: 2, dev: 1, test: 0, done: 2 },
+        { date: '2018-09-08', new: 1, dev: 1, test: 2, done: 2 },
+        { date: '2018-09-09', new: 0, dev: 0, test: 1, done: 5 },
+        { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 }
+        ]
+        }
+        </code></pre>Each entry object must contain a date and the status counts for the
+        toDo, progress and done status categories.
+        The unit is the unit of measurement for the status counts.
+        A value of <code>points</code> indicates story points.
+        An omitted unit will lead to interpreting the status counts as issue counts.
+        The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
+        must contain the status values as strings that belong exactly to those categories.
+        The rendering of the layers in the Cumulate Flow Diagram will follow the order
+        of the status values provided inside of the status categories. All values of the
+        <code>done</code> status category are always renderen at the bottom of the diagram,
+        beginning from left to right. Then all <code>progress</code> status values, again leftto right.
+        Finally all <code>new</code> status values, of course left to right.
+        For the above example: The <code>done</code> status layer is at the bottom, followed by
+        the <code>test</code> and <code>dev</code> layer
+        and finally the new <code>layer</code> is getting rendered.
 
+## draw
 
+```
+cfd.draw();
+```
+Draw the Cumulative Flow Diagram inside of the provided ```settings.svg``` DOM tree element.
+
+### remove
+
+```
+cfd.remove();
+```
+Clear the diagram from the provided ```settings.svg``` DOM tree element
+
+### image
+
+```
+let inlineImage = cfd.image();
+```
+Draw the Cumulative Flow Diagram inside of the provided ```settings.svg``` DOM tree element and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+
+Returns **[string][10]**
+
+[1]: #cfd
+
+[2]: #parameters
+
+[3]: #draw
+
+[4]: #remove
+
+[5]: #image
+
+[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[7]: https://en.wikipedia.org/wiki/ISO_8601
+
+[8]: https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+[9]: https://momentjs.com
+
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
