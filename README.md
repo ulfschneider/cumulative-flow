@@ -65,21 +65,19 @@ cfd.draw();
 ```
 Draw the Cumulative Flow Diagram inside of the provided `settings.svg` DOM tree element.
 
-### remove
+## remove
 
 ```
 cfd.remove();
 ```
 Clear the diagram from the provided `settings.svg` DOM tree element
 
-### image
+## image
 
 ```
 let inlineImage = cfd.image();
 ```
 Draw the Cumulative Flow Diagram inside of the provided `settings.svg` DOM tree element and return the result as a string which can be assigned to the src attribute of an HTML img tag.
-
-Returns **[string][10]**
 
 [1]: #cfd
 
