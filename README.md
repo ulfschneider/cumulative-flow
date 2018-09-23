@@ -23,7 +23,7 @@ import cfd from 'cfd';
 
 Create then new cfd objects via
 ```
-let cfd = cfd(settings);
+let diagram = cfd(settings);
 ```
 Where settings is the configuration object for the drawing.
 
@@ -61,21 +61,21 @@ Each entry object must contain a date and the status counts for the `toDo`, `pro
 ## draw
 
 ```
-cfd.draw();
+diagram.draw();
 ```
 Draw the Cumulative Flow Diagram inside of the provided `settings.svg` DOM tree element.
 
 ## remove
 
 ```
-cfd.remove();
+diagram.remove();
 ```
 Clear the diagram from the provided `settings.svg` DOM tree element
 
 ## image
 
 ```
-let inlineImage = cfd.image();
+let inlineImage = diagram.image();
 ```
 Draw the Cumulative Flow Diagram inside of the provided `settings.svg` DOM tree element and return the result as a string which can be assigned to the src attribute of an HTML img tag.
 
