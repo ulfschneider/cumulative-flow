@@ -248,13 +248,13 @@ function prepareDataFunctions(settings) {
     settings.stack = d3.stack();
     settings.area = d3.area()
         //.curve(d3.curveStepAfter) - this kind of interpolation is more correct, but not very readable
-        .x(function(d) {
+        .x(function (d) {
             return settings.x(moment(d.data.date));
         })
-        .y0(function(d) {
+        .y0(function (d) {
             return settings.y(d[0]);
         })
-        .y1(function(d) {
+        .y1(function (d) {
             return settings.y(d[1]);
         });
 
@@ -264,7 +264,7 @@ function prepareDataFunctions(settings) {
         .startOf('day') : settings.toDate;
 
 
-    let xRange = d3.extent(settings.data.entries, function(d) {
+    let xRange = d3.extent(settings.data.entries, function (d) {
         return moment(d.date);
     });
 
@@ -281,7 +281,7 @@ function prepareDataFunctions(settings) {
     settings.keys = settings.keys.concat(settings.data.toDo);
 
     settings.stack.keys(settings.keys);
-    settings.y.domain([0, d3.max(settings.data.entries, function(d) {
+    settings.y.domain([0, d3.max(settings.data.entries, function (d) {
         let sum = 0;
         for (let i = 0, n = settings.keys.length; i < n; i++) {
             sum += d[settings.keys[i]];
@@ -339,7 +339,7 @@ function drawAxis(settings) {
 
 function drawLayers(settings) {
     let layer = settings.g.selectAll('.layer')
-        .data(settings.stack(settings.data.entries.filter(function(d) {
+        .data(settings.stack(settings.data.entries.filter(function (d) {
             return isDateInRange(d.date, settings);
         })))
         .enter()
@@ -349,7 +349,7 @@ function drawLayers(settings) {
     layer
         .append('path')
         .attr('class', 'area')
-        .style('fill', function(d) {
+        .style('fill', function (d) {
             if (isProgressStatus(d.key, settings)) {
                 return settings.style.progress.color;
             } else if (isDoneStatus(d.key, settings)) {
@@ -357,7 +357,7 @@ function drawLayers(settings) {
             }
             return settings.style.toDo.color;
         })
-        .style('stroke', function(d) {
+        .style('stroke', function (d) {
             if (isProgressStatus(d.key, settings)) {
                 return settings.style.progress.stroke;
             } else if (isDoneStatus(d.key, settings)) {
@@ -369,19 +369,19 @@ function drawLayers(settings) {
         .attr('d', settings.area)
 
     if (settings.drawOptions.includes('legend')) {
-        layer.filter(function(d) {
-                return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
-            })
+        layer.filter(function (d) {
+            return settings.y(d[d.length - 1][0]) - settings.y(d[d.length - 1][1]) >= settings.style.fontSize;
+        })
             .append('text')
             .attr('x', settings.innerWidth + 50)
-            .attr('y', function(d) {
+            .attr('y', function (d) {
                 return settings.y(d[d.length - 1][1]);
             })
             .attr('dy', dy(settings))
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
-            .style('fill', function(d) {
+            .style('fill', function (d) {
                 if (isProgressStatus(d.key, settings)) {
                     return settings.style.progress.color;
                 } else if (isDoneStatus(d.key, settings)) {
@@ -389,14 +389,14 @@ function drawLayers(settings) {
                 }
                 return settings.style.toDo.color;
             })
-            .text(function(d) {
+            .text(function (d) {
                 return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
             });
     }
 }
 
 function drawPrediction(settings) {
-    let summarizeDone = function(date) {
+    let summarizeDone = function (date) {
         for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
@@ -424,15 +424,15 @@ function drawPrediction(settings) {
             let m = (y2 - y1) / (x2 - x1);
             const X_TRIM = 2; //do not draw the prediction line direct on to of y axis
 
-            let predictX = function() {
+            let predictX = function () {
                 return -y1 / m + x1;
             }
 
-            let yFromX = function(x) {
+            let yFromX = function (x) {
                 return y1 + m * (x - x1);
             }
 
-            let dateFromX = function(x) {
+            let dateFromX = function (x) {
                 let m = (x2 - x1) / (currentDate - predictStart);
                 let c = x1 - m * predictStart;
                 return moment((x - c) / m);
@@ -465,10 +465,10 @@ function drawPrediction(settings) {
                 y: -35
             }];
             let lineFunction = d3.line()
-                .x(function(d) {
+                .x(function (d) {
                     return d.x;
                 })
-                .y(function(d) {
+                .y(function (d) {
                     return d.y;
                 });
 
@@ -524,7 +524,7 @@ function isDateInRange(date, settings) {
 
 function drawMarkers(settings) {
 
-    let mark = function(date, label) {
+    let mark = function (date, label) {
         let x1 = settings.x(moment(date));
         let y1 = settings.innerHeight;
         let y2 = 0;
@@ -568,7 +568,7 @@ function drawLegend(settings) {
     const X = 5;
     const lineHeight = settings.style.fontSize;
 
-    const drawLegendItem = function({
+    const drawLegendItem = function ({
         text,
         x,
         y,
@@ -638,69 +638,88 @@ function drawLegend(settings) {
 /**
  * A Cumulative Flow Diagram instance
  * @constructor
- * @param {Object} settings - The configuration object for the diagram.
-    All data for the diagram is provided with this object.
-    In this configuration object, whenever a date is to be given, it can be an
-    [ISO 8601 String](https://en.wikipedia.org/wiki/ISO_8601)
-    or a JavaScript [Date](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date) object.
-    A [Moment](https://momentjs.com) object is also fine.
+ * @param {Object} settings - The configuration object for the diagram. 
+ * All data for the diagram is provided with this object. 
+ * In this configuration object, whenever a date is to be given, 
+ * it can be an [ISO 8601 String](https://en.wikipedia.org/wiki/ISO_8601)
+ * or a JavaScript [Date](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date) object.
+ * A [Moment](https://momentjs.com) object is also fine.
  * @param {String} [settings.title] - The title for the diagram.
  * @param {Object} settings.svg - The DOM tree element, wich must be an svg tag.
-    The diagram will be attached to this DOM tree element. Example:
-    <pre><code>settings.svg = document.getElementById('cfd-diagram');
-    </code></pre>
-    'cfd-diagram' is the id of a svg tag.
+ * The diagram will be attached to this DOM tree element. Example:
+ * <pre>settings.svg = document.getElementById('cfd-diagram');</pre>
+ * <code>'cfd-diagram'</code> is the id of a svg tag.
+ * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margins for the diagram.
+ * Default values are:
+ * <pre>settings.margins = {
+ * top: 75,
+ * right: 210,
+ * bottom: 30,
+ * left: 40 }
+ * </pre>
  * @param {String|Date} [settings.fromDate] - The start date for the diagram. Example:
-    <pre><code>settings.fromDate = '2018-09-01';</code></pre>
+ * <pre>settings.fromDate = '2018-09-01';</pre>
  * @param {String|Date} [settings.toDate] - The end date for the diagram. Example:
-    <pre><code>settings.fromDate = '2018-09-05';</code></pre>
+ * <pre>settings.fromDate = '2018-09-05';</pre>
  * @param {String|Date} [settings.predict] - To draw an indication line for the completion of work.
-    The predict argument determines at what date to start drawing the line. Example:
-    <pre><code>settings.fromDate = '2018-09-01';</code></pre>
+ * The predict argument determines at what date to start drawing the line. Example:
+ * <pre>settings.fromDate = '2018-09-01';</pre>
  * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates of inside of the diagram
-    with a markers, where each marker is an object with a date for the marker
-    and an optional label for the marker. Example:
-    <pre><code>settings.markers = [
-     { date: '2018-09-03', label: 'M1' },
-     { date: '2018-09-10', label: 'M2' }];</code></pre>
- * @param {{
-     toDo: String[],
-     progress: String[],
-     done: String[],
-     unit: String,
-     entries: Object[]}} settings.data - The data for the diagram. Example:
-    <pre><code>settings.data = {
-        toDo: ['new'],
-        progress: ['test', 'dev'],
-        done: ['done'],
-        unit: 'points',
-        entries: [
-            { date: '2018-09-03', new: 0, dev: 0, test: 0, done: 0 },
-            { date: '2018-09-04', new: 1, dev: 0, test: 0, done: 0 },
-            { date: '2018-09-05', new: 1, dev: 1, test: 0, done: 0 },
-            { date: '2018-09-06', new: 1, dev: 0, test: 1, done: 1 },
-            { date: '2018-09-07', new: 2, dev: 1, test: 0, done: 2 },
-            { date: '2018-09-08', new: 1, dev: 1, test: 2, done: 2 },
-            { date: '2018-09-09', new: 0, dev: 0, test: 1, done: 5 },
-            { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 }
-        ]
-    }
-    </code></pre>
-    Each entry object must contain a date and the status counts for the
-    toDo, progress and done status categories.
-    The unit is the unit of measurement for the status counts.
-    A value of <code>points</code> indicates story points.
-    An omitted unit will lead to interpreting the status counts as issue counts.
-    The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
-    must contain the status values as strings that belong exactly to those categories.
-    The rendering of the layers in the Cumulate Flow Diagram will follow the order
-    of the status values provided inside of the status categories. All values of the
-    <code>done</code> status category are always renderen at the bottom of the diagram,
-    beginning from left to right. Then all <code>progress</code> status values, again left to right.
-    Finally all <code>new</code> status values, of course left to right.
-    For the above example: The <code>done</code> status layer is at the bottom, followed by
-    the <code>test</code> and <code>dev</code> layer
-    and finally the new <code>layer</code> is getting rendered.
+ * with markers. Each marker is an object with a date for the marker and an optional label. Example:
+ * <pre>settings.markers = [
+ * { date: '2018-09-03', label: 'M1' },
+ * { date: '2018-09-10', label: 'M2' }];</pre>
+ * @param {String[]} [settings.drawOptions] - An array to determine the parts to be drawn. Possible contents:
+ * <pre>'title' - draw the title
+ * 'axis' - draw the x and y axis
+ * 'legend' - draw the legend information
+ * 'markers' - draw the markers
+ * 'predict' - draw the predict line
+ * </pre> By default all of these draw options are on.
+ * @param {Object} [settings.style] - Influence the appearance of the diagram with font and color. The defaults are:
+ * <pre>settings.style = {
+ * fontSize: 12,
+ * fontFamily: 'sans-serif',
+ * color: '#222',
+ * backgroundColor: '#fff',
+ * axis: {color: '#222'},
+ * toDo: {color: '#bec0c2', stroke: '#fff'},
+ * progress: {color: '#808285', stroke: '#fff'},
+ * done: {color: '#222', stroke: '#fff'},
+ * markers: {color: '#222', backgroundColor: '#fff'},
+ * predict: {color: '#222', backgroundColor: '#fff'}
+ * }</pre>
+ * @param {{toDo: String[], progress: String[], done: String[], unit: String, entries: Object[]}} settings.data - The data for the diagram. Example:
+ * <pre>settings.data = {
+ * toDo: ['new'],
+ * progress: ['test', 'dev'],
+ * done: ['done'],
+ * unit: 'points',
+ * entries: [
+ * { date: '2018-09-03', new: 0, dev: 0, test: 0, done: 0 },
+ * { date: '2018-09-04', new: 1, dev: 0, test: 0, done: 0 },
+ * { date: '2018-09-05', new: 1, dev: 1, test: 0, done: 0 },
+ * { date: '2018-09-06', new: 1, dev: 0, test: 1, done: 1 },
+ * { date: '2018-09-07', new: 2, dev: 1, test: 0, done: 2 },
+ * { date: '2018-09-08', new: 1, dev: 1, test: 2, done: 2 },
+ * { date: '2018-09-09', new: 0, dev: 0, test: 1, done: 5 },
+ * { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 }
+ * ]}</pre>
+ * Each entry object must contain a date and the status counts for th
+ * <code>toDo</code>, <code>progress</code> and <code>done</code> status categories.
+ * The unit is the unit of measurement for the status counts.
+ * A value of <code>'points'</code> indicates story points.
+ * An omitted unit will lead to interpreting the status counts as issue counts.
+ * The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
+ * must contain the status values as strings that belong exactly to those categories.
+ * The rendering of the layers in the Cumulate Flow Diagram will follow the order
+ * of the status values provided inside of the status categories. All values of the
+ * <code>done</code> status category are always rendered at the bottom of the diagram,
+ * beginning from left to right. Then all <code>progress</code> status values, again left to right.
+ * Finally all <code>new</code> status values, of course left to right.
+ * For the above example: The <code>done</code> status layer is at the bottom, followed by
+ * the <code>test</code> and <code>dev</code> layer
+ * and finally the <code>new</code> layer is getting rendered.
  */
 function CFD(settings) {
     this.settings = settings;
@@ -713,7 +732,7 @@ CFD[Symbol.species] = CFD;
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element.
  */
-CFD.prototype.draw = function() {
+CFD.prototype.draw = function () {
     validateSettings(this.settings);
     this.remove();
     prepareSVG(this.settings);
@@ -729,24 +748,25 @@ CFD.prototype.draw = function() {
 /**
  * Clear the diagram from the provided <code>settings.svg</code> DOM tree element
  */
-CFD.prototype.remove = function() {
+CFD.prototype.remove = function () {
     if (this.settings.d3svg) {
         this.settings.d3svg.selectAll("*").remove();
     }
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+ * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
+ * and return the result as a string which can be assigned to the src attribute of an HTML img tag.
  * @returns {string}
  */
 
-CFD.prototype.image = function() {
+CFD.prototype.image = function () {
     this.draw();
     let html = this.settings.svg.outerHTML;
     return 'data:image/svg+xml;base64,' + Base64.encode(html);
 }
 
 
-module.exports = function(settings) {
+module.exports = function (settings) {
     return new CFD(settings);
 }
