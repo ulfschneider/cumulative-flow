@@ -9,14 +9,22 @@ Draw SVG Cumulative Flow Diagrams and use the option to indicate the anticipated
 ## Usage
 
 Install in your Node project with 
-```npm i cumulative-flow``` 
+```
+npm i cumulative-flow
+``` 
 and use it inside your code via 
-```const cfd = require('cumulative-flow');```
+```
+const cfd = require('cumulative-flow');
+```
 or, alternatively 
-```import cfd from 'cfd';```
+```
+import cfd from 'cfd';
+```
 
 Create then new cfd objects via
-```let diagram = cfd(settings);```
+```
+let diagram = cfd(settings);
+```
 Where settings is the configuration object for the drawing.
 
 -   `settings` **[Object][6]** The configuration object for the diagram.
