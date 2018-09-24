@@ -2,7 +2,14 @@
     "name": "cumulative-flow",
     "version": "1.3.0",
     "description": "Draw Cumulative Flow Diagrams",
-    "keywords": ["cumulative", "flow", "completion", "prediction", "kanban"],
+    "keywords": [
+        "cumulative",
+        "flow",
+        "completion",
+        "prediction",
+        "kanban",
+        "svg"
+    ],
     "main": "cfd.js",
     "scripts": {
         "test": "jest",

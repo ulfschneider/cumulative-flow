@@ -4,7 +4,7 @@
 
 Draw SVG Cumulative Flow Diagrams and use the option to indicate the anticipated completion of work.
 
-<img src="http://github.com/ulfschneider/cumulative-flow/raw/master/cfd.png"/>
+<img src="https://raw.githubusercontent.com/ulfschneider/cumulative-flow/master/cfd.png"/>
 
 ## Usage
 
