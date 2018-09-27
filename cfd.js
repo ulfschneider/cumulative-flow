@@ -749,8 +749,11 @@ CFD.prototype.draw = function () {
  * Clear the diagram from the provided <code>settings.svg</code> DOM tree element
  */
 CFD.prototype.remove = function () {
-    if (this.settings.d3svg) {
-        this.settings.d3svg.selectAll("*").remove();
+    if (this.settings.svg) {
+        let svg = this.settings.svg;
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
     }
 }
 
