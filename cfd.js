@@ -415,14 +415,16 @@ function drawPrediction(settings) {
 
         let predictStart = moment(settings.predict);
         let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-        if (predictStart.isBefore(currentDate)) {
+        let doneAtPredictStart = summarizeDone(predictStart);
+        let doneAtCurrentDate = summarizeDone(currentDate);
+        if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
             //x1, x2, y1, y2 to calculate the line parameters
             let x1 = settings.x(predictStart);
             let x2 = settings.x(currentDate);
-            let y1 = settings.y(summarizeDone(predictStart));
-            let y2 = settings.y(summarizeDone(currentDate));
+            let y1 = settings.y(doneAtPredictStart);
+            let y2 = settings.y(doneAtCurrentDate);
             let m = (y2 - y1) / (x2 - x1);
-            const X_TRIM = 2; //do not draw the prediction line direct on to of y axis
+            const X_TRIM = 2; //do not draw the prediction line direct on y axis
 
             let predictX = function () {
                 return -y1 / m + x1;
