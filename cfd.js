@@ -212,6 +212,7 @@ function validateStyles(settings) {
     }
 }
 
+
 function validateDrawOptions(settings) {
     if (!settings.drawOptions) {
         settings.drawOptions = ['title', 'axis', 'legend', 'markers', 'predict'];
@@ -569,6 +570,7 @@ function drawLegend(settings) {
 
     const X = 5;
     const lineHeight = settings.style.fontSize;
+    let bbox = [];
 
     const drawLegendItem = function ({
         text,
@@ -576,7 +578,8 @@ function drawLegend(settings) {
         y,
         fill
     }) {
-        settings.g.append('text')
+        let bkg = settings.g.append('rect');
+        let txt = settings.g.append('text')
             .attr('x', x)
             .attr('y', y)
             .attr('dy', dy(settings))
@@ -585,6 +588,21 @@ function drawLegend(settings) {
             .style('text-anchor', 'start')
             .style('fill', fill)
             .text(text);
+    }
+
+    const drawBackground = function ({
+        x,
+        y,
+        width,
+        height
+    }) {
+        settings.g.append('rect')
+            .attr('x', x)
+            .attr('y', y)
+            .attr('width', width)
+            .attr('height', height)
+            .style('fill', settings.style.backgroundColor)
+            .style('stroke', 'none'); 
     }
 
     if (settings.drawOptions.includes('title')) {
@@ -600,6 +618,14 @@ function drawLegend(settings) {
     }
 
     if (settings.drawOptions.includes('legend')) {
+
+        drawBackground({
+            x: X,
+            y: 0 + lineHeight / 2,
+            width: settings.style.fontSize * 6,
+            height: 3 * lineHeight
+        });
+
         //toDo legend
         drawLegendItem({
             text: 'To Do',
