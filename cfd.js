@@ -330,7 +330,7 @@ function drawTextWithBackground({
         } else {
             bkg.attr('x',  x);
         }
-        bkg.attr('y', y - settings.style.fontSize)
+        bkg.attr('y', y - settings.style.fontSize / 2)
             .attr('width', bbx.width)
             .attr('height', settings.style.fontSize);
     } catch (e) {
