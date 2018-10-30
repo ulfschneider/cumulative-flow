@@ -578,8 +578,7 @@ function drawLegend(settings) {
         y,
         fill
     }) {
-        let bkg = settings.g.append('rect');
-        let txt = settings.g.append('text')
+        return settings.g.append('text')
             .attr('x', x)
             .attr('y', y)
             .attr('dy', dy(settings))
@@ -596,13 +595,13 @@ function drawLegend(settings) {
         width,
         height
     }) {
-        settings.g.append('rect')
+        return settings.g.append('rect')
             .attr('x', x)
             .attr('y', y)
             .attr('width', width)
             .attr('height', height)
             .style('fill', settings.style.backgroundColor)
-            .style('stroke', 'none'); 
+            .style('stroke', settings.style.color); 
     }
 
     if (settings.drawOptions.includes('title')) {
@@ -619,26 +618,34 @@ function drawLegend(settings) {
 
     if (settings.drawOptions.includes('legend')) {
 
-        drawBackground({
+        let background = drawBackground({
+            x: X - 2,
+            y: 0 + lineHeight / 2 - 2,
+            width: settings.style.fontSize * 6 + 4,
+            height: 4 * lineHeight + lineHeight/2 + 4
+        });
+
+        //legend headline
+        drawLegendItem({
+            text: 'Colors:',
             x: X,
-            y: 0 + lineHeight / 2,
-            width: settings.style.fontSize * 6,
-            height: 3 * lineHeight
+            y: lineHeight,
+            fill: settings.style.color
         });
 
         //toDo legend
         drawLegendItem({
             text: 'To Do',
             x: X,
-            y: lineHeight,
+            y: lineHeight * 2 + lineHeight/2,
             fill: settings.style.toDo.color
         });
 
         //progress legend
-        drawLegendItem({
+        let progress = drawLegendItem({
             text: 'In Progress',
             x: X,
-            y: lineHeight * 2,
+            y: lineHeight * 3 + lineHeight/2,
             fill: settings.style.progress.color
         });
 
@@ -646,9 +653,20 @@ function drawLegend(settings) {
         drawLegendItem({
             text: 'Done',
             x: X,
-            y: lineHeight * 3,
+            y: lineHeight * 4 + lineHeight/2,
             fill: settings.style.done.color
         });
+
+        //adjust background width
+        //and use progress because it has the most length of 
+        //To Do, In Progress and Done
+        try {
+            let bbox = progress.node().getBBox();
+            background.attr('width', bbox.width + 4);
+        } catch (e) {
+            //JSDOM is not able to operate with bbox
+            //therefore this code is not going to run in the tests
+        }
 
         //unit
         drawLegendItem({
