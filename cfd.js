@@ -300,6 +300,42 @@ function isDoneStatus(status, settings) {
     return settings.data.done.indexOf(status) >= 0;
 }
 
+function drawTextWithBackground({
+    text,
+    textAnchor,
+    x,
+    y,
+    color,
+    background,
+    settings
+}) {
+    let bkg = settings.g.append('rect')
+        .style('fill', background);
+    let txt = settings.g.append('text')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('dy', dy(settings))
+        .attr('font-size', settings.style.fontSize + 'px')
+        .attr('font-family', settings.style.fontFamily)
+        .style('text-anchor', 'start')
+        .style('fill', color)
+        .style('text-anchor', textAnchor ? textAnchor : 'start')
+        .text(text);
+
+    try {
+        let bbx = txt.node().getBBox();
+        bkg.attr('x', x)
+            .attr('y', y + settings.style.fontSize / 2)
+            .attr('width', bbx.width)
+            .attr('height', settings.style.fontSize);
+    } catch (e) {
+        //JSDOM is not able to operate with bbox
+        //therefore this code is not going to run in the tests
+    }
+}
+
+
+
 
 function drawAxis(settings) {
 
@@ -404,7 +440,7 @@ function drawPrediction(settings) {
                 for (let key of settings.keys) {
                     if (isDoneStatus(key, settings)) {
                         sum += entry[key];
-                    } 
+                    }
                 }
                 return sum;
             }
@@ -412,11 +448,11 @@ function drawPrediction(settings) {
         return 0;
     }
 
-   
+
 
     let setAutoPredict = function () {
-        for (let entry of settings.data.entries) {            
-            if (summarizeDone(entry.date, 'done')) {
+        for (let entry of settings.data.entries) {
+            if (summarizeDone(entry.date)) {
                 settings.autoPredict = entry.date;
                 return;
             }
@@ -428,7 +464,7 @@ function drawPrediction(settings) {
         setAutoPredict();
 
         if (settings.predict || settings.autoPredict) {
-            let predictStart = moment(settings.predict || settings.autoPredict);
+            let predictStart = moment(settings.predict ? settings.predict : settings.autoPredict);
             let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
             let doneAtPredictStart = summarizeDone(predictStart);
             let doneAtCurrentDate = summarizeDone(currentDate);
@@ -561,15 +597,16 @@ function drawMarkers(settings) {
             .style('stroke-width', '1')
             .style('stroke', settings.style.markers.color);
 
-        settings.g.append('text')
-            .attr('x', x1)
-            .attr('y', -15)
-            .attr('dy', dy(settings))
-            .attr('font-size', settings.style.fontSize)
-            .attr('font-family', settings.style.fontFamily)
-            .style('text-anchor', 'middle')
-            .style('fill', settings.style.markers.color)
-            .text(label ? label : moment(date).format(DATE_FORMAT));
+        drawTextWithBackground({
+            text: (label ? label : moment(date).format(DATE_FORMAT)),
+            x: x1,
+            y: -15,
+            color: settings.style.markers.color,
+            textAnchor: 'middle',
+            background: settings.style.backgroundColor,
+            settings: settings
+        });
+
     }
 
     if (settings.drawOptions.includes('markers') && settings.markers) {
@@ -585,7 +622,6 @@ function drawLegend(settings) {
 
     const X = 5;
     const lineHeight = settings.style.fontSize;
-    let bbox = [];
 
     const drawLegendItem = function ({
         text,
