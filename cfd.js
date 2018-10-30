@@ -291,9 +291,6 @@ function prepareDataFunctions(settings) {
     })]);
 }
 
-function isToDoStatus(status, settings) {
-    return settings.data.toDo.indexOf(status) >= 0;
-}
 
 function isProgressStatus(status, settings) {
     return settings.data.progress.indexOf(status) >= 0;
@@ -400,19 +397,14 @@ function drawLayers(settings) {
 }
 
 function drawPrediction(settings) {
-    let summarizePoints = function (date, category) {
+    let summarizeDone = function (date) {
         for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
                 for (let key of settings.keys) {
-
-                    if (category == 'done' && isDoneStatus(key, settings)) {
+                    if (isDoneStatus(key, settings)) {
                         sum += entry[key];
-                    } else if (category == 'progress' && isProgressStatus(key, settings)) {
-                        sum += entry[key];
-                    } else if (category == 'toDo' && isToDoStatus(key, settings)) {
-                        sum += entry[key];
-                    }
+                    } 
                 }
                 return sum;
             }
@@ -424,7 +416,7 @@ function drawPrediction(settings) {
 
     let setAutoPredict = function () {
         for (let entry of settings.data.entries) {            
-            if (summarizePoints(entry.date, 'progress') || summarizePoints(entry.date, 'done')) {
+            if (summarizeDone(entry.date, 'done')) {
                 settings.autoPredict = entry.date;
                 return;
             }
@@ -438,8 +430,8 @@ function drawPrediction(settings) {
         if (settings.predict || settings.autoPredict) {
             let predictStart = moment(settings.predict || settings.autoPredict);
             let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-            let doneAtPredictStart = summarizePoints(predictStart, 'done');
-            let doneAtCurrentDate = summarizePoints(currentDate, 'done');
+            let doneAtPredictStart = summarizeDone(predictStart);
+            let doneAtCurrentDate = summarizeDone(currentDate);
             if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
                 //x1, x2, y1, y2 to calculate the line parameters
                 let x1 = settings.x(predictStart);
@@ -733,6 +725,8 @@ function drawLegend(settings) {
  * @param {String|Date} [settings.predict] - To draw an indication line for the completion of work.
  * The predict argument determines at what date to start drawing the line. Example:
  * <pre>settings.fromDate = '2018-09-01';</pre>
+ * If no date is provided but the drawOptions allow to draw a prediction line, an automatic
+ * start date for that line will be calculated based on the first date something went to done.
  * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates of inside of the diagram
  * with markers. Each marker is an object with a date for the marker and an optional label. Example:
  * <pre>settings.markers = [
