@@ -291,6 +291,9 @@ function prepareDataFunctions(settings) {
     })]);
 }
 
+function isToDoStatus(status, settings) {
+    return settings.data.toDo.indexOf(status) >= 0;
+}
 
 function isProgressStatus(status, settings) {
     return settings.data.progress.indexOf(status) >= 0;
@@ -397,12 +400,17 @@ function drawLayers(settings) {
 }
 
 function drawPrediction(settings) {
-    let summarizeDone = function (date) {
+    let summarizePoints = function (date, category) {
         for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
                 for (let key of settings.keys) {
-                    if (isDoneStatus(key, settings)) {
+
+                    if (category == 'done' && isDoneStatus(key, settings)) {
+                        sum += entry[key];
+                    } else if (category == 'progress' && isProgressStatus(key, settings)) {
+                        sum += entry[key];
+                    } else if (category == 'toDo' && isToDoStatus(key, settings)) {
                         sum += entry[key];
                     }
                 }
@@ -412,93 +420,108 @@ function drawPrediction(settings) {
         return 0;
     }
 
-    if (settings.drawOptions.includes('predict') && settings.predict) {
+   
 
-        let predictStart = moment(settings.predict);
-        let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
-        let doneAtPredictStart = summarizeDone(predictStart);
-        let doneAtCurrentDate = summarizeDone(currentDate);
-        if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
-            //x1, x2, y1, y2 to calculate the line parameters
-            let x1 = settings.x(predictStart);
-            let x2 = settings.x(currentDate);
-            let y1 = settings.y(doneAtPredictStart);
-            let y2 = settings.y(doneAtCurrentDate);
-            let m = (y2 - y1) / (x2 - x1);
-            const X_TRIM = 2; //do not draw the prediction line direct on y axis
-
-            let predictX = function () {
-                return -y1 / m + x1;
+    let setAutoPredict = function () {
+        for (let entry of settings.data.entries) {            
+            if (summarizePoints(entry.date, 'progress') || summarizePoints(entry.date, 'done')) {
+                settings.autoPredict = entry.date;
+                return;
             }
+        }
+        delete settings.autoPredict;
+    }
 
-            let yFromX = function (x) {
-                return y1 + m * (x - x1);
+    if (settings.drawOptions.includes('predict')) {
+        setAutoPredict();
+
+        if (settings.predict || settings.autoPredict) {
+            let predictStart = moment(settings.predict || settings.autoPredict);
+            let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
+            let doneAtPredictStart = summarizePoints(predictStart, 'done');
+            let doneAtCurrentDate = summarizePoints(currentDate, 'done');
+            if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
+                //x1, x2, y1, y2 to calculate the line parameters
+                let x1 = settings.x(predictStart);
+                let x2 = settings.x(currentDate);
+                let y1 = settings.y(doneAtPredictStart);
+                let y2 = settings.y(doneAtCurrentDate);
+                let m = (y2 - y1) / (x2 - x1);
+                const X_TRIM = 2; //do not draw the prediction line direct on y axis
+
+                let predictX = function () {
+                    return -y1 / m + x1;
+                }
+
+                let yFromX = function (x) {
+                    return y1 + m * (x - x1);
+                }
+
+                let dateFromX = function (x) {
+                    let m = (x2 - x1) / (currentDate - predictStart);
+                    let c = x1 - m * predictStart;
+                    return moment((x - c) / m);
+                }
+
+                //x0 and y0 to be used for the real start point of the line
+                let x0 = x1;
+                let y0 = y1;
+                if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
+                    x0 = settings.x(settings.fromDate ? settings.fromDate : settings.data.entries[0].date);
+                    y0 = yFromX(x0);
+                }
+
+                //x3 and y3 to be used for the real end point of the line
+                let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
+                let y3 = yFromX(x3);
+                if (y3 < 0) {
+                    x3 = -y1 / m + x1 - X_TRIM;
+                    y3 = yFromX(x3);
+                }
+
+                let pathData = [{
+                    x: x0,
+                    y: y0
+                }, {
+                    x: x3,
+                    y: y3
+                }, {
+                    x: x3,
+                    y: -35
+                }];
+                let lineFunction = d3.line()
+                    .x(function (d) {
+                        return d.x;
+                    })
+                    .y(function (d) {
+                        return d.y;
+                    });
+
+                settings.g.append('path')
+                    .attr('d', lineFunction(pathData))
+                    .attr('fill', 'none')
+                    .style('stroke-width', '3')
+                    .style('stroke', settings.style.predict.backgroundColor);
+
+                settings.g.append('path')
+                    .attr('d', lineFunction(pathData))
+                    .attr('fill', 'none')
+                    .style('stroke-width', '1')
+                    .style('stroke', settings.style.predict.color);
+
+                let predictDate = dateFromX(predictX());
+                let futureHint = predictX() - X_TRIM > x3 ? ' →' : '';
+                settings.g.append('text')
+                    .attr('x', x3 - 5)
+                    .attr('y', -35)
+                    .attr('dy', dy(settings))
+                    .attr('font-size', settings.style.fontSize)
+                    .attr('font-family', settings.style.fontFamily)
+                    .style('text-anchor', 'end')
+                    .style('fill', settings.style.predict.color)
+                    .text(predictDate.format(DATE_FORMAT) + futureHint);
+
             }
-
-            let dateFromX = function (x) {
-                let m = (x2 - x1) / (currentDate - predictStart);
-                let c = x1 - m * predictStart;
-                return moment((x - c) / m);
-            }
-
-            //x0 and y0 to be used for the real start point of the line
-            let x0 = x1;
-            let y0 = y1;
-            if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
-                x0 = settings.x(settings.fromDate ? settings.fromDate : settings.data.entries[0].date);
-                y0 = yFromX(x0);
-            }
-
-            //x3 and y3 to be used for the real end point of the line
-            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
-            let y3 = yFromX(x3);
-            if (y3 < 0) {
-                x3 = -y1 / m + x1 - X_TRIM;
-                y3 = yFromX(x3);
-            }
-
-            let pathData = [{
-                x: x0,
-                y: y0
-            }, {
-                x: x3,
-                y: y3
-            }, {
-                x: x3,
-                y: -35
-            }];
-            let lineFunction = d3.line()
-                .x(function (d) {
-                    return d.x;
-                })
-                .y(function (d) {
-                    return d.y;
-                });
-
-            settings.g.append('path')
-                .attr('d', lineFunction(pathData))
-                .attr('fill', 'none')
-                .style('stroke-width', '3')
-                .style('stroke', settings.style.predict.backgroundColor);
-
-            settings.g.append('path')
-                .attr('d', lineFunction(pathData))
-                .attr('fill', 'none')
-                .style('stroke-width', '1')
-                .style('stroke', settings.style.predict.color);
-
-            let predictDate = dateFromX(predictX());
-            let futureHint = predictX() - X_TRIM > x3 ? ' →' : '';
-            settings.g.append('text')
-                .attr('x', x3 - 5)
-                .attr('y', -35)
-                .attr('dy', dy(settings))
-                .attr('font-size', settings.style.fontSize)
-                .attr('font-family', settings.style.fontFamily)
-                .style('text-anchor', 'end')
-                .style('fill', settings.style.predict.color)
-                .text(predictDate.format(DATE_FORMAT) + futureHint);
-
         }
     }
 }
@@ -601,7 +624,7 @@ function drawLegend(settings) {
             .attr('width', width)
             .attr('height', height)
             .style('fill', settings.style.backgroundColor)
-            .style('stroke', settings.style.color); 
+            .style('stroke', settings.style.color);
     }
 
     if (settings.drawOptions.includes('title')) {
@@ -622,7 +645,7 @@ function drawLegend(settings) {
             x: X - 2,
             y: 0 + lineHeight / 2 - 2,
             width: settings.style.fontSize * 6 + 4,
-            height: 4 * lineHeight + lineHeight/2 + 4
+            height: 4 * lineHeight + lineHeight / 2 + 4
         });
 
         //legend headline
@@ -637,7 +660,7 @@ function drawLegend(settings) {
         drawLegendItem({
             text: 'To Do',
             x: X,
-            y: lineHeight * 2 + lineHeight/2,
+            y: lineHeight * 2 + lineHeight / 2,
             fill: settings.style.toDo.color
         });
 
@@ -645,7 +668,7 @@ function drawLegend(settings) {
         let progress = drawLegendItem({
             text: 'In Progress',
             x: X,
-            y: lineHeight * 3 + lineHeight/2,
+            y: lineHeight * 3 + lineHeight / 2,
             fill: settings.style.progress.color
         });
 
@@ -653,7 +676,7 @@ function drawLegend(settings) {
         drawLegendItem({
             text: 'Done',
             x: X,
-            y: lineHeight * 4 + lineHeight/2,
+            y: lineHeight * 4 + lineHeight / 2,
             fill: settings.style.done.color
         });
 
