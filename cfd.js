@@ -317,15 +317,20 @@ function drawTextWithBackground({
         .attr('dy', dy(settings))
         .attr('font-size', settings.style.fontSize + 'px')
         .attr('font-family', settings.style.fontFamily)
-        .style('text-anchor', 'start')
         .style('fill', color)
         .style('text-anchor', textAnchor ? textAnchor : 'start')
         .text(text);
 
     try {
         let bbx = txt.node().getBBox();
-        bkg.attr('x', x)
-            .attr('y', y + settings.style.fontSize / 2)
+        if (textAnchor == 'middle') {
+            bkg.attr('x',  x - bbx.width / 2 );
+        } else if (textAnchor == 'end') {
+            bkg.attr('x',  x - bbx.width);
+        } else {
+            bkg.attr('x',  x);
+        }
+        bkg.attr('y', y - settings.style.fontSize)
             .attr('width', bbx.width)
             .attr('height', settings.style.fontSize);
     } catch (e) {
@@ -447,8 +452,6 @@ function drawPrediction(settings) {
         }
         return 0;
     }
-
-
 
     let setAutoPredict = function () {
         for (let entry of settings.data.entries) {
