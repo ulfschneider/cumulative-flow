@@ -276,7 +276,7 @@ test('set left and top margin to 0', () => {
 });
 
 
-test('no draw optons', () => {
+test('no draw options', () => {
     let settings = makeTestSettings();
     delete settings.drawOptions;
     let diagram = cfd(settings);
@@ -371,14 +371,13 @@ test('fontSize, fontFamily, default color and default background', () => {
     let done = '#222';
 
     diagram.settings.style = {
-        fontSize: 16,
         fontFamily: 'serif',
         color: color,
         backgroundColor: background,
     };
 
     diagram.draw();
-    expect(settings.style.fontSize).toBe(16);
+    expect(settings.style.fontSize).toBe(12);
     expect(settings.style.fontFamily).toBe('serif');
     expect(settings.style.color).toBe(color);
     expect(settings.style.backgroundColor).toBe(background);
