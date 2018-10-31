@@ -330,7 +330,7 @@ function drawTextWithBackground({
         } else {
             bkg.attr('x',  x);
         }
-        bkg.attr('y', y - settings.style.fontSize / 2)
+        bkg.attr('y', y - settings.style.fontSize / 2 )
             .attr('width', bbx.width)
             .attr('height', settings.style.fontSize);
     } catch (e) {
@@ -455,17 +455,18 @@ function drawPrediction(settings) {
 
     let setAutoPredict = function () {
         for (let entry of settings.data.entries) {
-            if (summarizeDone(entry.date)) {
-                settings.autoPredict = entry.date;
-                return;
-            }
+            for (let key of settings.keys) {
+                if (isDoneStatus(key, settings) && entry[key] > 0) {
+                    settings.autoPredict = entry.date;
+                    return settings.autoPredict;
+                }
+            }                        
         }
         delete settings.autoPredict;
     }
 
     if (settings.drawOptions.includes('predict')) {
-        setAutoPredict();
-
+        //setAutoPredict();
         if (settings.predict || settings.autoPredict) {
             let predictStart = moment(settings.predict ? settings.predict : settings.autoPredict);
             let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
