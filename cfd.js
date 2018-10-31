@@ -466,7 +466,7 @@ function drawPrediction(settings) {
     }
 
     if (settings.drawOptions.includes('predict')) {
-        //setAutoPredict();
+        setAutoPredict();
         if (settings.predict || settings.autoPredict) {
             let predictStart = moment(settings.predict ? settings.predict : settings.autoPredict);
             let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
