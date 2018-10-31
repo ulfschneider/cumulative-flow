@@ -1,6 +1,6 @@
 {
     "name": "cumulative-flow",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "description": "Draw Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
