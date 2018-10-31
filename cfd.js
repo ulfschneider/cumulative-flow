@@ -324,13 +324,13 @@ function drawTextWithBackground({
     try {
         let bbx = txt.node().getBBox();
         if (textAnchor == 'middle') {
-            bkg.attr('x',  x - bbx.width / 2 );
+            bkg.attr('x', x - bbx.width / 2);
         } else if (textAnchor == 'end') {
-            bkg.attr('x',  x - bbx.width);
+            bkg.attr('x', x - bbx.width);
         } else {
-            bkg.attr('x',  x);
+            bkg.attr('x', x);
         }
-        bkg.attr('y', y - settings.style.fontSize / 2 )
+        bkg.attr('y', y - settings.style.fontSize / 2)
             .attr('width', bbx.width)
             .attr('height', settings.style.fontSize);
     } catch (e) {
@@ -454,21 +454,24 @@ function drawPrediction(settings) {
     }
 
     let setAutoPredict = function () {
+        //calculate autoPredict date only once
         for (let entry of settings.data.entries) {
             for (let key of settings.keys) {
                 if (isDoneStatus(key, settings) && entry[key] > 0) {
-                    settings.autoPredict = entry.date;
-                    return settings.autoPredict;
+                    settings.predict = entry.date;
+                    return settings.predict;
                 }
-            }                        
+            }
         }
-        delete settings.autoPredict;
     }
 
     if (settings.drawOptions.includes('predict')) {
-        setAutoPredict();
-        if (settings.predict || settings.autoPredict) {
-            let predictStart = moment(settings.predict ? settings.predict : settings.autoPredict);
+        if (!settings.predict ) {
+            setAutoPredict();
+        }
+
+        if (settings.predict) {
+            let predictStart = moment(settings.predict);
             let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
             let doneAtPredictStart = summarizeDone(predictStart);
             let doneAtCurrentDate = summarizeDone(currentDate);
