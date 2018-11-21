@@ -380,6 +380,10 @@ function drawAxis(settings) {
 }
 
 function drawLayers(settings) {
+    const round = function(number) {
+        return Math.round(number * 100) / 100;
+    }
+
     let layer = settings.g.selectAll('.layer')
         .data(settings.stack(settings.data.entries.filter(function (d) {
             return isDateInRange(d.date, settings);
@@ -432,7 +436,7 @@ function drawLayers(settings) {
                 return settings.style.toDo.color;
             })
             .text(function (d) {
-                return (d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
+                return round(d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
             });
     }
 }
