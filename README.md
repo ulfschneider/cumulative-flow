@@ -18,10 +18,10 @@ const cfd = require('cumulative-flow');
 ```
 or, alternatively 
 ```
-import cfd from 'cfd';
+import cfd from 'cumulative-flow';
 ```
 
-Create then new cfd objects via
+Create the new cfd objects via
 ```
 let diagram = cfd(settings);
 ```
