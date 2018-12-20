@@ -1,7 +1,7 @@
 {
     "name": "cumulative-flow",
     "version": "1.6.7",
-    "description": "Draw Cumulative Flow Diagrams",
+    "description": "Draw SVG Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
         "flow",
