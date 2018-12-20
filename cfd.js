@@ -6,7 +6,6 @@ const Base64 = require('js-base64').Base64;
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
-const DAY_FORMAT = 'dddd D-MMM YYYY HH:mm[, GMT]Z';
 const DATE_FORMAT = 'YYYY-MM-DD';
 
 //Helper functions
@@ -233,10 +232,6 @@ function prepareSVG(settings) {
     }
 }
 
-function dy(settings) {
-    return settings.style.fontSize / 3 + 'px';
-}
-
 function prepareScales(settings) {
     settings.x = d3.scaleTime()
         .range([0, settings.innerWidth]);
@@ -298,6 +293,10 @@ function isProgressStatus(status, settings) {
 
 function isDoneStatus(status, settings) {
     return settings.data.done.indexOf(status) >= 0;
+}
+
+function dy(settings) {
+    return settings.style.fontSize / 3 + 'px';
 }
 
 function drawTextWithBackground({
@@ -380,7 +379,7 @@ function drawAxis(settings) {
 }
 
 function drawLayers(settings) {
-    const round = function(number) {
+    const round = function (number) {
         return Math.round(number * 100) / 100;
     }
 
@@ -470,7 +469,7 @@ function drawPrediction(settings) {
     }
 
     if (settings.drawOptions.includes('predict')) {
-        if (!settings.predict ) {
+        if (!settings.predict) {
             setAutoPredict();
         }
 
@@ -593,20 +592,24 @@ function drawMarkers(settings) {
         let x1 = settings.x(moment(date));
         let y1 = settings.innerHeight;
         let y2 = 0;
-        settings.g.append('line')
-            .attr('x1', x1)
-            .attr('y1', y1)
-            .attr('x2', x1)
-            .attr('y2', y2)
-            .style('stroke-width', '3')
-            .style('stroke', settings.style.markers.backgroundColor);
-        settings.g.append('line')
-            .attr('x1', x1)
-            .attr('y1', y1)
-            .attr('x2', x1)
-            .attr('y2', y2)
-            .style('stroke-width', '1')
-            .style('stroke', settings.style.markers.color);
+        if (!moment(date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
+            //as we have an axis at the right side, do only draw
+            //the marker if its not directly on top of the axis
+            settings.g.append('line')
+                .attr('x1', x1)
+                .attr('y1', y1)
+                .attr('x2', x1)
+                .attr('y2', y2)
+                .style('stroke-width', '3')
+                .style('stroke', settings.style.markers.backgroundColor);
+            settings.g.append('line')
+                .attr('x1', x1)
+                .attr('y1', y1)
+                .attr('x2', x1)
+                .attr('y2', y2)
+                .style('stroke-width', '1')
+                .style('stroke', settings.style.markers.color);
+        }
 
         drawTextWithBackground({
             text: (label ? label : moment(date).format(DATE_FORMAT)),
@@ -651,19 +654,21 @@ function drawLegend(settings) {
             .text(text);
     }
 
-    const drawBackground = function ({
+    const drawRectangle = function ({
         x,
         y,
         width,
-        height
+        height,
+        fill,
+        stroke
     }) {
         return settings.g.append('rect')
             .attr('x', x)
             .attr('y', y)
             .attr('width', width)
             .attr('height', height)
-            .style('fill', settings.style.backgroundColor)
-            .style('stroke', settings.style.color);
+            .style('fill', fill ? fill : settings.style.backgroundColor)
+            .style('stroke', stroke ? stroke : settings.style.backgroundColor);
     }
 
     if (settings.drawOptions.includes('title')) {
@@ -680,51 +685,66 @@ function drawLegend(settings) {
 
     if (settings.drawOptions.includes('legend')) {
 
-        let background = drawBackground({
+        let background = drawRectangle({
             x: X - 2,
-            y: 0 + lineHeight / 2 - 2,
-            width: settings.style.fontSize * 6 + 4,
-            height: 4 * lineHeight + lineHeight / 2 + 4
-        });
-
-        //legend headline
-        drawLegendItem({
-            text: 'Colors:',
-            x: X,
-            y: lineHeight,
-            fill: settings.style.color
+            y: lineHeight / 2 - 2,
+            width: settings.style.fontSize * 8,
+            height: 3.5 * lineHeight,
+            stroke: settings.style.color
         });
 
         //toDo legend
+        drawRectangle({
+            x: X + 1,
+            y: 0.5 * lineHeight + 1,
+            width: lineHeight,
+            height: lineHeight,
+            fill: settings.style.toDo.color
+        });
         drawLegendItem({
             text: 'To Do',
-            x: X,
-            y: lineHeight * 2 + lineHeight / 2,
-            fill: settings.style.toDo.color
+            x: X + lineHeight * 1.62 + 1,
+            y: lineHeight + 1,
+            fill: settings.style.color
         });
 
         //progress legend
+        drawRectangle({
+            x: X + 1,
+            y: 1.5 * lineHeight + 1,
+            width: lineHeight,
+            height: lineHeight,
+            fill: settings.style.progress.color
+        });
         let progress = drawLegendItem({
             text: 'In Progress',
-            x: X,
-            y: lineHeight * 3 + lineHeight / 2,
-            fill: settings.style.progress.color
+            x: X + lineHeight * 1.62 + 1,
+            y: 2 * lineHeight + 1,
+            fill: settings.style.color,
         });
 
         //done legend
-        drawLegendItem({
-            text: 'Done',
-            x: X,
-            y: lineHeight * 4 + lineHeight / 2,
+        drawRectangle({
+            x: X + 1,
+            y: 2.5 * lineHeight + 1,
+            width: lineHeight,
+            height: lineHeight,
             fill: settings.style.done.color
         });
+        drawLegendItem({
+            text: 'Done',
+            x: X + lineHeight * 1.62 + 1,
+            y: 3 * lineHeight + 1,
+            fill: settings.style.color
+        });
+
 
         //adjust background width
         //and use progress because it has the most length of 
         //To Do, In Progress and Done
         try {
             let bbox = progress.node().getBBox();
-            background.attr('width', bbox.width + 4);
+            background.attr('width', bbox.width + 2 * lineHeight);
         } catch (e) {
             //JSDOM is not able to operate with bbox
             //therefore this code is not going to run in the tests
