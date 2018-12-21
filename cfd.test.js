@@ -8,7 +8,7 @@ const {
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11';
-
+const NUMBER_OF_TEST_IMAGES = 10;
 let actuals = [];
 let expected = [];
 let settings;
@@ -118,7 +118,7 @@ function readExpectedFiles(folder, count) {
 //test the functions
 
 beforeAll(() => {
-    expected = readExpectedFiles('./test', 10);
+    expected = readExpectedFiles('./test', NUMBER_OF_TEST_IMAGES);
 });
 
 test('no settings at all', () => {
@@ -743,7 +743,7 @@ test('write test results into file', () => {
         + '.box {display:inline-block;}</style>'
         + '<h1>Expected Test Results with Actual Values</h1>';
 
-    for (let i = 0; i < expected.length; i++) {
+    for (let i = 0; i < actuals.length; i++) {
         writeTestFile('./test/actual' + i + '.svg', actuals[i]);
         let match = expected[i] == actuals[i];
         if (match) {
