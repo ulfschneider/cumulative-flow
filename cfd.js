@@ -634,7 +634,7 @@ function drawMarkers(settings) {
 
 function drawLegend(settings) {
 
-    const X = 5;
+    const X = 7;
     const lineHeight = settings.style.fontSize;
 
     const drawLegendItem = function ({
@@ -676,7 +676,7 @@ function drawLegend(settings) {
         if (settings.title) {
             drawLegendItem({
                 text: settings.title,
-                x: X,
+                x: X - 2,
                 y: -55,
                 fill: settings.style.color
             });
@@ -689,7 +689,7 @@ function drawLegend(settings) {
             x: X - 2,
             y: lineHeight / 2 - 2,
             width: settings.style.fontSize * 8,
-            height: 3.5 * lineHeight,
+            height: 3.5 * lineHeight - 1,
             stroke: settings.style.color
         });
 
