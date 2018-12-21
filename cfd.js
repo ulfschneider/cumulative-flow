@@ -744,7 +744,7 @@ function drawLegend(settings) {
         //To Do, In Progress and Done
         try {
             let bbox = progress.node().getBBox();
-            background.attr('width', bbox.width + 2 * lineHeight);
+            background.attr('width', bbox.width + 2.2 * lineHeight);
         } catch (e) {
             //JSDOM is not able to operate with bbox
             //therefore this code is not going to run in the tests
