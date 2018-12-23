@@ -347,8 +347,8 @@ test('default style', () => {
 
     let color = '#222';
     let background = '#fff';
-    let toDo = '#bec0c2';
-    let progress = '#808285';
+    let toDo = '#ccc';
+    let progress = '#888';
     let done = '#222';
     diagram.draw();
     expect(settings.style.fontSize).toBe(12);
@@ -374,8 +374,8 @@ test('fontSize, fontFamily, default color and default background', () => {
 
     let color = 'red';
     let background = 'lightgray';
-    let toDo = '#bec0c2';
-    let progress = '#808285';
+    let toDo = '#ccc';
+    let progress = '#888';
     let done = '#222';
 
     diagram.settings.style = {
@@ -457,8 +457,8 @@ test('stroke colors, empty axis color', () => {
     let diagram = cfd(settings);
     let color = '#222';
     let background = '#fff';
-    let toDo = '#bec0c2';
-    let progress = '#808285';
+    let toDo = '#ccc';
+    let progress = '#888';
     let done = '#222';
 
     settings.style = {};

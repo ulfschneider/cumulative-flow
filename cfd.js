@@ -102,11 +102,11 @@ function validateStyles(settings) {
             color: settings.style.color,
         };
         settings.style.toDo = {
-            color: '#bec0c2',
+            color: '#ccc',
             stroke: settings.style.backgroundColor,
         };
         settings.style.progress = {
-            color: '#808285',
+            color: '#888',
             stroke: settings.style.backgroundColor,
         };
         settings.style.done = {
@@ -145,12 +145,12 @@ function validateStyles(settings) {
         }
         if (!settings.style.toDo) {
             settings.style.toDo = {
-                color: '#bec0c2',
+                color: '#ccc',
                 stroke: settings.style.backgroundColor
             }
         } else {
             if (!settings.style.toDo.color) {
-                settings.style.toDo.color = '#bec0c2';
+                settings.style.toDo.color = '#ccc';
             }
             if (!settings.style.toDo.stroke) {
                 settings.style.toDo.stroke = settings.style.backgroundColor;
@@ -158,12 +158,12 @@ function validateStyles(settings) {
         }
         if (!settings.style.progress) {
             settings.style.progress = {
-                color: '#808285',
+                color: '#888',
                 stroke: settings.style.backgroundColor
             }
         } else {
             if (!settings.style.progress.color) {
-                settings.style.progress.color = '#808285';
+                settings.style.progress.color = '#888';
             }
             if (!settings.style.progress.stroke) {
                 settings.style.progress.stroke = settings.style.backgroundColor;
