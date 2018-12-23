@@ -695,7 +695,7 @@ function drawLegend(settings) {
 
         let background = drawRectangle({
             x: X - 3,
-            y: Y + lineHeight / 2 - 3,
+            y: Y + lineHeight / 2 - 3,   
             width: settings.style.fontSize * 8,
             height: 3.5 * lineHeight,
             stroke: settings.style.color
@@ -898,15 +898,35 @@ CFD.prototype.remove = function () {
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
  * and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+ * @deprecated use imageSource instead
  * @returns {string}
  */
-
 CFD.prototype.image = function () {
     this.draw();
     let html = this.settings.svg.outerHTML;
     return 'data:image/svg+xml;base64,' + Base64.encode(html);
 }
 
+/**
+ * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
+ * and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+ * @returns {string}
+ */
+CFD.prototype.imageSource = function () {
+    this.draw();
+    let html = this.settings.svg.outerHTML;
+    return 'data:image/svg+xml;base64,' + Base64.encode(html);
+}
+
+/**
+ * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
+ * and return the result as a svg tag string.
+ * @returns {string}
+ */
+CFD.prototype.svgSource = function () {
+    this.draw();
+    return this.settings.svg.outerHTML;
+}
 
 module.exports = function (settings) {
     return new CFD(settings);

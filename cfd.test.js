@@ -566,7 +566,7 @@ test('image 1 with default test data', () => {
     let settings = makeTestSettings();
     settings.title = 'Testing CFD';
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
 
     expect(actuals[0]).toBe(expected[0]);
@@ -586,7 +586,7 @@ test('ISO 6801 date strings', () => {
         d.date = moment(d.date).format('YYYY-MM-DD');
     });
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     expect(actual).toBe(expected[0]);
 });
 
@@ -596,7 +596,7 @@ test('image 2 without fromDate and toDate', () => {
     delete settings.toDate;
     settings.title = 'Testing CFD without fromDate and without toDate';
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
 
     expect(actuals[1]).toBe(expected[1]);
@@ -608,7 +608,7 @@ test('image 3 with narrow fromDate and toDate', () => {
     settings.toDate = moment(NOW).subtract(1, 'days');
     settings.title = 'Testing CFD with narrow fromDate and toDate';
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[2]).toBe(expected[2]);
 });
@@ -620,7 +620,7 @@ test('image 4 with early predictStart', () => {
     settings.predict = moment(NOW).subtract(10, 'days');
     settings.title = 'Testing CFD with predict start/end date out of range';
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[3]).toBe(expected[3]);
 });
@@ -633,7 +633,7 @@ test('image 5 without markers', () => {
     settings.predict = moment(NOW).subtract(10, 'days');    
     settings.title = 'Testing CFD without markers';
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[4]).toBe(expected[4]);
 });
@@ -646,7 +646,7 @@ test('image 6 without title and with auto predict', () => {
     delete settings.fromDate;
     delete settings.toDate;    
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[5]).toBe(expected[5]);
 });
@@ -662,7 +662,7 @@ test('image 7 without axis, markers and predict', () => {
     settings.title = 'Testing CFD without axis, markers and predict';
     settings.drawOptions = ['legend'];
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[6]).toBe(expected[6]);
 });
@@ -684,7 +684,7 @@ test('image 8 with markers out of range', () => {
         { date: moment(NOW).add(20, 'days'), label: 'm3' },
     ]
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[7]).toBe(expected[7]);
 });
@@ -706,7 +706,7 @@ test('image 9 with markers out of range', () => {
         { date: moment(NOW).add(20, 'days'), label: 'm3' },
     ]    
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[8]).toBe(expected[8]);
 });
@@ -719,7 +719,7 @@ test('image 10 without predict line because of 0 velocity', () => {
         entry.done = 3; 
     }
     let diagram = cfd(settings);
-    let actual = diagram.image();
+    let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[9]).toBe(expected[9]);
 });
@@ -728,7 +728,7 @@ test('remove image', () => {
     let settings = makeTestSettings();
     settings.title = 'Testing CFD';
     let diagram = cfd(settings);
-    expect(diagram.image()).toBe(expected[0]);
+    expect(diagram.svgSource()).toBe(expected[0]);
     diagram.remove();
     expect(settings.svg.outerHTML).toBe('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400"></svg>');
 });
@@ -747,11 +747,11 @@ test('write test results into file', () => {
         writeTestFile('./test/actual' + i + '.svg', actuals[i]);
         let match = expected[i] == actuals[i];
         if (match) {
-            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div><img id="expect' + (i+1) + '" src="' + expected[i] + '"/></div>'
-                + '<div class="box"><div class="label expected">Actual ' + (i+1) + ' is as expected</div><img id="actual' + (i+1) + '" src="' + actuals[i] + '"/></div></div>';
+            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div>' + expected[i] + '</div>'
+                + '<div class="box"><div class="label expected">Actual ' + (i+1) + ' is as expected</div>' + actuals[i] + '</div>';
         } else {
-            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div><img id="expect' + (i+1) + '" src="' + expected[i] + '"/></div>'
-                + '<div class="box"><div class="label mismatch">Actual ' + (i+1) + ' has a mismatch</div><img id="actual' + (i+1) + '" src="' + actuals[i] + '"/></div></div>';
+            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div>' + expected[i] + '/div>'
+                + '<div class="box"><div class="label mismatch">Actual ' + (i+1) + ' has a mismatch</div>' + actuals[i] + '</div>';
 
         }
     }
