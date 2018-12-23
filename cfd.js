@@ -590,18 +590,25 @@ function drawMarkers(settings) {
 
     let mark = function (date, label) {
         let x1 = settings.x(moment(date));
+        if (x1 < 0.5) {
+            //perfect left align if a marker sit at the most left boundary of the diagram
+            x1 = 0.5;
+        }
         let y1 = settings.innerHeight;
         let y2 = 0;
         if (!moment(date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
             //as we have an axis at the right side, do only draw
             //the marker if its not directly on top of the axis
-            settings.g.append('line')
-                .attr('x1', x1)
-                .attr('y1', y1)
-                .attr('x2', x1)
-                .attr('y2', y2)
-                .style('stroke-width', '3')
-                .style('stroke', settings.style.markers.backgroundColor);
+
+            if (x1 > 0.5) {
+                settings.g.append('line')
+                    .attr('x1', x1)
+                    .attr('y1', y1)
+                    .attr('x2', x1)
+                    .attr('y2', y2)
+                    .style('stroke-width', '3')
+                    .style('stroke', settings.style.markers.backgroundColor);
+            }
             settings.g.append('line')
                 .attr('x1', x1)
                 .attr('y1', y1)
@@ -634,7 +641,8 @@ function drawMarkers(settings) {
 
 function drawLegend(settings) {
 
-    const X = 7;
+    const X = 10;
+    const Y = 2.5;
     const lineHeight = settings.style.fontSize;
 
     const drawLegendItem = function ({
@@ -676,7 +684,7 @@ function drawLegend(settings) {
         if (settings.title) {
             drawLegendItem({
                 text: settings.title,
-                x: X - 2,
+                x: X - 3,
                 y: -55,
                 fill: settings.style.color
             });
@@ -686,55 +694,55 @@ function drawLegend(settings) {
     if (settings.drawOptions.includes('legend')) {
 
         let background = drawRectangle({
-            x: X - 2,
-            y: lineHeight / 2 - 2,
+            x: X - 3,
+            y: Y + lineHeight / 2 - 3,
             width: settings.style.fontSize * 8,
-            height: 3.5 * lineHeight - 1,
+            height: 3.5 * lineHeight,
             stroke: settings.style.color
         });
 
         //toDo legend
         drawRectangle({
-            x: X + 1,
-            y: 0.5 * lineHeight + 1,
+            x: X,
+            y: Y + 0.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.toDo.color
         });
         drawLegendItem({
             text: 'To Do',
-            x: X + lineHeight * 1.62 + 1,
-            y: lineHeight + 1,
+            x: X + lineHeight * 1.62,
+            y: Y + lineHeight,
             fill: settings.style.color
         });
 
         //progress legend
         drawRectangle({
-            x: X + 1,
-            y: 1.5 * lineHeight + 1,
+            x: X,
+            y: Y + 1.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.progress.color
         });
         let progress = drawLegendItem({
             text: 'In Progress',
-            x: X + lineHeight * 1.62 + 1,
-            y: 2 * lineHeight + 1,
+            x: X + lineHeight * 1.62,
+            y: Y + 2 * lineHeight,
             fill: settings.style.color,
         });
 
         //done legend
         drawRectangle({
-            x: X + 1,
-            y: 2.5 * lineHeight + 1,
+            x: X,
+            y: Y + 2.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.done.color
         });
         drawLegendItem({
             text: 'Done',
-            x: X + lineHeight * 1.62 + 1,
-            y: 3 * lineHeight + 1,
+            x: X + lineHeight * 1.62,
+            y: Y + 3 * lineHeight,
             fill: settings.style.color
         });
 
