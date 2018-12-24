@@ -15,7 +15,7 @@ function validateSettings(settings) {
         throw "No settings";
     }
 
-    if (!settings.svg || settings.svg.tagName !== 'svg') {
+    if (!settings.svg || settings.svg.tagName.toLowerCase() !== 'svg') {
         throw "No svg";
     }
 

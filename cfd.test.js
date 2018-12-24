@@ -1,10 +1,6 @@
 'use babel'
 
 const fs = require('fs');
-const jsdom = require('jsdom');
-const {
-    JSDOM
-} = jsdom;
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11';
@@ -17,7 +13,7 @@ let settings;
 function makeTestSettings() {
     settings = {};
     settings.data = makeTestData();
-    settings.svg = JSDOM.fragment('<svg></svg>').firstChild;
+    settings.svg = document.createElement('svg');
     settings.predict = settings.data.entries[0].date;
     let now = moment(NOW);
     settings.title = 'Testing the cfd'
@@ -140,7 +136,7 @@ test('empty settings', () => {
 
 test('no svg tag', () => {
     let settings = {};
-    settings.svg = JSDOM.fragment('<div></div>').firstChild;
+    settings.svg = document.createElement('div');
 
     expect(() => {
         diagram.draw()
