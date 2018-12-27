@@ -744,10 +744,10 @@ test('write test results into file', () => {
         let match = expected[i] == actuals[i];
         if (match) {
             testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div>' + expected[i] + '</div>'
-                + '<div class="box"><div class="label expected">Actual ' + (i+1) + ' is as expected</div>' + actuals[i] + '</div>';
+                + '<div class="box"><div class="label expected">Actual ' + (i+1) + ' is as expected</div>' + actuals[i] + '</div></div>';
         } else {
-            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div>' + expected[i] + '/div>'
-                + '<div class="box"><div class="label mismatch">Actual ' + (i+1) + ' has a mismatch</div>' + actuals[i] + '</div>';
+            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + (i+1) + '</div>' + expected[i] + '</div>'
+                + '<div class="box"><div class="label mismatch">Actual ' + (i+1) + ' has a mismatch</div>' + actuals[i] + '</div></div>';
 
         }
     }

@@ -234,7 +234,7 @@ function prepareSVG(settings) {
 
 function prepareScales(settings) {
     settings.x = d3.scaleTime()
-        .range([0, settings.innerWidth]);
+        .range([0, settings.innerWidth]);    
     settings.y = d3.scaleLinear()
         .range([settings.innerHeight, 0]);
 }
@@ -243,7 +243,6 @@ function prepareDataFunctions(settings) {
 
     settings.stack = d3.stack();
     settings.area = d3.area()
-        //.curve(d3.curveStepAfter) - this kind of interpolation is more correct, but not very readable
         .x(function (d) {
             return settings.x(moment(d.data.date));
         })
