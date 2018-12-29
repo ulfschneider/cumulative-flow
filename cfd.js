@@ -306,7 +306,7 @@ function getDataSet(date, settings) {
         if (moment(entry.date).isSame(date, 'day')) {
             //sort the result
             let result = {
-                date: entry.date,
+                date: moment(entry.date),
                 __sum: 0,
                 __count: 1
             }
