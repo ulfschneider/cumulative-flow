@@ -21114,7 +21114,8 @@ function drawFocus(settings) {
             let width = 0;
 
             let y1 = settings.innerHeight;
-            if (!moment(dataSet.date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
+            let y2 = 0;
+            if (!dataSet.date.isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
                 //as we have an axis at the right side, we only draw
                 //the marker if its not directly on top of the axis
 
@@ -21123,14 +21124,14 @@ function drawFocus(settings) {
                         .attr('x1', x)
                         .attr('y1', y1)
                         .attr('x2', x)
-                        .attr('y2', y - LEGEND_PAD - 0.5)
+                        .attr('y2', y2)
                         .style('display', null);
                 }
                 marker
                     .attr('x1', x)
                     .attr('y1', y1)
                     .attr('x2', x)
-                    .attr('y2', y - LEGEND_PAD - .5)
+                    .attr('y2', y2)
                     .style('display', null);
             }            
 
