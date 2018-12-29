@@ -743,7 +743,7 @@ test('write test results into file', () => {
         writeTestFile('./test/actual' + i + '.svg', actuals[i]);
         let match = expected[i] == actuals[i];
         if (match) {
-            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + i+ + '</div>' + expected[i] + '</div>'
+            testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + i + '</div>' + expected[i] + '</div>'
                 + '<div class="box"><div class="label expected">Actual ' + i + ' is as expected</div>' + actuals[i] + '</div></div>';
         } else {
             testFileContent += '<div class="image-set"><div class="box"><div class="label">Expected ' + i + '</div>' + expected[i] + '</div>'
