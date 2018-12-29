@@ -618,11 +618,7 @@ function isDateInRange(date, settings) {
 function drawMarkers(settings) {
 
     let mark = function (date, label) {
-        let x1 = settings.x(moment(date));
-        if (x1 < 0.5) {
-            //perfect left align if a marker sit at the most left boundary of the diagram
-            x1 = 0.5;
-        }
+        let x1 = settings.x(moment(date)) + 0.5; //perfect align marker
         let y1 = settings.innerHeight;
         let y2 = 0;
         if (!moment(date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
@@ -804,11 +800,7 @@ function drawFocus(settings) {
         let drawFocusItems = function (dataSet) {
             hideFocus();
 
-            let x = settings.x(dataSet.date);
-            if (x < 0.5) {
-                //perfect left align if a marker sit at the most left boundary of the diagram
-                x = 0.5;
-            }
+            let x = settings.x(dataSet.date) + 0.5; //perfect align marker
             let y = LEGEND_Y + lineHeight / 2;
             let row = 0.5;
             let width = 0;
