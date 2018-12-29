@@ -301,7 +301,7 @@ function isDoneStatus(status, settings) {
     return settings.data.done.indexOf(status) >= 0;
 }
 
-function getDataSet(date) {
+function getDataSet(date, settings) {
     for (let entry of settings.data.entries) {
         if (moment(entry.date).isSame(date, 'day')) {
             //sort the result
@@ -870,7 +870,7 @@ function drawFocus(settings) {
 
         let mousemove = function () {
             let x0 = settings.x.invert(d3.mouse(this)[0]);
-            let dataSet = getDataSet(x0);
+            let dataSet = getDataSet(x0, settings);
             if (dataSet && dataSet.__count > 1) {
                 drawFocusItems(dataSet);
             } else {
