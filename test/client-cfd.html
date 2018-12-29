@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+    <svg id='actual1'></svg>
+    <script src="bundle.js"></script>
+    <script>
+        let moment = require('moment');
+        let cfd = require('cumulative-flow');
+        let NOW = '2018-12-12';
+
+        function makeTestSettings() {
+            let settings = {};
+            settings.data = makeTestData();
+            settings.svg = document.getElementById('actual1');
+            settings.predict = settings.data.entries[0].date;
+            settings.title = 'Testing the cfd'
+            settings.fromDate = moment(NOW).subtract(8, 'days');
+            settings.toDate = moment(NOW).add(3, 'days');
+
+            settings.markers = [{
+                date: settings.data.entries[1].date
+            }, {
+                date: settings.data.entries[3].date
+            }, {
+                date: settings.data.entries[5].date
+            }, {
+                date: settings.toDate
+            }]
+            return settings;
+        }
+
+        function makeTestData() {
+            let testData = {};
+            testData.toDo = ['new'];
+            testData.progress = ['test', 'dev'];
+            testData.done = ['done'];
+            testData.unit = 'points';
+            testData.entries = [];
+            testData.entries.push({
+                date: moment(NOW).subtract(8, 'days'),
+                new: 0,
+                dev: 0,
+                test: 0,
+                done: 0,
+            }, {
+                    date: moment(NOW).subtract(7, 'days'),
+                    new: 1,
+                    dev: 0,
+                    test: 0,
+                    done: 0,
+                }, {
+                    date: moment(NOW).subtract(6, 'days'),
+                    new: 1,
+                    dev: 1,
+                    test: 0,
+                    done: 0
+                }, {
+                    date: moment(NOW).subtract(5, 'days'),
+                    new: 1,
+                    dev: 0,
+                    test: 1,
+                    done: 1
+                }, {
+                    date: moment(NOW).subtract(4, 'days'),
+                    new: 2,
+                    dev: 1,
+                    test: 0,
+                    done: 2
+                }, {
+                    date: moment(NOW).subtract(3, 'days'),
+                    new: 1,
+                    dev: 1,
+                    test: 2,
+                    done: 2
+                }, {
+                    date: moment(NOW).subtract(2, 'days'),
+                    new: 0,
+                    dev: 0,
+                    test: 1,
+                    done: 5
+                }, {
+                    date: moment(NOW).subtract(1, 'days'),
+                    new: 1,
+                    dev: 1,
+                    test: 0,
+                    done: 5
+                }
+
+            );
+            return testData;
+        }
+
+        let settings = makeTestSettings();
+        let diagram = cfd(settings);
+        diagram.draw();
+    </script>
+</body>

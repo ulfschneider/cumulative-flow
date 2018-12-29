@@ -1,18 +1,18 @@
 {
     "name": "cumulative-flow",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "Draw SVG Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
         "flow",
         "completion",
         "prediction",
-        "kanban",
+        "area",
         "svg"
     ],
     "main": "cfd.js",
     "scripts": {
-        "test": "jest",
+        "test": "jest && browserify -r moment -r ./cfd.js:cumulative-flow -o ./test/bundle.js",
         "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
     },
     "jest": {
@@ -33,9 +33,12 @@
     "dependencies": {
         "d3": "^5.7.0",
         "js-base64": "^2.5.0",
-        "moment": "^2.23.0"
+        "moment": "^2.23.0",
+        "underscore": "^1.9.1"
     },
     "devDependencies": {
+        "acorn": "^6.0.4",
+        "browserify": "^16.2.3",
         "coveralls": "^3.0.2",
         "fs": "0.0.1-security",
         "jest": "^23.5.0"

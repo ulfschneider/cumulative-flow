@@ -55,6 +55,7 @@ Where settings is the configuration object for the drawing.
         'legend' - draw the legend information
         'markers' - draw the markers
         'predict' - draw the predict line
+        'focus' - draw detailed data when hovering the diagram
         </pre> By default all of these draw options are on.
     -   `settings.style` **[Object][6]?** Influence the appearance of the diagram with font and color. The defaults are:<pre>settings.style = {
         fontSize: 12,
@@ -62,8 +63,8 @@ Where settings is the configuration object for the drawing.
         color: '#222',
         backgroundColor: '#fff',
         axis: {color: '#222'},
-        toDo: {color: '#bec0c2', stroke: '#fff'},
-        progress: {color: '#808285', stroke: '#fff'},
+        toDo: {color: '#ccc', stroke: '#fff'},
+        progress: {color: '#888', stroke: '#fff'},
         done: {color: '#222', stroke: '#fff'},
         markers: {color: '#222', backgroundColor: '#fff'},
         predict: {color: '#222', backgroundColor: '#fff'}

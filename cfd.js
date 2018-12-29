@@ -3,10 +3,15 @@
 const d3 = require('d3');
 const moment = require('moment');
 const Base64 = require('js-base64').Base64;
+const _ = require('underscore');
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 400;
 const DATE_FORMAT = 'YYYY-MM-DD';
+const LEGEND_X = 10;
+const LEGEND_Y = 2.5;
+const LEGEND_PAD = 3;
+
 
 //Helper functions
 
@@ -53,7 +58,6 @@ function validateData(settings) {
     if (!settings.data.done) {
         throw "No done status defined"
     }
-
 }
 
 function validateMargins(settings) {
@@ -214,7 +218,7 @@ function validateStyles(settings) {
 
 function validateDrawOptions(settings) {
     if (!settings.drawOptions) {
-        settings.drawOptions = ['title', 'axis', 'legend', 'markers', 'predict'];
+        settings.drawOptions = ['title', 'axis', 'legend', 'markers', 'predict', 'focus'];
     }
 }
 
@@ -271,15 +275,18 @@ function prepareDataFunctions(settings) {
     }
     settings.x.domain(xRange);
 
-    settings.keys = settings.data.done;
-    settings.keys = settings.keys.concat(settings.data.progress);
-    settings.keys = settings.keys.concat(settings.data.toDo);
+    settings.data.keys = settings.data.done;
+    settings.data.keys = settings.data.keys.concat(settings.data.progress);
+    settings.data.keys = settings.data.keys.concat(settings.data.toDo);  
+    settings.data.reverseKeys = [...settings.data.keys].reverse();
+    
 
-    settings.stack.keys(settings.keys);
+
+    settings.stack.keys(settings.data.keys);
     settings.y.domain([0, d3.max(settings.data.entries, function (d) {
         let sum = 0;
-        for (let i = 0, n = settings.keys.length; i < n; i++) {
-            sum += d[settings.keys[i]];
+        for (let i = 0, n = settings.data.keys.length; i < n; i++) {
+            sum += d[settings.data.keys[i]];
         }
         return sum;
     })]);
@@ -292,6 +299,29 @@ function isProgressStatus(status, settings) {
 
 function isDoneStatus(status, settings) {
     return settings.data.done.indexOf(status) >= 0;
+}
+
+function getDataSet(date) {
+    for (let entry of settings.data.entries) {
+        if (moment(entry.date).isSame(date, 'day')) {
+            //sort the result
+            let result = {
+                date: entry.date,
+                __sum: 0,
+                __count: 1
+            }
+            for (let key of settings.data.reverseKeys) {
+                if (_.isNumber(entry[key]) && entry[key] > 0) {
+                    //count only positive numbers
+                    result[key] = entry[key];
+                    result.__sum += entry[key];
+                    result.__count += 1;
+                }
+            }
+            return result;
+        }
+    }
+    return null;
 }
 
 function dy(settings) {
@@ -444,7 +474,7 @@ function drawPrediction(settings) {
         for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
-                for (let key of settings.keys) {
+                for (let key of settings.data.keys) {
                     if (isDoneStatus(key, settings)) {
                         sum += entry[key];
                     }
@@ -458,7 +488,7 @@ function drawPrediction(settings) {
     let setAutoPredict = function () {
         //calculate autoPredict date only once
         for (let entry of settings.data.entries) {
-            for (let key of settings.keys) {
+            for (let key of settings.data.keys) {
                 if (isDoneStatus(key, settings) && entry[key] > 0) {
                     settings.predict = entry.date;
                     return settings.predict;
@@ -640,8 +670,6 @@ function drawMarkers(settings) {
 
 function drawLegend(settings) {
 
-    const X = 10;
-    const Y = 2.5;
     const lineHeight = settings.style.fontSize;
 
     const drawLegendItem = function ({
@@ -683,7 +711,7 @@ function drawLegend(settings) {
         if (settings.title) {
             drawLegendItem({
                 text: settings.title,
-                x: X - 3,
+                x: LEGEND_X - LEGEND_PAD,
                 y: -55,
                 fill: settings.style.color
             });
@@ -693,8 +721,8 @@ function drawLegend(settings) {
     if (settings.drawOptions.includes('legend')) {
 
         let background = drawRectangle({
-            x: X - 3,
-            y: Y + lineHeight / 2 - 3,   
+            x: LEGEND_X - LEGEND_PAD,
+            y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,   
             width: settings.style.fontSize * 8,
             height: 3.5 * lineHeight,
             stroke: settings.style.color
@@ -702,46 +730,46 @@ function drawLegend(settings) {
 
         //toDo legend
         drawRectangle({
-            x: X,
-            y: Y + 0.5 * lineHeight,
+            x: LEGEND_X,
+            y: LEGEND_Y + 0.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.toDo.color
         });
         drawLegendItem({
             text: 'To Do',
-            x: X + lineHeight * 1.62,
-            y: Y + lineHeight,
+            x: LEGEND_X + lineHeight * 1.62,
+            y: LEGEND_Y + lineHeight,
             fill: settings.style.color
         });
 
         //progress legend
         drawRectangle({
-            x: X,
-            y: Y + 1.5 * lineHeight,
+            x: LEGEND_X,
+            y: LEGEND_Y + 1.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.progress.color
         });
         let progress = drawLegendItem({
             text: 'In Progress',
-            x: X + lineHeight * 1.62,
-            y: Y + 2 * lineHeight,
+            x: LEGEND_X + lineHeight * 1.62,
+            y: LEGEND_Y + 2 * lineHeight,
             fill: settings.style.color,
         });
 
         //done legend
         drawRectangle({
-            x: X,
-            y: Y + 2.5 * lineHeight,
+            x: LEGEND_X,
+            y: LEGEND_Y + 2.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
             fill: settings.style.done.color
         });
         drawLegendItem({
             text: 'Done',
-            x: X + lineHeight * 1.62,
-            y: Y + 3 * lineHeight,
+            x: LEGEND_X + lineHeight * 1.62,
+            y: LEGEND_Y + LEGEND_PAD * lineHeight,
             fill: settings.style.color
         });
 
@@ -751,7 +779,7 @@ function drawLegend(settings) {
         //To Do, In Progress and Done
         try {
             let bbox = progress.node().getBBox();
-            background.attr('width', bbox.width + 2.2 * lineHeight);
+            background.attr('width', bbox.width + 2.6 * lineHeight);
         } catch (e) {
             //JSDOM is not able to operate with bbox
             //therefore this code is not going to run in the tests
@@ -765,6 +793,139 @@ function drawLegend(settings) {
             fill: settings.style.color
 
         });
+    }
+}
+
+function drawFocus(settings) {
+
+    if (settings.drawOptions.includes('focus')) {
+        const lineHeight = settings.style.fontSize;
+
+        let drawFocusItems = function (dataSet) {
+            hideFocus();
+
+            let x = settings.x(dataSet.date);
+            if (x < 0.5) {
+                //perfect left align if a marker sit at the most left boundary of the diagram
+                x = 0.5;
+            }
+            let y = LEGEND_Y + lineHeight / 2;
+            let row = 0.5;
+            let width = 0;
+
+            let y1 = settings.innerHeight;
+            if (!moment(dataSet.date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
+                //as we have an axis at the right side, we only draw
+                //the marker if its not directly on top of the axis
+
+                if (x > 0.5) {
+                    markerBackground
+                        .attr('x1', x)
+                        .attr('y1', y1)
+                        .attr('x2', x)
+                        .attr('y2', y - LEGEND_PAD - 0.5)
+                        .style('display', null);
+                }
+                marker
+                    .attr('x1', x)
+                    .attr('y1', y1)
+                    .attr('x2', x)
+                    .attr('y2', y - LEGEND_PAD - .5)
+                    .style('display', null);
+            }            
+
+            focus
+                .attr('x', (x + 2))
+                .attr('y', (y - LEGEND_PAD))
+                .attr('height', (.5 + row + dataSet.__count) * lineHeight)
+                .style('display', null);
+
+            let count = 0;
+            for (let key of _.keys(dataSet)) {
+                if (!key.startsWith('__')) {
+                    focusItems[count]
+                        .attr('x', x + LEGEND_PAD + 2,)
+                        .attr('y', key == 'date' ? y + row * lineHeight : y + (0.5 + row) * lineHeight)
+                        .style('display', null)
+                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : dataSet[key] + ' ' + key)    
+                    try {
+                        let bbx = focusItems[count].node().getBBox();
+                        width = Math.max(width, bbx.width + 2 * LEGEND_PAD);
+                    } catch (e) { }
+                    row++;
+                    count++;
+                }
+            }
+            focus.attr('width', width);
+            
+            if (x + 2 + width >= settings.innerWidth) {
+                let offset = - (2 + width);
+                focus.attr('x', x + offset);
+                for(let focusItem of focusItems) {
+                    focusItem.attr('x', x + LEGEND_PAD + offset);
+                }
+            }
+
+        }
+
+        let mousemove = function () {
+            let x0 = settings.x.invert(d3.mouse(this)[0]);
+            let dataSet = getDataSet(x0);
+            if (dataSet && dataSet.__count > 1) {
+                drawFocusItems(dataSet);
+            } else {
+                hideFocus();
+            }
+        }
+
+        let hideFocus = function () {
+            focus.style('display', 'none');
+            for (let focusItem of focusItems) {
+                focusItem.style('display', 'none');
+            }
+            markerBackground.style('display', 'none');
+            marker.style('display', 'none');
+        }
+
+        let focus = settings.g.append("rect")
+            .attr('fill', settings.style.backgroundColor)
+            .attr('stroke', settings.style.color)
+            .attr('class', 'focus-item')
+            .attr('width', lineHeight)
+            .attr('height', lineHeight)
+            .style('display', 'none');
+
+        let focusItems = [];
+        for (let i = 0; i < 40; i++) {
+            let focusItem = settings.g.append('text')
+                .attr('dy', dy(settings))
+                .attr('font-size', settings.style.fontSize + 'px')
+                .attr('font-family', settings.style.fontFamily)
+                .style('text-anchor', 'start')
+                .style('fill', settings.style.color)
+                .style('display', 'none')
+                .text('');
+
+            focusItems.push(focusItem);
+        }
+
+        let markerBackground = settings.g.append('line')
+            .style('display', 'none')        
+            .style('stroke-width', '3')
+            .style('stroke', settings.style.markers.backgroundColor);
+
+        let marker = settings.g.append('line')
+            .style('display', 'none')
+            .style('stroke-width', '1')
+            .style('stroke', settings.style.markers.color);
+
+        settings.g.append("rect")
+            .attr('width', settings.innerWidth)
+            .attr('height', settings.innerHeight)
+            .attr('fill', 'transparent')
+            .on('mousemove', mousemove)
+            .on('mouseout', hideFocus);
+
     }
 }
 
@@ -812,6 +973,7 @@ function drawLegend(settings) {
  * 'legend' - draw the legend information
  * 'markers' - draw the markers
  * 'predict' - draw the predict line
+ * 'focus' - draw detailed data when hovering the diagram
  * </pre> By default all of these draw options are on.
  * @param {Object} [settings.style] - Influence the appearance of the diagram with font and color. The defaults are:
  * <pre>settings.style = {
@@ -820,8 +982,8 @@ function drawLegend(settings) {
  * color: '#222',
  * backgroundColor: '#fff',
  * axis: {color: '#222'},
- * toDo: {color: '#bec0c2', stroke: '#fff'},
- * progress: {color: '#808285', stroke: '#fff'},
+ * toDo: {color: '#ccc', stroke: '#fff'},
+ * progress: {color: '#888', stroke: '#fff'},
  * done: {color: '#222', stroke: '#fff'},
  * markers: {color: '#222', backgroundColor: '#fff'},
  * predict: {color: '#222', backgroundColor: '#fff'}
@@ -880,6 +1042,7 @@ CFD.prototype.draw = function () {
     drawMarkers(this.settings);
     drawAxis(this.settings);
     drawLegend(this.settings);
+    drawFocus(this.settings);
 }
 
 /**

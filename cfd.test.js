@@ -285,7 +285,7 @@ test('no draw options', () => {
     delete settings.drawOptions;
     let diagram = cfd(settings);
     diagram.draw();
-    expect(settings.drawOptions).toEqual(['title', 'axis', 'legend', 'markers', 'predict']);
+    expect(settings.drawOptions).toEqual(['title', 'axis', 'legend', 'markers', 'predict', 'focus']);
 });
 
 
