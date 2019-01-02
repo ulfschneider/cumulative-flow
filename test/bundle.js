@@ -21245,18 +21245,25 @@ function drawFocus(settings) {
  * <pre>
  * npm i cumulative-flow
  * </pre>
+ * 
  * and use it inside your code via 
+ * 
  * <pre>
  * const cfd = require('cumulative-flow');
- * <pre>
+ * </pre>
+ * 
  * or, alternatively 
+ * 
  * <pre>
  * import cfd from 'cumulative-flow';
  * </pre>
+ * 
  * Create the new cfd objects via
+ * 
  * <pre>
  * let diagram = cfd(settings);
  * </pre>
+ * 
  * @constructor
  * @param {Object} settings - The configuration object for the diagram. 
  * All data for the diagram is provided with this object. 

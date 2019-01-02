@@ -30,8 +30,10 @@ and use it inside your code via
 
 <pre>
 const cfd = require('cumulative-flow');
-<pre>
+</pre>
+
 or, alternatively 
+
 <pre>
 import cfd from 'cumulative-flow';
 </pre>
