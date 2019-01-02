@@ -925,7 +925,30 @@ function drawFocus(settings) {
 //Object with API
 
 /**
- * A Cumulative Flow Diagram instance
+ * <a href='https://travis-ci.com/ulfschneider/cumulative-flow'><img src='https://travis-ci.com/ulfschneider/cumulative-flow.svg?branch=master'/></a>
+ * <a href='https://coveralls.io/github/ulfschneider/cumulative-flow?branch=master'><img src='https://coveralls.io/repos/github/ulfschneider/cumulative-flow/badge.svg?branch=master' /></a>
+ * <a href='https://badge.fury.io/js/cumulative-flow'><img src='https://badge.fury.io/js/cumulative-flow.svg' /></a>
+ *
+ * Draw SVG Cumulative Flow Diagrams and predict the anticipated completion of work.
+ * 
+ * <img src="https://raw.githubusercontent.com/ulfschneider/cumulative-flow/master/cfd.png"/>
+ *
+ * Install in your Node project with 
+ * <pre>
+ * npm i cumulative-flow
+ * </pre>
+ * and use it inside your code via 
+ * <pre>
+ * const cfd = require('cumulative-flow');
+ * </pre>
+ * or, alternatively 
+ * <pre>
+ * import cfd from 'cumulative-flow';
+ * </pre>
+ * Create the new cfd objects via
+ * <pre>
+ * let diagram = cfd(settings);
+ * </pre>
  * @constructor
  * @param {Object} settings - The configuration object for the diagram. 
  * All data for the diagram is provided with this object. 
@@ -936,11 +959,11 @@ function drawFocus(settings) {
  * @param {String} [settings.title] - The title for the diagram.
  * @param {Object} settings.svg - The DOM tree element, wich must be an svg tag.
  * The diagram will be attached to this DOM tree element. Example:
- * <pre>settings.svg = document.getElementById('cfd-diagram');</pre>
- * <code>'cfd-diagram'</code> is the id of a svg tag.
- * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margins for the diagram.
+ * <pre>settings.svg = document.getElementById('cfdDiagram');</pre>
+ * <code>'cfdDiagram'</code> is the id of a svg tag.
+ * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margin for the diagram.
  * Default values are:
- * <pre>settings.margins = {
+ * <pre>settings.margin = {
  * top: 75,
  * right: 210,
  * bottom: 30,
@@ -949,18 +972,18 @@ function drawFocus(settings) {
  * @param {String|Date} [settings.fromDate] - The start date for the diagram. Example:
  * <pre>settings.fromDate = '2018-09-01';</pre>
  * @param {String|Date} [settings.toDate] - The end date for the diagram. Example:
- * <pre>settings.fromDate = '2018-09-05';</pre>
+ * <pre>settings.toDate = '2018-09-05';</pre>
  * @param {String|Date} [settings.predict] - To draw an indication line for the completion of work.
  * The predict argument determines at what date to start drawing the line. Example:
  * <pre>settings.fromDate = '2018-09-01';</pre>
  * If no date is provided but the drawOptions allow to draw a prediction line, an automatic
  * start date for that line will be calculated based on the first date something went to done.
- * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates of inside of the diagram
+ * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates inside of the diagram
  * with markers. Each marker is an object with a date for the marker and an optional label. Example:
  * <pre>settings.markers = [
  * { date: '2018-09-03', label: 'M1' },
  * { date: '2018-09-10', label: 'M2' }];</pre>
- * @param {String[]} [settings.drawOptions] - An array to determine the parts to be drawn. Possible contents:
+ * @param {String[]} [settings.drawOptions] - An array to determine the parts to be drawn. Possible options:
  * <pre>'title' - draw the title
  * 'axis' - draw the x and y axis
  * 'legend' - draw the legend information
@@ -968,7 +991,7 @@ function drawFocus(settings) {
  * 'predict' - draw the predict line
  * 'focus' - draw detailed data when hovering the diagram
  * </pre> By default all of these draw options are on.
- * @param {Object} [settings.style] - Influence the appearance of the diagram with font and color. The defaults are:
+ * @param {Object} [settings.style] - Influence the appearance of the diagram with typeface and colors. The defaults are:
  * <pre>settings.style = {
  * fontSize: 12,
  * fontFamily: 'sans-serif',
@@ -997,7 +1020,7 @@ function drawFocus(settings) {
  * { date: '2018-09-09', new: 0, dev: 0, test: 1, done: 5 },
  * { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 }
  * ]}</pre>
- * Each entry object must contain a date and the status counts for th
+ * Each entry object must contain a date and the status counts for the
  * <code>toDo</code>, <code>progress</code> and <code>done</code> status categories.
  * The unit is the unit of measurement for the status counts.
  * A value of <code>'points'</code> indicates story points.
@@ -1052,19 +1075,17 @@ CFD.prototype.remove = function () {
 
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+ * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @deprecated use imageSource instead
  * @returns {string}
  */
 CFD.prototype.image = function () {
-    this.draw();
-    let html = this.settings.svg.outerHTML;
-    return 'data:image/svg+xml;base64,' + Base64.encode(html);
+    return this.imageSource();
 }
 
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the src attribute of an HTML img tag.
+ * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @returns {string}
  */
 CFD.prototype.imageSource = function () {
@@ -1075,7 +1096,7 @@ CFD.prototype.imageSource = function () {
 
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a svg tag string.
+ * and return the result as a SVG tag string.
  * @returns {string}
  */
 CFD.prototype.svgSource = function () {

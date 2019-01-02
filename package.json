@@ -1,6 +1,6 @@
 {
     "name": "cumulative-flow",
-    "version": "1.10.5",
+    "version": "1.10.6",
     "description": "Draw SVG Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
@@ -12,7 +12,7 @@
     ],
     "main": "cfd.js",
     "scripts": {
-        "test": "jest && browserify -r moment -r ./cfd.js:cumulative-flow -o ./test/bundle.js",
+        "test": "jest && browserify -r moment -r ./cfd.js:cumulative-flow -o ./test/bundle.js && documentation build cfd.js -f md > README.md",
         "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
     },
     "jest": {
@@ -40,6 +40,7 @@
         "acorn": "^6.0.4",
         "browserify": "^16.2.3",
         "coveralls": "^3.0.2",
+        "documentation": "^9.1.1",
         "fs": "0.0.1-security",
         "jest": "^23.5.0"
     }
