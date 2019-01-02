@@ -105,7 +105,7 @@ function readTestFile(path) {
 
 function readExpectedFiles(folder, count) {
     let expected = [];
-    for(let i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
         expected.push(readTestFile(folder + '/expect' + i + '.svg'));
     }
     return expected;
@@ -428,7 +428,7 @@ test('colors toDo, progress, done, axis, default color and background', () => {
         color: toDo
     }
     settings.style.axis = {
-        color:axis
+        color: axis
     };
     diagram.draw();
     expect(settings.style.fontSize).toBe(12);
@@ -558,7 +558,7 @@ test('no done status defined', () => {
     }).toThrow(/No done status defined/);
 });
 
-test('image 1 with default test data', () => {
+test('image 0 with default test data', () => {
     let settings = makeTestSettings();
     settings.title = 'Testing CFD';
     let diagram = cfd(settings);
@@ -586,10 +586,22 @@ test('ISO 6801 date strings', () => {
     expect(actual).toBe(expected[0]);
 });
 
-test('image 2 without fromDate and toDate', () => {
+test('image 1 without fromDate and toDate', () => {
     let settings = makeTestSettings();
     delete settings.fromDate
     delete settings.toDate;
+    settings.style = {
+        toDo: {
+            color: 'cornflowerblue'
+        },
+        progress: {
+            color: 'firebrick'
+        },
+        done: {
+            color: 'purple'
+        }
+    }
+
     settings.title = 'Testing CFD without fromDate and without toDate';
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
@@ -598,7 +610,7 @@ test('image 2 without fromDate and toDate', () => {
     expect(actuals[1]).toBe(expected[1]);
 });
 
-test('image 3 with narrow fromDate and toDate', () => {
+test('image 2 with narrow fromDate and toDate', () => {
     let settings = makeTestSettings();
     settings.fromDate = moment(NOW).subtract(5, 'days');
     settings.toDate = moment(NOW).subtract(1, 'days');
@@ -609,7 +621,7 @@ test('image 3 with narrow fromDate and toDate', () => {
     expect(actuals[2]).toBe(expected[2]);
 });
 
-test('image 4 with early predictStart', () => {
+test('image 3 with early predictStart', () => {
     let settings = makeTestSettings();
     delete settings.fromDate;
     delete settings.toDate;
@@ -621,12 +633,12 @@ test('image 4 with early predictStart', () => {
     expect(actuals[3]).toBe(expected[3]);
 });
 
-test('image 5 without markers', () => {
+test('image 4 without markers', () => {
     let settings = makeTestSettings();
     delete settings.markers;
     delete settings.fromDate;
     delete settings.toDate;
-    settings.predict = moment(NOW).subtract(10, 'days');    
+    settings.predict = moment(NOW).subtract(10, 'days');
     settings.title = 'Testing CFD without markers';
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
@@ -634,26 +646,26 @@ test('image 5 without markers', () => {
     expect(actuals[4]).toBe(expected[4]);
 });
 
-test('image 6 without title and with auto predict', () => {
+test('image 5 without title and with auto predict', () => {
     let settings = makeTestSettings();
     delete settings.title;
     delete settings.predict;
     delete settings.markers;
     delete settings.fromDate;
-    delete settings.toDate;    
+    delete settings.toDate;
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[5]).toBe(expected[5]);
 });
 
-test('image 7 without axis, markers and predict', () => {
+test('image 6 without axis, markers and predict', () => {
     let settings = makeTestSettings();
     delete settings.title;
     delete settings.predict;
     delete settings.markers;
     delete settings.fromDate;
-    delete settings.toDate;    
+    delete settings.toDate;
 
     settings.title = 'Testing CFD without axis, markers and predict';
     settings.drawOptions = ['legend'];
@@ -663,14 +675,14 @@ test('image 7 without axis, markers and predict', () => {
     expect(actuals[6]).toBe(expected[6]);
 });
 
-test('image 8 with markers out of range', () => {
+test('image 7 with markers out of range', () => {
     let settings = makeTestSettings();
     settings.title = "Testing CFD with markers out of range";
 
     delete settings.predict;
     delete settings.markers;
     delete settings.fromDate;
-    delete settings.toDate;    
+    delete settings.toDate;
     delete settings.drawOptions;
     settings.predict = moment(NOW).add(20, 'days');
     delete settings.data.unit;
@@ -685,7 +697,7 @@ test('image 8 with markers out of range', () => {
     expect(actuals[7]).toBe(expected[7]);
 });
 
-test('image 9 with markers out of range', () => {
+test('image 8 with markers out of range', () => {
     let settings = makeTestSettings();
     settings.toDate = moment(NOW);
     delete settings.predict;
@@ -700,19 +712,19 @@ test('image 9 with markers out of range', () => {
         { date: moment(NOW).subtract(20, 'days'), label: 'm1' },
         { date: moment(NOW).subtract(2, 'days'), label: 'm2' },
         { date: moment(NOW).add(20, 'days'), label: 'm3' },
-    ]    
+    ]
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
     actuals.push(actual);
     expect(actuals[8]).toBe(expected[8]);
 });
 
-test('image 10 without predict line because of 0 velocity', () => {
+test('image 9 without predict line because of 0 velocity', () => {
     let settings = makeTestSettings();
     settings.toDate = moment(NOW);
     settings.title = "Testing CFD without predict line because of 0 velocity";
-    for(entry of settings.data.entries) {
-        entry.done = 3; 
+    for (entry of settings.data.entries) {
+        entry.done = 3;
     }
     let diagram = cfd(settings);
     let actual = diagram.svgSource();

@@ -292,6 +292,9 @@ function prepareDataFunctions(settings) {
     })]);
 }
 
+function isToDoStatus(status, settings) {
+    return settings.data.toDo.indexOf(status) >= 0;
+}
 
 function isProgressStatus(status, settings) {
     return settings.data.progress.indexOf(status) >= 0;
@@ -424,7 +427,9 @@ function drawLayers(settings) {
         .append('path')
         .attr('class', 'area')
         .style('fill', function (d) {
-            if (isProgressStatus(d.key, settings)) {
+            if (isToDoStatus(d.key, settings)) {
+                return settings.style.toDo.color;
+            } else if (isProgressStatus(d.key, settings)) {
                 return settings.style.progress.color;
             } else if (isDoneStatus(d.key, settings)) {
                 return settings.style.done.color;
@@ -432,7 +437,9 @@ function drawLayers(settings) {
             return settings.style.toDo.color;
         })
         .style('stroke', function (d) {
-            if (isProgressStatus(d.key, settings)) {
+            if (isToDoStatus(d.key, settings)) {
+                return settings.style.toDo.stroke;
+            } else if (isProgressStatus(d.key, settings)) {
                 return settings.style.progress.stroke;
             } else if (isDoneStatus(d.key, settings)) {
                 return settings.style.done.stroke;
@@ -1061,7 +1068,7 @@ CFD.prototype.draw = function () {
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
     drawLayers(this.settings);
-    drawPrediction(this.settings);
+    drawPrediction(this.settings);        
     drawMarkers(this.settings);
     drawAxis(this.settings);
     drawLegend(this.settings);
