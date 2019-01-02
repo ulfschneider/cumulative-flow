@@ -20567,7 +20567,8 @@ function prepareDataFunctions(settings) {
 
     settings.fromDate = settings.fromDate ? moment(settings.fromDate)
         .startOf('day') : settings.fromDate;
-    settings.toDate = settings.toDate ? moment(settings.toDate) : settings.toDate;
+    settings.toDate = settings.toDate ? moment(settings.toDate)
+        .startOf('day') : settings.toDate;
 
 
     let xRange = d3.extent(settings.data.entries, function (d) {
