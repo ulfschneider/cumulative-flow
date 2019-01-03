@@ -1,6 +1,6 @@
 {
     "name": "cumulative-flow",
-    "version": "1.10.9",
+    "version": "1.10.10",
     "description": "Draw SVG Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
@@ -8,7 +8,8 @@
         "completion",
         "prediction",
         "area",
-        "svg"
+        "svg",
+        "d3"
     ],
     "main": "cfd.js",
     "scripts": {

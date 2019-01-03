@@ -108,7 +108,7 @@ let diagram = cfd(settings);
         <code>toDo</code>, <code>progress</code> and <code>done</code> status categories.
         The unit is the unit of measurement for the status counts.
         A value of <code>'points'</code> indicates story points.
-        An omitted unit will lead to interpreting the status counts as issue counts.
+        An omitted unit will lead to interpreting the status counts as item counts.
         The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
         must contain the status values as strings that belong exactly to those categories.
         The rendering of the layers in the Cumulate Flow Diagram will follow the order
