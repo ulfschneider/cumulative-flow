@@ -248,7 +248,7 @@ function prepareDataFunctions(settings) {
     settings.stack = d3.stack();
     settings.area = d3.area()
         .x(function (d) {
-            return settings.x(moment(d.data.date));
+            return settings.x(getStartOfDay(d.data.date));
         })
         .y0(function (d) {
             return settings.y(d[0]);
@@ -257,14 +257,12 @@ function prepareDataFunctions(settings) {
             return settings.y(d[1]);
         });
 
-    settings.fromDate = settings.fromDate ? moment(settings.fromDate)
-        .startOf('day') : settings.fromDate;
-    settings.toDate = settings.toDate ? moment(settings.toDate)
-        .startOf('day') : settings.toDate;
+    settings.fromDate = settings.fromDate ? getStartOfDay(settings.fromDate) : settings.fromDate;
+    settings.toDate = settings.toDate ? getStartOfDay(settings.toDate) : settings.toDate;
 
 
     let xRange = d3.extent(settings.data.entries, function (d) {
-        return moment(d.date);
+        return getStartOfDay(d.date);
     });
 
     if (settings.fromDate) {
@@ -304,12 +302,16 @@ function isDoneStatus(status, settings) {
     return settings.data.done.indexOf(status) >= 0;
 }
 
+function getStartOfDay(date) {
+    return moment(moment(date).format('YYYY-MM-DD'));
+}
+
 function getDataSet(date, settings) {
     for (let entry of settings.data.entries) {
         if (moment(entry.date).isSame(date, 'day')) {
             //sort the result
             let result = {
-                date: moment(entry.date),
+                date: getStartOfDay(entry.date),
                 __sum: 0,
                 __count: 1
             }
@@ -463,12 +465,15 @@ function drawLayers(settings) {
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
             .style('fill', function (d) {
+                /*
                 if (isProgressStatus(d.key, settings)) {
                     return settings.style.progress.color;
                 } else if (isDoneStatus(d.key, settings)) {
                     return settings.style.done.color;
                 }
                 return settings.style.toDo.color;
+                */
+               return settings.style.color;
             })
             .text(function (d) {
                 return round(d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
@@ -510,8 +515,8 @@ function drawPrediction(settings) {
         }
 
         if (settings.predict) {
-            let predictStart = moment(settings.predict);
-            let currentDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
+            let predictStart = getStartOfDay(settings.predict);
+            let currentDate = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
             let doneAtPredictStart = summarizeDone(predictStart);
             let doneAtCurrentDate = summarizeDone(currentDate);
             if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
@@ -534,14 +539,14 @@ function drawPrediction(settings) {
                 let dateFromX = function (x) {
                     let m = (x2 - x1) / (currentDate - predictStart);
                     let c = x1 - m * predictStart;
-                    return moment((x - c) / m);
+                    return getStartOfDay((x - c) / m);
                 }
 
                 //x0 and y0 to be used for the real start point of the line
                 let x0 = x1;
                 let y0 = y1;
                 if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
-                    x0 = settings.x(settings.fromDate ? settings.fromDate : settings.data.entries[0].date);
+                    x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : settings.data.entries[0].date));
                     y0 = yFromX(x0);
                 }
 
@@ -602,10 +607,10 @@ function drawPrediction(settings) {
 
 function isDateInRange(date, settings) {
     let dataFromDate, dataToDate;
-    let momentDate = moment(date);
+    let momentDate = getStartOfDay(date);
 
-    dataFromDate = moment(settings.data.entries[0].date);
-    dataToDate = moment(settings.data.entries[settings.data.entries.length - 1].date);
+    dataFromDate = getStartOfDay(settings.data.entries[0].date);
+    dataToDate = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
         return false;
@@ -625,10 +630,10 @@ function isDateInRange(date, settings) {
 function drawMarkers(settings) {
 
     let mark = function (date, label) {
-        let x1 = settings.x(moment(date)) + 0.5; //perfect align marker
+        let x1 = settings.x(getStartOfDay(date)) + 0.5; //perfect align marker
         let y1 = settings.innerHeight;
         let y2 = 0;
-        if (!moment(date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
+        if (!getStartOfDay(date).isSame(settings.toDate) || !settings.drawOptions.includes('axis')) {
             //as we have an axis at the right side, do only draw
             //the marker if its not directly on top of the axis
 

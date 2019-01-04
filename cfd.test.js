@@ -3,7 +3,7 @@
 const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
-const NOW = '2018-09-11';
+const NOW = '2018-09-11 12:00';
 const NUMBER_OF_TEST_IMAGES = 10;
 let actuals = [];
 let expected = [];
@@ -564,6 +564,15 @@ test('image 0 with default test data', () => {
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
     actuals.push(actual);
+
+    for(let i = 0; i < actuals[0].length && i < expected[0].length; i++) {
+        if (actuals[0].charAt(i) !== expected[0].charAt(i)) {
+            console.log('MISMATCH at ' + i);
+            console.log('ACT: ' + actuals[0].substring(i));
+            console.log('EXP: ' + expected[0].substring(i));
+            break;
+        }
+    }
 
     expect(actuals[0]).toBe(expected[0]);
 
