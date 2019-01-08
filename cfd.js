@@ -334,7 +334,12 @@ function getFirstEntryDate(settings) {
 }
 
 function getLastEntryDate(settings) {
-    return getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
+    let entry = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
+    if (settings.toDate && settings.toDate.isBefore(entry)) {
+        return settings.toDate;
+    } else {
+        return entry;
+    }
 }
 
 function dy(settings) {
