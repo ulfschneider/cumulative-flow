@@ -21182,8 +21182,8 @@ function drawFocus(settings) {
         }
 
         let mousemove = function () {
-            let x0 = settings.x.invert(d3.mouse(this)[0]);
-            let dataSet = getDataSet(x0, settings);
+            let date = settings.x.invert(d3.mouse(this)[0]);
+            let dataSet = getDataSet(date, settings);
             if (dataSet && dataSet.__count > 1) {
                 drawFocusItems(dataSet);
             } else {
@@ -21233,7 +21233,7 @@ function drawFocus(settings) {
             .style('stroke', settings.style.markers.color);
 
         settings.g.append("rect")
-            .attr('width', settings.innerWidth)
+            .attr('width', settings.innerWidth + settings.margin.right)
             .attr('height', settings.innerHeight)
             .attr('fill', 'transparent')
             .on('mousemove', mousemove)
