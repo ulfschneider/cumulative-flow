@@ -341,6 +341,11 @@ function dy(settings) {
     return settings.style.fontSize / 3 + 'px';
 }
 
+function round(number) {
+    return Math.round(number * 100) / 100;
+}
+
+
 function drawTextWithBackground({
     text,
     textAnchor,
@@ -421,10 +426,6 @@ function drawAxis(settings) {
 }
 
 function drawLayers(settings) {
-    const round = function (number) {
-        return Math.round(number * 100) / 100;
-    }
-
     let layer = settings.g.selectAll('.layer')
         .data(settings.stack(settings.data.entries.filter(function (d) {
             return isDateInRange(d.date, settings);
@@ -860,7 +861,7 @@ function drawFocus(settings) {
                         .attr('x', x + LEGEND_PAD + 2,)
                         .attr('y', key == 'date' ? y + row * lineHeight : y + (0.5 + row) * lineHeight)
                         .style('display', null)
-                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : dataSet[key] + ' ' + key)    
+                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)    
                     try {
                         let bbx = focusItems[count].node().getBBox();
                         width = Math.max(width, bbx.width + 2 * LEGEND_PAD);
