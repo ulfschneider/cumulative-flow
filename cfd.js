@@ -329,6 +329,14 @@ function getDataSet(date, settings) {
     return null;
 }
 
+function getFirstEntryDate(settings) {
+    return getStartOfDay(settings.data.entries[0].date);
+}
+
+function getLastEntryDate(settings) {
+    return getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
+}
+
 function dy(settings) {
     return settings.style.fontSize / 3 + 'px';
 }
@@ -516,7 +524,7 @@ function drawPrediction(settings) {
 
         if (settings.predict) {
             let predictStart = getStartOfDay(settings.predict);
-            let currentDate = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
+            let currentDate = getLastEntryDate(settings)
             let doneAtPredictStart = summarizeDone(predictStart);
             let doneAtCurrentDate = summarizeDone(currentDate);
             if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
@@ -546,7 +554,7 @@ function drawPrediction(settings) {
                 let x0 = x1;
                 let y0 = y1;
                 if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
-                    x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : settings.data.entries[0].date));
+                    x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : getFirstEntryDate(settings)));
                     y0 = yFromX(x0);
                 }
 
@@ -609,8 +617,8 @@ function isDateInRange(date, settings) {
     let dataFromDate, dataToDate;
     let momentDate = getStartOfDay(date);
 
-    dataFromDate = getStartOfDay(settings.data.entries[0].date);
-    dataToDate = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
+    dataFromDate = getFirstEntryDate(settings);
+    dataToDate = getLastEntryDate(settings);
 
     if (settings.fromDate && momentDate.isBefore(settings.fromDate)) {
         return false;
@@ -874,7 +882,13 @@ function drawFocus(settings) {
         }
 
         let mousemove = function () {
-            let date = settings.x.invert(d3.mouse(this)[0]);
+            let date = getStartOfDay(settings.x.invert(d3.mouse(this)[0]));
+            let lastDate = getLastEntryDate(settings);
+
+            if (date.isAfter(lastDate)) {
+                date = lastDate;
+            }
+            
             let dataSet = getDataSet(date, settings);
             if (dataSet && dataSet.__count > 1) {
                 drawFocusItems(dataSet);
