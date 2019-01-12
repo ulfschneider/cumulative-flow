@@ -1002,6 +1002,8 @@ function drawFocus(settings) {
  * The diagram will be attached to this DOM tree element. Example:
  * <pre>settings.svg = document.getElementById('cfdDiagram');</pre>
  * <code>'cfdDiagram'</code> is the id of a svg tag.
+ * @param {Number} [settings.width] - The width of the diagram
+ * @param {Number} [settings.height] - The height of the diagram
  * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margin for the diagram.
  * Default values are:
  * <pre>settings.margin = {
