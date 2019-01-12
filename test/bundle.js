@@ -20716,6 +20716,7 @@ function drawAxis(settings) {
         xAxis
             .selectAll('text')
             .style('fill', settings.style.axis.color)
+            .style('text-anchor', 'start')
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily);
 
@@ -20733,6 +20734,7 @@ function drawAxis(settings) {
         yAxis
             .selectAll('text')
             .style('fill', settings.style.axis.color)
+            .attr('text-anchor', 'start')
             .attr('font-size', settings.style.fontSize + 'px')
             .attr('font-family', settings.style.fontFamily);
     }
@@ -20982,7 +20984,7 @@ function drawMarkers(settings) {
             x: x1,
             y: -15,
             color: settings.style.markers.color,
-            textAnchor: 'middle',
+            textAnchor: 'start',
             background: settings.style.backgroundColor,
             settings: settings
         });
