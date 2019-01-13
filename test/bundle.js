@@ -20727,7 +20727,7 @@ function drawAxis(settings) {
     if (settings.drawOptions.includes('axis')) {
         let xAxis = settings.g.append('g')
             .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-            .call(d3.axisBottom(settings.x).ticks(Math.floor(settings.innerWidth / 100)));
+            .call(d3.axisBottom(settings.x).ticks(Math.floor(settings.innerWidth / 100)).tickFormat(d3.timeFormat("%b %d")));
         xAxis
             .selectAll('path')
             .style('stroke', settings.style.axis.color);
