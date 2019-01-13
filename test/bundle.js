@@ -20368,6 +20368,7 @@ function validateData(settings) {
     }
 
     settings.data.keys = [...settings.data.done].concat(settings.data.progress).concat(settings.data.toDo);  
+    settings.data.reverseKeys = [...settings.data.keys].reverse();
     
     if (_.isArray(settings.data.entries[0])) {
         transformData(settings);
@@ -20643,7 +20644,7 @@ function getDataSet(date, settings) {
                 __sum: 0,
                 __count: 1
             }
-            for (let key of settings.data.keys) {
+            for (let key of settings.data.reverseKeys) {
                 if (_.isNumber(entry[key]) && entry[key] > 0) {
                     //count only positive numbers
                     result[key] = entry[key];
