@@ -20366,7 +20366,37 @@ function validateData(settings) {
     if (!settings.data.done) {
         throw "No done status defined"
     }
+
+    settings.data.keys = [...settings.data.done];
+    settings.data.keys = settings.data.keys.concat(settings.data.progress);
+    settings.data.keys = settings.data.keys.concat(settings.data.toDo);  
+    settings.data.reverseKeys = [...settings.data.keys].reverse();
+
+    if (_.isArray(settings.data.entries[0])) {
+        transformData(settings);
+    }
 }
+
+function transformData(settings) {
+    //the given data entries itself are arrays    
+    let transformedEntries = [];    
+    for (let entry of settings.data.entries) {
+        let transformedEntry = {}
+
+        //the first value of the array must be the date
+        transformedEntry.date = moment(entry[0]);
+
+        //the following entries must be the values in order of the given keys
+        let i = 1;
+        for(let key of settings.data.keys) {
+            transformedEntry[key] = entry[i];
+            i++;
+        }
+        transformedEntries.push(transformedEntry);
+    }
+    settings.data.entries = transformedEntries;
+}
+
 
 function validateMargins(settings) {
     if (!settings.margin) {
@@ -20580,13 +20610,6 @@ function prepareDataFunctions(settings) {
         xRange[1] = settings.toDate;
     }
     settings.x.domain(xRange);
-
-    settings.data.keys = settings.data.done;
-    settings.data.keys = settings.data.keys.concat(settings.data.progress);
-    settings.data.keys = settings.data.keys.concat(settings.data.toDo);  
-    settings.data.reverseKeys = [...settings.data.keys].reverse();
-    
-
 
     settings.stack.keys(settings.data.keys);
     settings.y.domain([0, d3.max(settings.data.entries, function (d) {
@@ -21310,8 +21333,8 @@ function drawFocus(settings) {
  * The diagram will be attached to this DOM tree element. Example:
  * <pre>settings.svg = document.getElementById('cfdDiagram');</pre>
  * <code>'cfdDiagram'</code> is the id of a svg tag.
- * @param {Number} [settings.width] - The width of the diagram
- * @param {Number} [settings.height] - The height of the diagram
+ * @param {Number} [settings.width] - The width of the diagram in pixels, the margin settings have to be included in that width.
+ * @param {Number} [settings.height] - The height of the diagram in pixels, the margin settings have to be included in that height.
  * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margin for the diagram.
  * Default values are:
  * <pre>settings.margin = {

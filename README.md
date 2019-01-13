@@ -55,8 +55,8 @@ let diagram = cfd(settings);
     -   `settings.title` **[String][12]?** The title for the diagram.
     -   `settings.svg` **[Object][8]** The DOM tree element, wich must be an svg tag.
         The diagram will be attached to this DOM tree element. Example:<pre>settings.svg = document.getElementById('cfdDiagram');</pre><code>'cfdDiagram'</code> is the id of a svg tag.
-    -   `settings.width` **[Number][13]?** The width of the diagram
-    -   `settings.height` **[Number][13]?** The height of the diagram
+    -   `settings.width` **[Number][13]?** The width of the diagram in pixels, the margin settings have to be included in that width.
+    -   `settings.height` **[Number][13]?** The height of the diagram in pixels, the margin settings have to be included in that height.
     -   `settings.margin` **{top: [Number][13], right: [Number][13], bottom: [Number][13], right: [Number][13]}?** The margin for the diagram.
         Default values are:<pre>settings.margin = {
         top: 75,

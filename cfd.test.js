@@ -4,7 +4,7 @@ const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11 12:00';
-const NUMBER_OF_TEST_IMAGES = 10;
+const NUMBER_OF_TEST_IMAGES = 11;
 let actuals = [];
 let expected = [];
 let settings;
@@ -89,6 +89,29 @@ function makeTestData() {
             test: 0,
             done: 5
         }
+
+    );
+    return testData;
+}
+
+function makeArrayOfArraysTestData() {
+    let testData = {};
+    let now = moment(NOW);
+    testData.toDo = ['new'];
+    testData.progress = ['test', 'dev'];
+    testData.done = ['done'];
+    testData.unit = 'points';
+    testData.entries = [];
+    testData.entries.push([
+        moment(now).subtract(8, 'days'), 0, 0, 0, 0,],
+        [moment(now).subtract(7, 'days'), 0, 0, 0, 1],
+        [moment(now).subtract(6, 'days'), 0, 0, 1, 1],
+        [moment(now).subtract(5, 'days'), 1, 1, 0, 1],
+        [moment(now).subtract(4, 'days'), 2, 0, 1, 2],
+        [moment(now).subtract(3, 'days'), 2, 2, 1, 1],
+        [moment(now).subtract(2, 'days'), 5, 1, 0, 0],
+        [moment(now).subtract(1, 'days'), 5, 0, 1, 1
+        ]
 
     );
     return testData;
@@ -730,6 +753,19 @@ test('image 9 without predict line because of 0 velocity', () => {
     actuals.push(actual);
     expect(actuals[9]).toBe(expected[9]);
 });
+
+test('image 10 with array of arrays default test data', () => {
+    let settings = makeTestSettings();
+    settings.data = makeArrayOfArraysTestData();
+    settings.title = 'Testing CFD with array of arrays';
+    let diagram = cfd(settings);
+    let actual = diagram.svgSource();
+    actuals.push(actual);
+
+    expect(actuals[10]).toBe(expected[10]);
+});
+
+
 
 test('remove image', () => {
     let settings = makeTestSettings();
