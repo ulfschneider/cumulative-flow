@@ -59,11 +59,8 @@ function validateData(settings) {
         throw "No done status defined"
     }
 
-    settings.data.keys = [...settings.data.done];
-    settings.data.keys = settings.data.keys.concat(settings.data.progress);
-    settings.data.keys = settings.data.keys.concat(settings.data.toDo);  
-    settings.data.reverseKeys = [...settings.data.keys].reverse();
-
+    settings.data.keys = [...settings.data.done].concat(settings.data.progress).concat(settings.data.toDo);  
+    
     if (_.isArray(settings.data.entries[0])) {
         transformData(settings);
     }
@@ -338,7 +335,7 @@ function getDataSet(date, settings) {
                 __sum: 0,
                 __count: 1
             }
-            for (let key of settings.data.reverseKeys) {
+            for (let key of settings.data.keys) {
                 if (_.isNumber(entry[key]) && entry[key] > 0) {
                     //count only positive numbers
                     result[key] = entry[key];
