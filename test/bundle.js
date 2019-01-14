@@ -20450,7 +20450,7 @@ function validateStyles(settings) {
             stroke: settings.style.backgroundColor,
         };
         settings.style.done = {
-            color: '#222',
+            color: '#555',
             stroke: settings.style.backgroundColor,
         };
         settings.style.predict = {
@@ -20511,12 +20511,12 @@ function validateStyles(settings) {
         }
         if (!settings.style.done) {
             settings.style.done = {
-                color: '#222',
+                color: '#555',
                 stroke: settings.style.backgroundColor
             }
         } else {
             if (!settings.style.done.color) {
-                settings.style.done.color = '#222';
+                settings.style.done.color = '#555';
             }
             if (!settings.style.done.stroke) {
                 settings.style.done.stroke = settings.style.backgroundColor;
@@ -20727,7 +20727,7 @@ function drawAxis(settings) {
     if (settings.drawOptions.includes('axis')) {
         let xAxis = settings.g.append('g')
             .attr('transform', 'translate(0,' + settings.innerHeight + ')')
-            .call(d3.axisBottom(settings.x).ticks(Math.floor(settings.innerWidth / 100)).tickFormat(d3.timeFormat("%b %d")));
+            .call(d3.axisBottom(settings.x).ticks(Math.floor(settings.innerWidth / 120)).tickFormat(d3.timeFormat("%b %d")));
         xAxis
             .selectAll('path')
             .style('stroke', settings.style.axis.color);

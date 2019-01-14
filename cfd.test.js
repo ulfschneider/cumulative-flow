@@ -368,7 +368,7 @@ test('default style', () => {
     let background = '#fff';
     let toDo = '#ccc';
     let progress = '#888';
-    let done = '#222';
+    let done = '#555';
     diagram.draw();
     expect(settings.style.fontSize).toBe(12);
     expect(settings.style.fontFamily).toBe('sans-serif');
@@ -395,7 +395,7 @@ test('fontSize, fontFamily, default color and default background', () => {
     let background = 'lightgray';
     let toDo = '#ccc';
     let progress = '#888';
-    let done = '#222';
+    let done = '#555';
 
     diagram.settings.style = {
         fontFamily: 'serif',
@@ -478,7 +478,7 @@ test('stroke colors, empty axis color', () => {
     let background = '#fff';
     let toDo = '#ccc';
     let progress = '#888';
-    let done = '#222';
+    let done = '#555';
 
     settings.style = {};
     settings.style.toDo = {
@@ -511,7 +511,7 @@ test('stroke colors, empty axis color', () => {
     expect(settings.style.done.color).toBe(done);
     expect(settings.style.done.stroke).toBe(done);
     expect(settings.style.predict.backgroundColor).toBe(color);
-    expect(settings.style.predict.color).toBe(color);
+    expect(settings.style.predict.color).toBe(done);
     expect(settings.style.markers.backgroundColor).toBe(color);
     expect(settings.style.markers.color).toBe(color);
 });
