@@ -1230,7 +1230,7 @@ CFD.prototype.draw = function () {
 
 /**
  * Calculate the predict and short term predict date
- * @returns {Object} predict and shortTermPredict dates as {String}
+ * @returns {Object} with predict and shortTermPredict dates as {String}s
  */
 CFD.prototype.prediction = function() {
     validateSettings(this.settings);
@@ -1279,7 +1279,7 @@ CFD.prototype.remove = function () {
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
  * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @deprecated use imageSource instead
- * @returns {string}
+ * @returns {String}
  */
 CFD.prototype.image = function () {
     return this.imageSource();
@@ -1288,7 +1288,7 @@ CFD.prototype.image = function () {
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
  * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
- * @returns {string}
+ * @returns {String}
  */
 CFD.prototype.imageSource = function () {
     this.draw();
@@ -1299,7 +1299,7 @@ CFD.prototype.imageSource = function () {
 /**
  * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
  * and return the result as a SVG tag string.
- * @returns {string}
+ * @returns {String}
  */
 CFD.prototype.svgSource = function () {
     this.draw();
