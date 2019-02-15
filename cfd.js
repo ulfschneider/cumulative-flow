@@ -1229,7 +1229,7 @@ CFD.prototype.draw = function () {
 }
 
 /**
- * Calculate the predict and short term predict date
+ * Calculate the predict date and the short term predict date
  * @returns {Object} with <code>predict</code> and <code>shortTermPredict</code> dates as strings
  */
 CFD.prototype.prediction = function() {
