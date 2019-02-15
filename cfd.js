@@ -1168,7 +1168,8 @@ function drawFocus(settings) {
  * progress: {color: '#888', stroke: '#fff', pattern: false},
  * done: {color: '#222', stroke: '#fff'},
  * markers: {color: '#222', backgroundColor: '#fff'},
- * predict: {color: '#222', backgroundColor: '#fff'}
+ * predict: {color: '#222', backgroundColor: '#fff'},
+ * shortTermPredict: {color: '#222', backgroundColor: '#fff'}
  * }</pre>
  * @param {{toDo: String[], progress: String[], done: String[], unit: String, entries: Object[]}} settings.data - The data for the diagram. Example:
  * <pre>settings.data = {
