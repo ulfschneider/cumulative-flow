@@ -94,7 +94,8 @@ let diagram = cfd(settings);
         progress: {color: '#888', stroke: '#fff', pattern: false},
         done: {color: '#222', stroke: '#fff'},
         markers: {color: '#222', backgroundColor: '#fff'},
-        predict: {color: '#222', backgroundColor: '#fff'}
+        predict: {color: '#222', backgroundColor: '#fff'},
+        shortTermPredict: {color: '#222', backgroundColor: '#fff'}
         }</pre>
     -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
         toDo: ['new'],
@@ -132,9 +133,9 @@ Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code
 
 ### prediction
 
-Calculate the predict and short term predict date
+Calculate the predict date and the short term predict date
 
-Returns **[Object][9]** predict and shortTermPredict dates as {String}
+Returns **[Object][9]** with <code>predict</code> and <code>shortTermPredict</code> dates as strings
 
 ### remove
 
@@ -145,7 +146,7 @@ Clear the diagram from the provided <code>settings.svg</code> DOM tree element
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[string][13]** 
+Returns **[String][13]** 
 
 **Meta**
 
@@ -157,14 +158,14 @@ Returns **[string][13]**
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[string][13]** 
+Returns **[String][13]** 
 
 ### svgSource
 
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a SVG tag string.
 
-Returns **[string][13]** 
+Returns **[String][13]** 
 
 [1]: #cfd
 

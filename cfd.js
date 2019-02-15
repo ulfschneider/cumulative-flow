@@ -522,7 +522,7 @@ function drawLayers(settings) {
         .append('path')
         .attr('class', 'area')
         .style('fill', function (d) {
-            if (isToDoStatus(d.key, settings)) {
+            if (isToDoStatus(d.key, settings)) {                
                 return settings.style.toDo.color;
             } else if (isProgressStatus(d.key, settings)) {
                 if (settings.style.progress.pattern) {
@@ -537,20 +537,21 @@ function drawLayers(settings) {
         })
         .style('stroke', function (d) {
             if (isToDoStatus(d.key, settings)) {
-                return settings.style.toDo.stroke;
+                    return settings.style.toDo.stroke;
+                
             } else if (isProgressStatus(d.key, settings)) {
-                return settings.style.progress.stroke;
+                if (settings.style.progress.pattern) {
+                    return 'transparent';
+                }  else {
+                    return settings.style.progress.stroke;
+                }
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.style.done.stroke;
+                return settings.style.done.stroke;            
             }
             return settings.style.toDo.stroke;
         })
         .style('stroke-width', function (d) {
-            if (isProgressStatus(d.key, settings) && settings.style.progress.pattern) {
-                return '0';
-            } else {
-                return '.5'
-            }
+            return '0.5';
         })
         .attr('d', settings.area)
 
@@ -593,7 +594,7 @@ function calculatePredictData(settings, predictStart) {
     }
 
     predictStart = getStartOfDay(predictStart);
-    let result = {};    
+    let result = {};
     let currentDate = getLastEntryDate(settings)
     let doneAtPredictStart = summarizeDone(predictStart);
     let doneAtCurrentDate = summarizeDone(currentDate);
@@ -636,7 +637,7 @@ function drawPrediction(settings) {
         }
     }
 
-    const drawPredictLine = function ({predictStart, shortTerm, style}) {
+    const drawPredictLine = function ({ predictStart, shortTerm, style }) {
         let date;
         let currentDate = getLastEntryDate(settings)
 
@@ -675,6 +676,7 @@ function drawPrediction(settings) {
                 x: x3,
                 y: shortTerm ? -25 : -45
             }];
+
             let lineFunction = d3.line()
                 .x(function (d) {
                     return d.x;
@@ -682,6 +684,7 @@ function drawPrediction(settings) {
                 .y(function (d) {
                     return d.y;
                 });
+
 
             settings.g.append('path')
                 .attr('d', lineFunction(pathData))
@@ -695,9 +698,12 @@ function drawPrediction(settings) {
                 .style('stroke-width', '1')
                 .style('stroke', style ? style.color : settings.style.predict.color);
 
+
             date = predictData.date;
             let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
-            let label = date.format(DATE_FORMAT) + futureHint;
+            let label = shortTerm ? settings.shortTermPredict + ' day: ' : '';
+            label += date.format(DATE_FORMAT) + futureHint;
+
             settings.g.append('text')
                 .attr('x', x3 - 5)
                 .attr('y', shortTerm ? -35 : -55)
@@ -717,24 +723,23 @@ function drawPrediction(settings) {
         }
 
         if (settings.predict) {
-            let predictStart = settings.predict;
-            drawPredictLine({predictStart: predictStart});
+            drawPredictLine({ predictStart: settings.predict });
         }
 
         if (settings.shortTermPredict) {
             let fromDate = getFirstEntryDate(settings);
-            if (settings.fromDate) {
-                if (fromDate.isBefore(settings.fromDate)) {
-                    fromDate = settings.fromDate;
-                }
+            if (fromDate.isBefore(settings.fromDate)) {
+                fromDate = settings.fromDate;
             }
-            let currentDate = getLastEntryDate(settings);            
-            let shortTermPredictStart = currentDate.subtract(Math.abs(settings.shortTermPredict), 'days');            
+
+            let currentDate = getLastEntryDate(settings);
+            let shortTermPredictStart = currentDate.subtract(Math.abs(settings.shortTermPredict), 'days');
             if (shortTermPredictStart.isAfter(fromDate)) {
                 drawPredictLine({
-                    predictStart: shortTermPredictStart, 
-                    style: settings.style.shortTermPredict, 
-                    shortTerm: true});
+                    predictStart: shortTermPredictStart,
+                    style: settings.style.shortTermPredict,
+                    shortTerm: true
+                });
             }
         }
     }
@@ -1232,8 +1237,9 @@ CFD.prototype.draw = function () {
  * Calculate the predict date and the short term predict date
  * @returns {Object} with <code>predict</code> and <code>shortTermPredict</code> dates as strings
  */
-CFD.prototype.prediction = function() {
-    validateSettings(this.settings);
+CFD.prototype.prediction = function () {
+    validateData(this.settings);
+    validateMargins(this.settings);
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
 
@@ -1249,9 +1255,9 @@ CFD.prototype.prediction = function() {
                 fromDate = this.settings.fromDate;
             }
         }
-        let currentDate = getLastEntryDate(this.settings);            
-        let shortTermPredictStart = currentDate.subtract(this.settings.shortTermPredict, 'days');      
-                
+        let currentDate = getLastEntryDate(this.settings);
+        let shortTermPredictStart = currentDate.subtract(this.settings.shortTermPredict, 'days');
+
         if (shortTermPredictStart.isSameOrAfter(fromDate)) {
             shortTermPredict = calculatePredictData(this.settings, shortTermPredictStart);
         }
@@ -1259,7 +1265,7 @@ CFD.prototype.prediction = function() {
 
     return {
         predict: predict && predict.date ? predict.date.format(DATE_FORMAT) : null,
-        shortTermPredict: shortTermPredict && shortTermPredict.date? shortTermPredict.date.format(DATE_FORMAT) : null
+        shortTermPredict: shortTermPredict && shortTermPredict.date ? shortTermPredict.date.format(DATE_FORMAT) : null
     };
 }
 
