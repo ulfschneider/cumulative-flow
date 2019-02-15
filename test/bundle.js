@@ -20367,9 +20367,9 @@ function validateData(settings) {
         throw "No done status defined"
     }
 
-    settings.data.keys = [...settings.data.done].concat(settings.data.progress).concat(settings.data.toDo);  
+    settings.data.keys = [...settings.data.done].concat(settings.data.progress).concat(settings.data.toDo);
     settings.data.reverseKeys = [...settings.data.keys].reverse();
-    
+
     if (_.isArray(settings.data.entries[0])) {
         transformData(settings);
     }
@@ -20377,7 +20377,7 @@ function validateData(settings) {
 
 function transformData(settings) {
     //the given data entries itself are arrays    
-    let transformedEntries = [];    
+    let transformedEntries = [];
     for (let entry of settings.data.entries) {
         let transformedEntry = {}
 
@@ -20386,7 +20386,7 @@ function transformData(settings) {
 
         //the following entries must be the values in order of the given keys
         let i = 1;
-        for(let key of settings.data.keys) {
+        for (let key of settings.data.keys) {
             transformedEntry[key] = entry[i];
             i++;
         }
@@ -20456,6 +20456,10 @@ function validateStyles(settings) {
         settings.style.predict = {
             backgroundColor: settings.style.backgroundColor,
             color: settings.style.done.color
+        };
+        settings.style.shortTermPredict = {
+            backgroundColor: settings.style.predict.backgroundColor,
+            color: settings.style.predict.color
         };
         settings.style.markers = {
             backgroundColor: settings.style.backgroundColor,
@@ -20535,6 +20539,19 @@ function validateStyles(settings) {
                 settings.style.predict.color = settings.style.done.color;
             }
         }
+        if (!settings.style.shortTermPredict) {
+            settings.style.shortTermPredict = {
+                backgroundColor: settings.style.predict.backgroundColor,
+                color: settings.style.predict.color
+            }
+        } else {
+            if (!settings.style.shortTermPredict.backgroundColor) {
+                settings.style.shortTermPredict.backgroundColor = settings.style.predict.backgroundColor;
+            }
+            if (!settings.style.shortTermPredict.color) {
+                settings.style.shortTermPredict.color = settings.style.predict.color;
+            }
+        }
         if (!settings.style.markers) {
             settings.style.markers = {
                 backgroundColor: settings.style.backgroundColor,
@@ -20566,15 +20583,54 @@ function prepareSVG(settings) {
         .attr('width', settings.width)
         .attr('height', settings.height);
 
-    settings.g = settings.d3svg.append("g");
+    settings.defs = settings.d3svg.append('defs');
+    let pattern = settings.defs.append('pattern')
+        .attr('id', 'pattern-checkers')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 4)
+        .attr('height', 4)
+        .attr('patternUnits', 'userSpaceOnUse');
+
+    pattern.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 2)
+        .attr('height', 2)
+        .style('fill', settings.style.done.color);
+
+    pattern.append('rect')
+        .attr('x', 2)
+        .attr('y', 0)
+        .attr('width', 2)
+        .attr('height', 2)
+        .style('fill', settings.style.toDo.color);
+
+    pattern.append('rect')
+        .attr('x', 0)
+        .attr('y', 2)
+        .attr('width', 2)
+        .attr('height', 2)
+        .style('fill', settings.style.toDo.color);
+
+    pattern.append('rect')
+        .attr('x', 2)
+        .attr('y', 2)
+        .attr('width', 2)
+        .attr('height', 2)
+        .style('fill', settings.style.done.color);
+
+
+
+    settings.g = settings.d3svg.append('g');
     if (settings.margin.left || settings.margin.top) {
-        settings.g.attr("transform", "translate(" + settings.margin.left + "," + settings.margin.top + ")");
+        settings.g.attr('transform', 'translate(' + settings.margin.left + ',' + settings.margin.top + ')');
     }
 }
 
 function prepareScales(settings) {
     settings.x = d3.scaleTime()
-        .range([0, settings.innerWidth]);    
+        .range([0, settings.innerWidth]);
     settings.y = d3.scaleLinear()
         .range([settings.innerHeight, 0]);
 }
@@ -20632,7 +20688,7 @@ function isDoneStatus(status, settings) {
 }
 
 function getStartOfDay(date) {
-    return moment(moment(date).format('YYYY-MM-DD'));
+    return moment(moment(date).format(DATE_FORMAT));
 }
 
 function getDataSet(date, settings) {
@@ -20777,7 +20833,11 @@ function drawLayers(settings) {
             if (isToDoStatus(d.key, settings)) {
                 return settings.style.toDo.color;
             } else if (isProgressStatus(d.key, settings)) {
-                return settings.style.progress.color;
+                if (settings.style.progress.pattern) {
+                    return 'url(#pattern-checkers)';
+                } else {
+                    return settings.style.progress.color;
+                }
             } else if (isDoneStatus(d.key, settings)) {
                 return settings.style.done.color;
             }
@@ -20793,7 +20853,13 @@ function drawLayers(settings) {
             }
             return settings.style.toDo.stroke;
         })
-        .style('stroke-width', '.5')
+        .style('stroke-width', function (d) {
+            if (isProgressStatus(d.key, settings) && settings.style.progress.pattern) {
+                return '0';
+            } else {
+                return '.5'
+            }
+        })
         .attr('d', settings.area)
 
     if (settings.drawOptions.includes('legend')) {
@@ -20810,15 +20876,7 @@ function drawLayers(settings) {
             .attr('font-family', settings.style.fontFamily)
             .style('text-anchor', 'start')
             .style('fill', function (d) {
-                /*
-                if (isProgressStatus(d.key, settings)) {
-                    return settings.style.progress.color;
-                } else if (isDoneStatus(d.key, settings)) {
-                    return settings.style.done.color;
-                }
-                return settings.style.toDo.color;
-                */
-               return settings.style.color;
+                return settings.style.color;
             })
             .text(function (d) {
                 return round(d[d.length - 1][1] - d[d.length - 1][0]) + ' ' + d.key;
@@ -20826,8 +20884,8 @@ function drawLayers(settings) {
     }
 }
 
-function drawPrediction(settings) {
-    let summarizeDone = function (date) {
+function calculatePredictData(settings, predictStart) {
+    const summarizeDone = function (date) {
         for (let entry of settings.data.entries) {
             if (moment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
@@ -20842,7 +20900,39 @@ function drawPrediction(settings) {
         return 0;
     }
 
-    let setAutoPredict = function () {
+    predictStart = getStartOfDay(predictStart);
+    let result = {};    
+    let currentDate = getLastEntryDate(settings)
+    let doneAtPredictStart = summarizeDone(predictStart);
+    let doneAtCurrentDate = summarizeDone(currentDate);
+    if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
+        //x1, x2, y1, y2 to calculate the line parameters
+        result.x1 = settings.x(predictStart);
+        result.x2 = settings.x(currentDate);
+        result.y1 = settings.y(doneAtPredictStart);
+        result.y2 = settings.y(doneAtCurrentDate);
+        result.m = (result.y2 - result.y1) / (result.x2 - result.x1);
+
+
+        let predictX = function () {
+            return -result.y1 / result.m + result.x1;
+        }
+
+        let dateFromX = function (x) {
+            let m = (result.x2 - result.x1) / (currentDate - predictStart);
+            let c = result.x1 - m * predictStart;
+            return getStartOfDay((x - c) / m);
+        }
+
+        result.x = predictX();
+        result.date = dateFromX(result.x);
+    }
+    return result;
+}
+
+function drawPrediction(settings) {
+
+    const setAutoPredict = function () {
         //calculate autoPredict date only once
         for (let entry of settings.data.entries) {
             for (let key of settings.data.keys) {
@@ -20854,97 +20944,105 @@ function drawPrediction(settings) {
         }
     }
 
+    const drawPredictLine = function ({predictStart, shortTerm, style}) {
+        let date;
+        let currentDate = getLastEntryDate(settings)
+
+        //x1, x2, y1, y2 to calculate the line parameters
+        let predictData = calculatePredictData(settings, predictStart);
+        if (predictData.date) {
+            const X_TRIM = 2; //do not draw the prediction line direct on y axis
+
+            let yFromX = function (x) {
+                return predictData.y1 + predictData.m * (x - predictData.x1);
+            }
+
+            //x0 and y0 to be used for the real start point of the line
+            let x0 = predictData.x1;
+            let y0 = predictData.y1;
+            if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
+                x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : getFirstEntryDate(settings)));
+                y0 = yFromX(x0);
+            }
+
+            //x3 and y3 to be used for the real end point of the line
+            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
+            let y3 = yFromX(x3);
+            if (y3 < 0) {
+                x3 = -predictData.y1 / predictData.m + predictData.x1 - X_TRIM;
+                y3 = yFromX(x3);
+            }
+
+            let pathData = [{
+                x: x0,
+                y: y0
+            }, {
+                x: x3,
+                y: y3
+            }, {
+                x: x3,
+                y: shortTerm ? -25 : -45
+            }];
+            let lineFunction = d3.line()
+                .x(function (d) {
+                    return d.x;
+                })
+                .y(function (d) {
+                    return d.y;
+                });
+
+            settings.g.append('path')
+                .attr('d', lineFunction(pathData))
+                .attr('fill', 'none')
+                .style('stroke-width', '3')
+                .style('stroke', style ? style.backgroundColor : settings.style.predict.backgroundColor);
+
+            settings.g.append('path')
+                .attr('d', lineFunction(pathData))
+                .attr('fill', 'none')
+                .style('stroke-width', '1')
+                .style('stroke', style ? style.color : settings.style.predict.color);
+
+            date = predictData.date;
+            let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
+            let label = date.format(DATE_FORMAT) + futureHint;
+            settings.g.append('text')
+                .attr('x', x3 - 5)
+                .attr('y', shortTerm ? -35 : -55)
+                .attr('dy', dy(settings))
+                .attr('font-size', settings.style.fontSize)
+                .attr('font-family', settings.style.fontFamily)
+                .style('text-anchor', 'end')
+                .style('fill', style ? style.color : settings.style.predict.color)
+                .text(label);
+        }
+        return predictData;
+    }
+
     if (settings.drawOptions.includes('predict')) {
         if (!settings.predict) {
             setAutoPredict();
         }
 
         if (settings.predict) {
-            let predictStart = getStartOfDay(settings.predict);
-            let currentDate = getLastEntryDate(settings)
-            let doneAtPredictStart = summarizeDone(predictStart);
-            let doneAtCurrentDate = summarizeDone(currentDate);
-            if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
-                //x1, x2, y1, y2 to calculate the line parameters
-                let x1 = settings.x(predictStart);
-                let x2 = settings.x(currentDate);
-                let y1 = settings.y(doneAtPredictStart);
-                let y2 = settings.y(doneAtCurrentDate);
-                let m = (y2 - y1) / (x2 - x1);
-                const X_TRIM = 2; //do not draw the prediction line direct on y axis
+            let predictStart = settings.predict;
+            drawPredictLine({predictStart: predictStart});
+        }
 
-                let predictX = function () {
-                    return -y1 / m + x1;
+        if (settings.shortTermPredict) {
+            let fromDate = getFirstEntryDate(settings);
+            if (settings.fromDate) {
+                if (fromDate.isBefore(settings.fromDate)) {
+                    fromDate = settings.fromDate;
                 }
-
-                let yFromX = function (x) {
-                    return y1 + m * (x - x1);
-                }
-
-                let dateFromX = function (x) {
-                    let m = (x2 - x1) / (currentDate - predictStart);
-                    let c = x1 - m * predictStart;
-                    return getStartOfDay((x - c) / m);
-                }
-
-                //x0 and y0 to be used for the real start point of the line
-                let x0 = x1;
-                let y0 = y1;
-                if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
-                    x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : getFirstEntryDate(settings)));
-                    y0 = yFromX(x0);
-                }
-
-                //x3 and y3 to be used for the real end point of the line
-                let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
-                let y3 = yFromX(x3);
-                if (y3 < 0) {
-                    x3 = -y1 / m + x1 - X_TRIM;
-                    y3 = yFromX(x3);
-                }
-
-                let pathData = [{
-                    x: x0,
-                    y: y0
-                }, {
-                    x: x3,
-                    y: y3
-                }, {
-                    x: x3,
-                    y: -35
-                }];
-                let lineFunction = d3.line()
-                    .x(function (d) {
-                        return d.x;
-                    })
-                    .y(function (d) {
-                        return d.y;
-                    });
-
-                settings.g.append('path')
-                    .attr('d', lineFunction(pathData))
-                    .attr('fill', 'none')
-                    .style('stroke-width', '3')
-                    .style('stroke', settings.style.predict.backgroundColor);
-
-                settings.g.append('path')
-                    .attr('d', lineFunction(pathData))
-                    .attr('fill', 'none')
-                    .style('stroke-width', '1')
-                    .style('stroke', settings.style.predict.color);
-
-                let predictDate = dateFromX(predictX());
-                let futureHint = predictX() - X_TRIM > x3 ? ' →' : '';
-                settings.g.append('text')
-                    .attr('x', x3 - 5)
-                    .attr('y', -35)
-                    .attr('dy', dy(settings))
-                    .attr('font-size', settings.style.fontSize)
-                    .attr('font-family', settings.style.fontFamily)
-                    .style('text-anchor', 'end')
-                    .style('fill', settings.style.predict.color)
-                    .text(predictDate.format(DATE_FORMAT) + futureHint);
-
+            }
+            let currentDate = getLastEntryDate(settings);            
+            let shortTermPredictStart = currentDate.subtract(Math.abs(settings.shortTermPredict), 'days');            
+            if (shortTermPredictStart.isAfter(fromDate)) {
+                drawPredictLine({
+                    predictStart: shortTermPredictStart, 
+                    style: settings.style.shortTermPredict, 
+                    shortTerm: true});
             }
         }
     }
@@ -21075,7 +21173,7 @@ function drawLegend(settings) {
 
         let background = drawRectangle({
             x: LEGEND_X - LEGEND_PAD,
-            y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,   
+            y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,
             width: settings.style.fontSize * 8,
             height: 3.5 * lineHeight,
             stroke: settings.style.color
@@ -21102,7 +21200,7 @@ function drawLegend(settings) {
             y: LEGEND_Y + 1.5 * lineHeight,
             width: lineHeight,
             height: lineHeight,
-            fill: settings.style.progress.color
+            fill: settings.style.progress.pattern ? 'url(#pattern-checkers)' : settings.style.progress.color
         });
         let progress = drawLegendItem({
             text: 'In Progress',
@@ -21182,7 +21280,7 @@ function drawFocus(settings) {
                     .attr('x2', x)
                     .attr('y2', y2)
                     .style('display', null);
-            }            
+            }
 
             focus
                 .attr('x', (x + 2))
@@ -21194,10 +21292,10 @@ function drawFocus(settings) {
             for (let key of _.keys(dataSet)) {
                 if (!key.startsWith('__')) {
                     focusItems[count]
-                        .attr('x', x + LEGEND_PAD + 2,)
+                        .attr('x', x + LEGEND_PAD + 2)
                         .attr('y', key == 'date' ? y + row * lineHeight : y + (0.5 + row) * lineHeight)
                         .style('display', null)
-                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)    
+                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)
                     try {
                         let bbx = focusItems[count].node().getBBox();
                         width = Math.max(width, bbx.width + 2 * LEGEND_PAD);
@@ -21207,11 +21305,11 @@ function drawFocus(settings) {
                 }
             }
             focus.attr('width', width);
-            
+
             if (x + 2 + width >= settings.innerWidth) {
                 let offset = - (2 + width);
                 focus.attr('x', x + offset);
-                for(let focusItem of focusItems) {
+                for (let focusItem of focusItems) {
                     focusItem.attr('x', x + LEGEND_PAD + offset);
                 }
             }
@@ -21225,7 +21323,7 @@ function drawFocus(settings) {
             if (date.isAfter(lastDate)) {
                 date = lastDate;
             }
-            
+
             let dataSet = getDataSet(date, settings);
             if (dataSet && dataSet.__count > 1) {
                 drawFocusItems(dataSet);
@@ -21266,7 +21364,7 @@ function drawFocus(settings) {
         }
 
         let markerBackground = settings.g.append('line')
-            .style('display', 'none')        
+            .style('display', 'none')
             .style('stroke-width', '3')
             .style('stroke', settings.style.markers.backgroundColor);
 
@@ -21347,9 +21445,13 @@ function drawFocus(settings) {
  * <pre>settings.toDate = '2018-09-05';</pre>
  * @param {String|Date} [settings.predict] - To draw an indication line for the completion of work.
  * The predict argument determines at what date to start drawing the line. Example:
- * <pre>settings.fromDate = '2018-09-01';</pre>
+ * <pre>settings.predict = '2018-09-01';</pre>
  * If no date is provided but the drawOptions allow to draw a prediction line, an automatic
  * start date for that line will be calculated based on the first date something went to done.
+ * @param {Number} [settings.shortTermPredict] - Indicate the number of days to go back from current date to 
+ * determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
+ * short term prediction line is drawn. Default is 0. Example:
+ * <pre>settings.shortTermPredict = 30;</pre> 
  * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates inside of the diagram
  * with markers. Each marker is an object with a date for the marker and an optional label. Example:
  * <pre>settings.markers = [
@@ -21371,7 +21473,7 @@ function drawFocus(settings) {
  * backgroundColor: '#fff',
  * axis: {color: '#222'},
  * toDo: {color: '#ccc', stroke: '#fff'},
- * progress: {color: '#888', stroke: '#fff'},
+ * progress: {color: '#888', stroke: '#fff', pattern: false},
  * done: {color: '#222', stroke: '#fff'},
  * markers: {color: '#222', backgroundColor: '#fff'},
  * predict: {color: '#222', backgroundColor: '#fff'}
@@ -21426,11 +21528,46 @@ CFD.prototype.draw = function () {
     prepareScales(this.settings);
     prepareDataFunctions(this.settings);
     drawLayers(this.settings);
-    drawPrediction(this.settings);        
+    drawPrediction(this.settings);
     drawMarkers(this.settings);
     drawAxis(this.settings);
     drawLegend(this.settings);
     drawFocus(this.settings);
+}
+
+/**
+ * Calculate the predict and short term predict date
+ * @returns {Object} predict and shortTermPredict dates as {String}
+ */
+CFD.prototype.prediction = function() {
+    validateSettings(this.settings);
+    prepareScales(this.settings);
+    prepareDataFunctions(this.settings);
+
+    let predict, shortTermPredict;
+    if (this.settings.predict) {
+        predict = calculatePredictData(this.settings, this.settings.predict);
+    }
+
+    if (this.settings.shortTermPredict) {
+        let fromDate = getFirstEntryDate(this.settings);
+        if (this.settings.fromDate) {
+            if (fromDate.isBefore(this.settings.fromDate)) {
+                fromDate = this.settings.fromDate;
+            }
+        }
+        let currentDate = getLastEntryDate(this.settings);            
+        let shortTermPredictStart = currentDate.subtract(this.settings.shortTermPredict, 'days');      
+                
+        if (shortTermPredictStart.isSameOrAfter(fromDate)) {
+            shortTermPredict = calculatePredictData(this.settings, shortTermPredictStart);
+        }
+    }
+
+    return {
+        predict: predict && predict.date ? predict.date.format(DATE_FORMAT) : null,
+        shortTermPredict: shortTermPredict && shortTermPredict.date? shortTermPredict.date.format(DATE_FORMAT) : null
+    };
 }
 
 /**

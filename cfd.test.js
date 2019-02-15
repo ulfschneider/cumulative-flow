@@ -4,7 +4,7 @@ const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11 12:00';
-const NUMBER_OF_TEST_IMAGES = 11;
+const NUMBER_OF_TEST_IMAGES = 12;
 let actuals = [];
 let expected = [];
 let settings;
@@ -383,6 +383,8 @@ test('default style', () => {
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
     expect(settings.style.predict.color).toBe(done);
+    expect(settings.style.shortTermPredict.color).toBe(settings.style.predict.color);
+    expect(settings.style.shortTermPredict.backgroundColor).toBe(settings.style.predict.backgroundColor);
     expect(settings.style.markers.backgroundColor).toBe(background);
     expect(settings.style.markers.color).toBe(color);
 });
@@ -763,6 +765,44 @@ test('image 10 with array of arrays default test data', () => {
     actuals.push(actual);
 
     expect(actuals[10]).toBe(expected[10]);
+});
+
+test('image 11 with pattern for progress', () => {
+    let settings = makeTestSettings();
+    settings.data = makeArrayOfArraysTestData();
+    settings.shortTermPredict = 2;
+    settings.title = 'Testing CFD pattern for progress';
+    settings.style = {
+        progress: {
+            pattern: true
+        },
+        shortTermPredict: {
+            color: 'red'
+        }
+    }
+
+    let diagram = cfd(settings);
+    let predict = diagram.prediction();    
+    let now = moment(NOW);
+    expect(predict.shortTermPredict).toBe(now.format('YYYY-MM-DD'));
+    expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
+    
+    let actual = diagram.svgSource();
+    actuals.push(actual);
+    expect(actuals[11]).toBe(expected[11]);    
+
+    now = moment(NOW);
+    settings.shortTermPredict = 7;    
+    predict = diagram.prediction();
+    expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
+    expect(predict.shortTermPredict).toBe(now.format('YYYY-MM-DD'));
+
+    now = moment(NOW);
+    settings.shortTermPredict = 8;    
+    predict = diagram.prediction();
+    expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
+    expect(predict.shortTermPredict).toBe(null);
+    
 });
 
 

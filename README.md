@@ -5,10 +5,11 @@
 -   [CFD][1]
     -   [Parameters][2]
     -   [draw][3]
-    -   [remove][4]
-    -   [image][5]
-    -   [imageSource][6]
-    -   [svgSource][7]
+    -   [prediction][4]
+    -   [remove][5]
+    -   [image][6]
+    -   [imageSource][7]
+    -   [svgSource][8]
 
 ## CFD
 
@@ -46,53 +47,56 @@ let diagram = cfd(settings);
 
 ### Parameters
 
--   `settings` **[Object][8]** The configuration object for the diagram. 
+-   `settings` **[Object][9]** The configuration object for the diagram. 
     All data for the diagram is provided with this object. 
     In this configuration object, whenever a date is to be given, 
-    it can be an [ISO 8601 String][9]
-    or a JavaScript [Date][10] object.
-    A [Moment][11] object is also fine.
-    -   `settings.title` **[String][12]?** The title for the diagram.
-    -   `settings.svg` **[Object][8]** The DOM tree element, wich must be an svg tag.
+    it can be an [ISO 8601 String][10]
+    or a JavaScript [Date][11] object.
+    A [Moment][12] object is also fine.
+    -   `settings.title` **[String][13]?** The title for the diagram.
+    -   `settings.svg` **[Object][9]** The DOM tree element, wich must be an svg tag.
         The diagram will be attached to this DOM tree element. Example:<pre>settings.svg = document.getElementById('cfdDiagram');</pre><code>'cfdDiagram'</code> is the id of a svg tag.
-    -   `settings.width` **[Number][13]?** The width of the diagram in pixels, the margin settings have to be included in that width.
-    -   `settings.height` **[Number][13]?** The height of the diagram in pixels, the margin settings have to be included in that height.
-    -   `settings.margin` **{top: [Number][13], right: [Number][13], bottom: [Number][13], right: [Number][13]}?** The margin for the diagram.
+    -   `settings.width` **[Number][14]?** The width of the diagram in pixels, the margin settings have to be included in that width.
+    -   `settings.height` **[Number][14]?** The height of the diagram in pixels, the margin settings have to be included in that height.
+    -   `settings.margin` **{top: [Number][14], right: [Number][14], bottom: [Number][14], right: [Number][14]}?** The margin for the diagram.
         Default values are:<pre>settings.margin = {
         top: 75,
         right: 210,
         bottom: 30,
         left: 40 }
         </pre>
-    -   `settings.fromDate` **([String][12] \| [Date][14])?** The start date for the diagram. Example:<pre>settings.fromDate = '2018-09-01';</pre>
-    -   `settings.toDate` **([String][12] \| [Date][14])?** The end date for the diagram. Example:<pre>settings.toDate = '2018-09-05';</pre>
-    -   `settings.predict` **([String][12] \| [Date][14])?** To draw an indication line for the completion of work.
-        The predict argument determines at what date to start drawing the line. Example:<pre>settings.fromDate = '2018-09-01';</pre>If no date is provided but the drawOptions allow to draw a prediction line, an automatic
+    -   `settings.fromDate` **([String][13] \| [Date][15])?** The start date for the diagram. Example:<pre>settings.fromDate = '2018-09-01';</pre>
+    -   `settings.toDate` **([String][13] \| [Date][15])?** The end date for the diagram. Example:<pre>settings.toDate = '2018-09-05';</pre>
+    -   `settings.predict` **([String][13] \| [Date][15])?** To draw an indication line for the completion of work.
+        The predict argument determines at what date to start drawing the line. Example:<pre>settings.predict = '2018-09-01';</pre>If no date is provided but the drawOptions allow to draw a prediction line, an automatic
         start date for that line will be calculated based on the first date something went to done.
-    -   `settings.markers` **[Array][15]&lt;{date: ([String][12] \| [Date][14]), label: [String][12]}>?** Highlight specific dates inside of the diagram
+    -   `settings.shortTermPredict` **[Number][14]?** Indicate the number of days to go back from current date to 
+        determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
+        short term prediction line is drawn. Default is 0. Example:<pre>settings.shortTermPredict = 30;</pre>
+    -   `settings.markers` **[Array][16]&lt;{date: ([String][13] \| [Date][15]), label: [String][13]}>?** Highlight specific dates inside of the diagram
         with markers. Each marker is an object with a date for the marker and an optional label. Example:<pre>settings.markers = [
         { date: '2018-09-03', label: 'M1' },
         { date: '2018-09-10', label: 'M2' }];</pre>
-    -   `settings.drawOptions` **[Array][15]&lt;[String][12]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
+    -   `settings.drawOptions` **[Array][16]&lt;[String][13]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
         'axis' - draw the x and y axis
         'legend' - draw the legend information
         'markers' - draw the markers
         'predict' - draw the predict line
         'focus' - draw detailed data when hovering the diagram
         </pre> By default all of these draw options are on.
-    -   `settings.style` **[Object][8]?** Influence the appearance of the diagram with typeface and colors. The defaults are:<pre>settings.style = {
+    -   `settings.style` **[Object][9]?** Influence the appearance of the diagram with typeface and colors. The defaults are:<pre>settings.style = {
         fontSize: 12,
         fontFamily: 'sans-serif',
         color: '#222',
         backgroundColor: '#fff',
         axis: {color: '#222'},
         toDo: {color: '#ccc', stroke: '#fff'},
-        progress: {color: '#888', stroke: '#fff'},
+        progress: {color: '#888', stroke: '#fff', pattern: false},
         done: {color: '#222', stroke: '#fff'},
         markers: {color: '#222', backgroundColor: '#fff'},
         predict: {color: '#222', backgroundColor: '#fff'}
         }</pre>
-    -   `settings.data` **{toDo: [Array][15]&lt;[String][12]>, progress: [Array][15]&lt;[String][12]>, done: [Array][15]&lt;[String][12]>, unit: [String][12], entries: [Array][15]&lt;[Object][8]>}** The data for the diagram. Example:<pre>settings.data = {
+    -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
         toDo: ['new'],
         progress: ['test', 'dev'],
         done: ['done'],
@@ -126,6 +130,12 @@ let diagram = cfd(settings);
 
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element.
 
+### prediction
+
+Calculate the predict and short term predict date
+
+Returns **[Object][9]** predict and shortTermPredict dates as {String}
+
 ### remove
 
 Clear the diagram from the provided <code>settings.svg</code> DOM tree element
@@ -135,7 +145,7 @@ Clear the diagram from the provided <code>settings.svg</code> DOM tree element
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[string][12]** 
+Returns **[string][13]** 
 
 **Meta**
 
@@ -147,14 +157,14 @@ Returns **[string][12]**
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[string][12]** 
+Returns **[string][13]** 
 
 ### svgSource
 
 Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
 and return the result as a SVG tag string.
 
-Returns **[string][12]** 
+Returns **[string][13]** 
 
 [1]: #cfd
 
@@ -162,26 +172,28 @@ Returns **[string][12]**
 
 [3]: #draw
 
-[4]: #remove
+[4]: #prediction
 
-[5]: #image
+[5]: #remove
 
-[6]: #imagesource
+[6]: #image
 
-[7]: #svgsource
+[7]: #imagesource
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[8]: #svgsource
 
-[9]: https://en.wikipedia.org/wiki/ISO_8601
+[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[10]: https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date
+[10]: https://en.wikipedia.org/wiki/ISO_8601
 
-[11]: https://momentjs.com
+[11]: https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date
 
-[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[12]: https://momentjs.com
 
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
