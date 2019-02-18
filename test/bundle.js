@@ -20370,29 +20370,31 @@ function validateData(settings) {
     settings.data.keys = [...settings.data.done].concat(settings.data.progress).concat(settings.data.toDo);
     settings.data.reverseKeys = [...settings.data.keys].reverse();
 
-    if (_.isArray(settings.data.entries[0])) {
-        transformData(settings);
-    }
+    transformData(settings);
 }
 
 function transformData(settings) {
-    //the given data entries itself are arrays    
-    let transformedEntries = [];
-    for (let entry of settings.data.entries) {
-        let transformedEntry = {}
 
-        //the first value of the array must be the date
-        transformedEntry.date = moment(entry[0]);
+    if (_.isArray(settings.data.entries[0])) {
+        //the given data entries itself are arrays        
+        let transformedEntries = [];
+        for (let entry of settings.data.entries) {
+            let transformedEntry = {}
 
-        //the following entries must be the values in order of the given keys
-        let i = 1;
-        for (let key of settings.data.keys) {
-            transformedEntry[key] = entry[i];
-            i++;
+            //the first value of the array must be the date
+            transformedEntry.date = moment(entry[0]);
+
+            //the following entries must be the values in order of the given keys
+            let i = 1;
+
+            for (let key of settings.data.keys) {
+                transformedEntry[key] = entry[i];
+                i++;
+            }
+            transformedEntries.push(transformedEntry);
         }
-        transformedEntries.push(transformedEntry);
+        settings.data.entries = transformedEntries;
     }
-    settings.data.entries = transformedEntries;
 }
 
 
@@ -20455,11 +20457,15 @@ function validateStyles(settings) {
         };
         settings.style.predict = {
             backgroundColor: settings.style.backgroundColor,
-            color: settings.style.done.color
+            color: settings.style.color,
+            goodColor: settings.style.color,
+            troubleColor: settings.style.color
         };
         settings.style.shortTermPredict = {
             backgroundColor: settings.style.predict.backgroundColor,
-            color: settings.style.predict.color
+            color: settings.style.predict.color,
+            goodColor: settings.style.predict.goodColor,
+            troubleColor: settings.style.predict.troubleColor
         };
         settings.style.markers = {
             backgroundColor: settings.style.backgroundColor,
@@ -20529,20 +20535,30 @@ function validateStyles(settings) {
         if (!settings.style.predict) {
             settings.style.predict = {
                 backgroundColor: settings.style.backgroundColor,
-                color: settings.style.done.color
+                color: settings.style.color,
+                goodColor: settings.style.color,
+                troubleColor: settings.style.color
             }
         } else {
             if (!settings.style.predict.backgroundColor) {
                 settings.style.predict.backgroundColor = settings.style.backgroundColor;
             }
             if (!settings.style.predict.color) {
-                settings.style.predict.color = settings.style.done.color;
+                settings.style.predict.color = settings.style.color;
+            }
+            if (!settings.style.predict.goodColor) {
+                settings.style.predict.goodColor = settings.style.color;
+            }
+            if (!settings.style.predict.troubleColor) {
+                settings.style.predict.troubleColor = settings.style.color;
             }
         }
         if (!settings.style.shortTermPredict) {
             settings.style.shortTermPredict = {
                 backgroundColor: settings.style.predict.backgroundColor,
-                color: settings.style.predict.color
+                color: settings.style.predict.color,
+                goodColor: settings.style.predict.color,
+                troubleColor: settings.style.predict.color
             }
         } else {
             if (!settings.style.shortTermPredict.backgroundColor) {
@@ -20550,6 +20566,12 @@ function validateStyles(settings) {
             }
             if (!settings.style.shortTermPredict.color) {
                 settings.style.shortTermPredict.color = settings.style.predict.color;
+            }
+            if (!settings.style.shortTermPredict.goodColor) {
+                settings.style.shortTermPredict.goodColor = settings.style.shortTermPredict.color;
+            }
+            if (!settings.style.shortTermPredict.troubleColor) {
+                settings.style.shortTermPredict.troubleColor = settings.style.shortTermPredict.color;
             }
         }
         if (!settings.style.markers) {
@@ -20776,8 +20798,6 @@ function drawTextWithBackground({
 }
 
 
-
-
 function drawAxis(settings) {
 
     if (settings.drawOptions.includes('axis')) {
@@ -20819,9 +20839,10 @@ function drawAxis(settings) {
 
 function drawLayers(settings) {
     let layer = settings.g.selectAll('.layer')
-        .data(settings.stack(settings.data.entries.filter(function (d) {
-            return isDateInRange(d.date, settings);
-        })))
+        .data(settings.stack(
+            settings.data.entries.filter(function (d) {
+                return isDateInRange(d.date, settings);
+            })))
         .enter()
         .append('g')
         .attr('class', 'layer');
@@ -20830,7 +20851,7 @@ function drawLayers(settings) {
         .append('path')
         .attr('class', 'area')
         .style('fill', function (d) {
-            if (isToDoStatus(d.key, settings)) {                
+            if (isToDoStatus(d.key, settings)) {
                 return settings.style.toDo.color;
             } else if (isProgressStatus(d.key, settings)) {
                 if (settings.style.progress.pattern) {
@@ -20845,16 +20866,11 @@ function drawLayers(settings) {
         })
         .style('stroke', function (d) {
             if (isToDoStatus(d.key, settings)) {
-                    return settings.style.toDo.stroke;
-                
+                return settings.style.toDo.stroke;
             } else if (isProgressStatus(d.key, settings)) {
-                if (settings.style.progress.pattern) {
-                    return 'transparent';
-                }  else {
-                    return settings.style.progress.stroke;
-                }
+                return settings.style.progress.stroke;                
             } else if (isDoneStatus(d.key, settings)) {
-                return settings.style.done.stroke;            
+                return settings.style.done.stroke;
             }
             return settings.style.toDo.stroke;
         })
@@ -20945,7 +20961,7 @@ function drawPrediction(settings) {
         }
     }
 
-    const drawPredictLine = function ({ predictStart, shortTerm, style }) {
+    const drawPredictLine = function ({ predictStart, shortTerm }) {
         let date;
         let currentDate = getLastEntryDate(settings)
 
@@ -20982,7 +20998,7 @@ function drawPrediction(settings) {
                 y: y3
             }, {
                 x: x3,
-                y: shortTerm ? -25 : -45
+                y: shortTerm ? -45 : -25
             }];
 
             let lineFunction = d3.line()
@@ -20993,34 +21009,51 @@ function drawPrediction(settings) {
                     return d.y;
                 });
 
+            date = predictData.date;
+            let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
+
+            let backgroundColor = settings.style.predict.backgroundColor;
+            let color = settings.style.predict.goodColor;
+            if (shortTerm) {
+                if (futureHint) {
+                    color = settings.style.shortTermPredict.troubleColor;
+                } else {
+                    color = settings.style.shortTermPredict.goodColor;
+                }
+            } else {
+                if (futureHint) {
+                    color = settings.style.predict.troubleColor;
+                } else {
+                    color = settings.style.predict.goodColor;
+                }
+            }
+
 
             settings.g.append('path')
                 .attr('d', lineFunction(pathData))
                 .attr('fill', 'none')
                 .style('stroke-width', '3')
-                .style('stroke', style ? style.backgroundColor : settings.style.predict.backgroundColor);
+                .style('stroke', backgroundColor);
 
             settings.g.append('path')
                 .attr('d', lineFunction(pathData))
                 .attr('fill', 'none')
                 .style('stroke-width', '1')
-                .style('stroke', style ? style.color : settings.style.predict.color);
+                .style('stroke', color);
 
 
-            date = predictData.date;
-            let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
             let label = shortTerm ? settings.shortTermPredict + ' day: ' : '';
             label += date.format(DATE_FORMAT) + futureHint;
 
-            settings.g.append('text')
-                .attr('x', x3 - 5)
-                .attr('y', shortTerm ? -35 : -55)
-                .attr('dy', dy(settings))
-                .attr('font-size', settings.style.fontSize)
-                .attr('font-family', settings.style.fontFamily)
-                .style('text-anchor', 'end')
-                .style('fill', style ? style.color : settings.style.predict.color)
-                .text(label);
+            drawTextWithBackground({
+                text: label,
+                textAnchor: 'end',
+                x: x3 - 5,
+                y: shortTerm ? -55 : -35,
+                color: color,
+                background: backgroundColor,
+                settings: settings
+            });
         }
         return predictData;
     }
@@ -21030,26 +21063,28 @@ function drawPrediction(settings) {
             setAutoPredict();
         }
 
-        if (settings.predict) {
-            drawPredictLine({ predictStart: settings.predict });
-        }
-
         if (settings.shortTermPredict) {
             let fromDate = getFirstEntryDate(settings);
-            if (fromDate.isBefore(settings.fromDate)) {
+            let currentDate = getLastEntryDate(settings);
+
+            if (settings.fromDate 
+                && currentDate.isSameOrAfter(settings.fromDate)) {
                 fromDate = settings.fromDate;
             }
 
-            let currentDate = getLastEntryDate(settings);
             let shortTermPredictStart = currentDate.subtract(Math.abs(settings.shortTermPredict), 'days');
             if (shortTermPredictStart.isAfter(fromDate)) {
                 drawPredictLine({
                     predictStart: shortTermPredictStart,
-                    style: settings.style.shortTermPredict,
                     shortTerm: true
                 });
             }
         }
+
+        if (settings.predict) {
+            drawPredictLine({ predictStart: settings.predict });
+        }
+
     }
 }
 
@@ -21481,8 +21516,8 @@ function drawFocus(settings) {
  * progress: {color: '#888', stroke: '#fff', pattern: false},
  * done: {color: '#222', stroke: '#fff'},
  * markers: {color: '#222', backgroundColor: '#fff'},
- * predict: {color: '#222', backgroundColor: '#fff'},
- * shortTermPredict: {color: '#222', backgroundColor: '#fff'}
+ * predict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'},
+ * shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
  * }</pre>
  * @param {{toDo: String[], progress: String[], done: String[], unit: String, entries: Object[]}} settings.data - The data for the diagram. Example:
  * <pre>settings.data = {

@@ -94,8 +94,8 @@ let diagram = cfd(settings);
         progress: {color: '#888', stroke: '#fff', pattern: false},
         done: {color: '#222', stroke: '#fff'},
         markers: {color: '#222', backgroundColor: '#fff'},
-        predict: {color: '#222', backgroundColor: '#fff'},
-        shortTermPredict: {color: '#222', backgroundColor: '#fff'}
+        predict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'},
+        shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
         }</pre>
     -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
         toDo: ['new'],

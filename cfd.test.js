@@ -382,7 +382,7 @@ test('default style', () => {
     expect(settings.style.done.color).toBe(done);
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
-    expect(settings.style.predict.color).toBe(done);
+    expect(settings.style.predict.color).toBe(color);
     expect(settings.style.shortTermPredict.color).toBe(settings.style.predict.color);
     expect(settings.style.shortTermPredict.backgroundColor).toBe(settings.style.predict.backgroundColor);
     expect(settings.style.markers.backgroundColor).toBe(background);
@@ -418,7 +418,13 @@ test('fontSize, fontFamily, default color and default background', () => {
     expect(settings.style.done.color).toBe(done);
     expect(settings.style.done.stroke).toBe(background);
     expect(settings.style.predict.backgroundColor).toBe(background);
-    expect(settings.style.predict.color).toBe(done);
+    expect(settings.style.predict.color).toBe(color);
+    expect(settings.style.predict.goodColor).toBe(color);
+    expect(settings.style.predict.troubleColor).toBe(color);
+    expect(settings.style.shortTermPredict.backgroundColor).toBe(background);
+    expect(settings.style.shortTermPredict.color).toBe(color);
+    expect(settings.style.shortTermPredict.goodColor).toBe(color);
+    expect(settings.style.shortTermPredict.troubleColor).toBe(color);
     expect(settings.style.markers.backgroundColor).toBe(background);
     expect(settings.style.markers.color).toBe(color);
 });
@@ -513,7 +519,13 @@ test('stroke colors, empty axis color', () => {
     expect(settings.style.done.color).toBe(done);
     expect(settings.style.done.stroke).toBe(done);
     expect(settings.style.predict.backgroundColor).toBe(color);
-    expect(settings.style.predict.color).toBe(done);
+    expect(settings.style.predict.color).toBe(color);
+    expect(settings.style.predict.goodColor).toBe(color);
+    expect(settings.style.predict.troubleColor).toBe(color);
+    expect(settings.style.shortTermPredict.backgroundColor).toBe(color);
+    expect(settings.style.shortTermPredict.color).toBe(color);
+    expect(settings.style.shortTermPredict.goodColor).toBe(color);
+    expect(settings.style.shortTermPredict.troubleColor).toBe(color);
     expect(settings.style.markers.backgroundColor).toBe(color);
     expect(settings.style.markers.color).toBe(color);
 });
@@ -662,6 +674,18 @@ test('image 4 without markers', () => {
     delete settings.markers;
     delete settings.fromDate;
     delete settings.toDate;
+
+    settings.shortTermPredict = 3;
+    settings.style = {
+        predict: {
+            troubleColor: 'red',
+            goodColor: 'green'
+        },
+        shortTermPredict: {
+            troubleColor: 'orange',
+            goodColor: 'cornflowerblue'
+        }
+    }
     settings.predict = moment(NOW).subtract(10, 'days');
     settings.title = 'Testing CFD without markers';
     let diagram = cfd(settings);
@@ -777,32 +801,37 @@ test('image 11 with pattern for progress', () => {
             pattern: true
         },
         shortTermPredict: {
-            color: 'red'
+            goodColor: 'green',
+            troubleColor: 'red'
+        },
+        predict: {
+            goodColor: 'lime',
+            troubleColor: 'firebrick'
         }
     }
 
     let diagram = cfd(settings);
-    let predict = diagram.prediction();    
+    let predict = diagram.prediction();
     let now = moment(NOW);
     expect(predict.shortTermPredict).toBe(now.format('YYYY-MM-DD'));
     expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
-    
+
     let actual = diagram.svgSource();
     actuals.push(actual);
-    expect(actuals[11]).toBe(expected[11]);    
+    expect(actuals[11]).toBe(expected[11]);
 
     now = moment(NOW);
-    settings.shortTermPredict = 7;    
+    settings.shortTermPredict = 7;
     predict = diagram.prediction();
     expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
     expect(predict.shortTermPredict).toBe(now.format('YYYY-MM-DD'));
 
     now = moment(NOW);
-    settings.shortTermPredict = 8;    
+    settings.shortTermPredict = 8;
     predict = diagram.prediction();
     expect(predict.predict).toBe(now.add(1, 'days').format('YYYY-MM-DD'));
     expect(predict.shortTermPredict).toBe(null);
-    
+
 });
 
 
