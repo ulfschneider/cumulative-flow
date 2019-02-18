@@ -1210,9 +1210,8 @@ function drawFocus(settings) {
  * markers: {color: '#222', backgroundColor: '#fff'},
  * predict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'},
  * shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
- * }</pre>
- * A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
- * progress and instead will create a pattern made of the toDo color and the done color.
+ * }</pre> A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
+ * progress and instead will create a pattern made of the toDo color and the done color. 
  * For the prediction, a <code>goodColor>/code> is used whenever the workload can be completed within
  * the scheduled amount of time and the <code>troubleColoe</code> is used in case there is not sufficient
  * time to complete all work.
