@@ -73,8 +73,9 @@ let diagram = cfd(settings);
     -   `settings.shortTermPredict` **[Number][14]?** Indicate the number of days to go back from current date to 
         determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
         short term prediction line is drawn. Default is 0. Example:<pre>settings.shortTermPredict = 30;</pre>
-    -   `settings.markers` **[Array][16]&lt;{date: ([String][13] \| [Date][15]), label: [String][13]}>?** Highlight specific dates inside of the diagram
-        with markers. Each marker is an object with a date for the marker and an optional label. Example:<pre>settings.markers = [
+    -   `settings.markers` **[Array][16]&lt;{date: ([String][13] \| [Date][15]), label: [String][13]}>?** Highlight specific dates 
+        inside of the diagram with markers. 
+        Each marker is an object with a date for the marker and an optional label. Example:<pre>settings.markers = [
         { date: '2018-09-03', label: 'M1' },
         { date: '2018-09-10', label: 'M2' }];</pre>
     -   `settings.drawOptions` **[Array][16]&lt;[String][13]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
@@ -84,7 +85,8 @@ let diagram = cfd(settings);
         'predict' - draw the predict line
         'focus' - draw detailed data when hovering the diagram
         </pre> By default all of these draw options are on.
-    -   `settings.style` **[Object][9]?** Influence the appearance of the diagram with typeface and colors. The defaults are:<pre>settings.style = {
+    -   `settings.style` **[Object][9]?** Influence the appearance of the diagram with typeface and colors. 
+        The defaults are:<pre>settings.style = {
         fontSize: 12,
         fontFamily: 'sans-serif',
         color: '#222',
@@ -96,7 +98,11 @@ let diagram = cfd(settings);
         markers: {color: '#222', backgroundColor: '#fff'},
         predict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'},
         shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
-        }</pre>
+        }</pre> A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
+        progress and instead will create a pattern made of the toDo color and the done color. 
+        For the prediction, a <code>goodColor>/code> is used whenever the workload can be completed within
+        the scheduled amount of time and the <code>troubleColor</code> is used in case there is 
+        not sufficient time to complete all work.
     -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
         toDo: ['new'],
         progress: ['test', 'dev'],
@@ -135,7 +141,7 @@ Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code
 
 Calculate the predict date and the short term predict date
 
-Returns **[Object][9]** with <code>predict</code> and <code>shortTermPredict</code> dates as strings
+Returns **[Object][9]** with  <code>predict</code> and <code>shortTermPredict</code> dates as strings
 
 ### remove
 

@@ -1184,8 +1184,9 @@ function drawFocus(settings) {
  * determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
  * short term prediction line is drawn. Default is 0. Example:
  * <pre>settings.shortTermPredict = 30;</pre> 
- * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates inside of the diagram
- * with markers. Each marker is an object with a date for the marker and an optional label. Example:
+ * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates 
+ * inside of the diagram with markers. 
+ * Each marker is an object with a date for the marker and an optional label. Example:
  * <pre>settings.markers = [
  * { date: '2018-09-03', label: 'M1' },
  * { date: '2018-09-10', label: 'M2' }];</pre>
@@ -1197,7 +1198,8 @@ function drawFocus(settings) {
  * 'predict' - draw the predict line
  * 'focus' - draw detailed data when hovering the diagram
  * </pre> By default all of these draw options are on.
- * @param {Object} [settings.style] - Influence the appearance of the diagram with typeface and colors. The defaults are:
+ * @param {Object} [settings.style] - Influence the appearance of the diagram with typeface and colors. 
+ * The defaults are:
  * <pre>settings.style = {
  * fontSize: 12,
  * fontFamily: 'sans-serif',
@@ -1210,11 +1212,12 @@ function drawFocus(settings) {
  * markers: {color: '#222', backgroundColor: '#fff'},
  * predict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'},
  * shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
- * }</pre> A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
+ * }</pre> 
+ * A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
  * progress and instead will create a pattern made of the toDo color and the done color. 
  * For the prediction, a <code>goodColor>/code> is used whenever the workload can be completed within
- * the scheduled amount of time and the <code>troubleColoe</code> is used in case there is not sufficient
- * time to complete all work.
+ * the scheduled amount of time and the <code>troubleColor</code> is used in case there is 
+ * not sufficient time to complete all work.
  * @param {{toDo: String[], progress: String[], done: String[], unit: String, entries: Object[]}} settings.data - The data for the diagram. Example:
  * <pre>settings.data = {
  * toDo: ['new'],
