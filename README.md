@@ -100,7 +100,7 @@ let diagram = cfd(settings);
         shortTermPredict: {color: '#222', backgroundColor: '#fff', goodColor: '#222', troubleColor: '#222'}
         }</pre> A setting of <code>settings.style.progress.pattern = true</code> will ignore the color setting for 
         progress and instead will create a pattern made of the toDo color and the done color. 
-        For the prediction, a <code>goodColor>/code> is used whenever the workload can be completed within
+        For the prediction, a <code>goodColor</code> is used whenever the workload can be completed within
         the scheduled amount of time and the <code>troubleColor</code> is used in case there is 
         not sufficient time to complete all work.
     -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
