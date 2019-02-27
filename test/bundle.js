@@ -21014,17 +21014,22 @@ function drawPrediction(settings) {
 
             let backgroundColor = settings.style.predict.backgroundColor;
             let color = settings.style.predict.goodColor;
+            
             if (shortTerm) {
-                if (futureHint) {
+                if (futureHint && settings.toDate) {
                     color = settings.style.shortTermPredict.troubleColor;
-                } else {
+                } else if (settings.toDate) {
                     color = settings.style.shortTermPredict.goodColor;
+                } else {
+                    color = settings.style.predict.color;
                 }
             } else {
-                if (futureHint) {
+                if (futureHint && settings.toDate) {
                     color = settings.style.predict.troubleColor;
-                } else {
+                } else if (settings.toDate) {
                     color = settings.style.predict.goodColor;
+                } else {
+                    color = settings.style.predict.color;
                 }
             }
 
