@@ -690,7 +690,7 @@ function drawPrediction(settings) {
                 y: y3
             }, {
                 x: x3,
-                y: shortTerm ? -45 : -25
+                y: shortTerm ? -55 : -35
             }];
 
             let lineFunction = d3.line()
@@ -732,11 +732,14 @@ function drawPrediction(settings) {
                 .style('stroke-width', '3')
                 .style('stroke', backgroundColor);
 
-            settings.g.append('path')
+            let path = settings.g.append('path')
                 .attr('d', lineFunction(pathData))
                 .attr('fill', 'none')
                 .style('stroke-width', '1')
                 .style('stroke', color);
+            if (shortTerm) {
+                path.style('stroke-dasharray', ('9, 3'));
+            } 
 
 
             let label = shortTerm ? settings.shortTermPredict + ' day: ' : '';
