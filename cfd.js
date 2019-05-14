@@ -74,7 +74,7 @@ function transformData(settings) {
             let transformedEntry = {}
 
             //the first value of the array must be the date
-            transformedEntry.date = moment(entry[0]);
+            transformedEntry.date = getMoment(entry[0]);
 
             //the following entries must be the values in order of the given keys
             let i = 1;
@@ -366,7 +366,6 @@ function prepareDataFunctions(settings) {
     settings.fromDate = settings.fromDate ? getStartOfDay(settings.fromDate) : settings.fromDate;
     settings.toDate = settings.toDate ? getStartOfDay(settings.toDate) : settings.toDate;
 
-
     let xRange = d3.extent(settings.data.entries, function (d) {
         return getStartOfDay(d.date);
     });
@@ -402,12 +401,21 @@ function isDoneStatus(status, settings) {
 }
 
 function getStartOfDay(date) {
-    return moment(moment(date).format(DATE_FORMAT));
+    return getMoment(date).startOf('day');
+}
+
+function getMoment(date) {
+    if (_.isString(date)) {
+        return moment(date, 'YYYY-MM-DD');
+    } else {
+        return moment(date);
+    }
 }
 
 function getDataSet(date, settings) {
     for (let entry of settings.data.entries) {
-        if (moment(entry.date).isSame(date, 'day')) {
+
+        if (getMoment(entry.date).isSame(date, 'day')) {
             //sort the result
             let result = {
                 date: getStartOfDay(entry.date),
@@ -435,7 +443,7 @@ function getFirstEntryDate(settings) {
 function getLastEntryDate(settings) {
     let entry = getStartOfDay(settings.data.entries[settings.data.entries.length - 1].date);
     if (settings.toDate && settings.toDate.isBefore(entry)) {
-        return settings.toDate;
+        return getMoment(settings.toDate);
     } else {
         return entry;
     }
@@ -560,7 +568,7 @@ function drawLayers(settings) {
             if (isToDoStatus(d.key, settings)) {
                 return settings.style.toDo.stroke;
             } else if (isProgressStatus(d.key, settings)) {
-                return settings.style.progress.stroke;                
+                return settings.style.progress.stroke;
             } else if (isDoneStatus(d.key, settings)) {
                 return settings.style.done.stroke;
             }
@@ -596,7 +604,7 @@ function drawLayers(settings) {
 function calculatePredictData(settings, predictStart) {
     const summarizeDone = function (date) {
         for (let entry of settings.data.entries) {
-            if (moment(entry.date).isSame(date, 'day')) {
+            if (getStartOfDay(entry.date).isSame(getStartOfDay(date), 'day')) {
                 let sum = 0;
                 for (let key of settings.data.keys) {
                     if (isDoneStatus(key, settings)) {
@@ -655,7 +663,8 @@ function drawPrediction(settings) {
 
     const drawPredictLine = function ({ predictStart, shortTerm }) {
         let date;
-        let currentDate = getLastEntryDate(settings)
+        let currentDate = getLastEntryDate(settings);
+
 
         //x1, x2, y1, y2 to calculate the line parameters
         let predictData = calculatePredictData(settings, predictStart);
@@ -706,7 +715,7 @@ function drawPrediction(settings) {
 
             let backgroundColor = settings.style.predict.backgroundColor;
             let color = settings.style.predict.goodColor;
-            
+
             if (shortTerm) {
                 if (futureHint && settings.toDate) {
                     color = settings.style.shortTermPredict.troubleColor;
@@ -739,7 +748,7 @@ function drawPrediction(settings) {
                 .style('stroke', color);
             if (shortTerm) {
                 path.style('stroke-dasharray', ('9, 3'));
-            } 
+            }
 
 
             let label = shortTerm ? settings.shortTermPredict + ' day: ' : '';
@@ -767,18 +776,20 @@ function drawPrediction(settings) {
             let fromDate = getFirstEntryDate(settings);
             let currentDate = getLastEntryDate(settings);
 
-            if (settings.fromDate 
+            if (settings.fromDate
                 && currentDate.isSameOrAfter(settings.fromDate)) {
                 fromDate = settings.fromDate;
             }
 
             let shortTermPredictStart = currentDate.subtract(Math.abs(settings.shortTermPredict), 'days');
+
             if (shortTermPredictStart.isAfter(fromDate)) {
                 drawPredictLine({
                     predictStart: shortTermPredictStart,
                     shortTerm: true
                 });
             }
+
         }
 
         if (settings.predict) {
@@ -839,7 +850,7 @@ function drawMarkers(settings) {
         }
 
         drawTextWithBackground({
-            text: (label ? label : moment(date).format(DATE_FORMAT)),
+            text: (label ? label : getMoment(date).format(DATE_FORMAT)),
             x: x1,
             y: -15,
             color: settings.style.markers.color,
@@ -1035,7 +1046,7 @@ function drawFocus(settings) {
                         .attr('x', x + LEGEND_PAD + 2)
                         .attr('y', key == 'date' ? y + row * lineHeight : y + (0.5 + row) * lineHeight)
                         .style('display', null)
-                        .text(key == 'date' ? moment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)
+                        .text(key == 'date' ? getMoment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)
                     try {
                         let bbx = focusItems[count].node().getBBox();
                         width = Math.max(width, bbx.width + 2 * LEGEND_PAD);

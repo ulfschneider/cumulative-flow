@@ -3,7 +3,7 @@
 const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
-const NOW = '2018-09-11 12:00';
+const NOW = '2018-09-11T12:00:00';
 const NUMBER_OF_TEST_IMAGES = 12;
 let actuals = [];
 let expected = [];
@@ -844,6 +844,9 @@ test('remove image', () => {
     diagram.remove();
     expect(settings.svg.outerHTML).toBe('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400"></svg>');
 });
+
+
+
 
 test('write test results into file', () => {
     let testFileContent = '<!DOCTYPE html>\n<meta charset="utf-8">\n'
