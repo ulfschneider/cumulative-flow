@@ -405,11 +405,7 @@ function getStartOfDay(date) {
 }
 
 function getMoment(date) {
-    if (_.isString(date)) {
-        return moment(date, 'YYYY-MM-DD');
-    } else {
-        return moment(date);
-    }
+    return moment(date);
 }
 
 function getDataSet(date, settings) {
@@ -604,7 +600,7 @@ function drawLayers(settings) {
 function calculatePredictData(settings, predictStart) {
     const summarizeDone = function (date) {
         for (let entry of settings.data.entries) {
-            if (getStartOfDay(entry.date).isSame(getStartOfDay(date), 'day')) {
+            if (getMoment(entry.date).isSame(date, 'day')) {
                 let sum = 0;
                 for (let key of settings.data.keys) {
                     if (isDoneStatus(key, settings)) {
