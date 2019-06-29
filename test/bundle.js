@@ -20921,22 +20921,38 @@ function calculatePredictData(settings, predictStart) {
         return 0;
     }
 
+    const summarizeAll = function (date) {
+        for (let entry of settings.data.entries) {
+            if (getMoment(entry.date).isSame(date, 'day')) {
+                let sum = 0;
+                for (let key of settings.data.keys) {
+                    if (isToDoStatus(key, settings) || isProgressStatus(key, settings) || isDoneStatus(key, settings)) {
+                        sum += entry[key];
+                    }
+                }
+                return sum;
+            }
+        }
+        return 0;
+    }
+
     predictStart = getStartOfDay(predictStart);
     let result = {};
     let currentDate = getLastEntryDate(settings)
     let doneAtPredictStart = summarizeDone(predictStart);
     let doneAtCurrentDate = summarizeDone(currentDate);
+    let allAtCurrentDate = summarizeAll(currentDate);
     if (predictStart.isBefore(currentDate) && doneAtPredictStart < doneAtCurrentDate) {
         //x1, x2, y1, y2 to calculate the line parameters
         result.x1 = settings.x(predictStart);
         result.x2 = settings.x(currentDate);
         result.y1 = settings.y(doneAtPredictStart);
         result.y2 = settings.y(doneAtCurrentDate);
+        result.y = settings.y(allAtCurrentDate);
         result.m = (result.y2 - result.y1) / (result.x2 - result.x1);
 
-
         let predictX = function () {
-            return -result.y1 / result.m + result.x1;
+            return (result.y - result.y1) / result.m + result.x1;
         }
 
         let dateFromX = function (x) {
@@ -20945,9 +20961,11 @@ function calculatePredictData(settings, predictStart) {
             return getStartOfDay((x - c) / m);
         }
 
+
         result.x = predictX();
         result.date = dateFromX(result.x);
     }
+
     return result;
 }
 
@@ -20972,6 +20990,7 @@ function drawPrediction(settings) {
 
         //x1, x2, y1, y2 to calculate the line parameters
         let predictData = calculatePredictData(settings, predictStart);
+
         if (predictData.date) {
             const X_TRIM = 2; //do not draw the prediction line direct on y axis
 
@@ -20988,7 +21007,11 @@ function drawPrediction(settings) {
             }
 
             //x3 and y3 to be used for the real end point of the line
-            let x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
+            let x3 = predictData.x - X_TRIM;
+            if (!isDateInRange(predictData.date, settings)) {                
+                x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
+            }
+
             let y3 = yFromX(x3);
             if (y3 < 0) {
                 x3 = -predictData.y1 / predictData.m + predictData.x1 - X_TRIM;

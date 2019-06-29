@@ -4,7 +4,7 @@ const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11T12:00:00';
-const NUMBER_OF_TEST_IMAGES = 12;
+const NUMBER_OF_TEST_IMAGES = 13;
 let actuals = [];
 let expected = [];
 let settings;
@@ -833,6 +833,23 @@ test('image 11 with pattern for progress', () => {
     expect(predict.shortTermPredict).toBe(null);
 
 });
+
+test('image 12 with reduced done count', () => {
+    let settings = makeTestSettings();
+    settings.data = makeTestData();
+    settings.data.entries[settings.data.entries.length -1].new = 0;
+    settings.data.entries[settings.data.entries.length -1].dev = 0;
+    settings.data.entries[settings.data.entries.length -1].done = 2;
+
+    settings.shortTermPredict = 2;
+    settings.title = 'Testing CFD with reduced done count';
+
+    let diagram = cfd(settings);
+    let actual = diagram.svgSource();
+    actuals.push(actual);
+    expect(actuals[11]).toBe(expected[11]);
+});
+
 
 
 
