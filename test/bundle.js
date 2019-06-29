@@ -20999,7 +20999,7 @@ function drawPrediction(settings) {
             }
 
             //x0 and y0 to be used for the real start point of the line
-            let x0 = predictData.x1;
+            let x0 = predictData.x1 + 0.5; //like for markers
             let y0 = predictData.y1;
             if (!isDateInRange(predictStart, settings) && predictStart.isBefore(currentDate)) {
                 x0 = settings.x(getStartOfDay(settings.fromDate ? settings.fromDate : getFirstEntryDate(settings)));

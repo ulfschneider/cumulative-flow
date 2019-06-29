@@ -843,6 +843,15 @@ test('image 12 with reduced done count', () => {
 
     settings.shortTermPredict = 2;
     settings.title = 'Testing CFD with reduced done count';
+    settings.markers = [{
+        date: settings.data.entries[1].date
+    }, {
+        date: settings.data.entries[3].date
+    }, {
+        date: settings.data.entries[settings.data.entries.length - 1].date
+    }, {
+        date: settings.toDate
+    }]
 
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
