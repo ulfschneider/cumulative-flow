@@ -700,7 +700,7 @@ function drawPrediction(settings) {
 
             //x3 and y3 to be used for the real end point of the line
             let x3 = predictData.x - X_TRIM;
-            if (!isDateInRange(predictData.date, settings)) {                
+            if (!isDateInRange(predictData.date, settings)) {
                 x3 = settings.x(settings.toDate ? settings.toDate : currentDate) - X_TRIM;
             }
 
@@ -842,7 +842,7 @@ function isDateInRange(date, settings) {
 
 function drawMarkers(settings) {
 
-    let mark = function (date, label) {
+    let mark = function (date, label, color) {
         let x1 = settings.x(getStartOfDay(date)) + 0.5; //perfect align marker
         let y1 = settings.innerHeight;
         let y2 = 0;
@@ -865,14 +865,14 @@ function drawMarkers(settings) {
                 .attr('x2', x1)
                 .attr('y2', y2)
                 .style('stroke-width', '1')
-                .style('stroke', settings.style.markers.color);
+                .style('stroke', color ? color : settings.style.markers.color);
         }
 
         drawTextWithBackground({
             text: (label ? label : getMoment(date).format(DATE_FORMAT)),
             x: x1,
             y: -15,
-            color: settings.style.markers.color,
+            color: color ? color : settings.style.markers.color,
             textAnchor: 'start',
             background: settings.style.backgroundColor,
             settings: settings
@@ -883,7 +883,7 @@ function drawMarkers(settings) {
     if (settings.drawOptions.includes('markers') && settings.markers) {
         settings.markers.forEach(m => {
             if (isDateInRange(m.date, settings)) {
-                mark(m.date, m.label);
+                mark(m.date, m.label, m.color);
             }
         });
     }
@@ -1224,9 +1224,10 @@ function drawFocus(settings) {
  * <pre>settings.shortTermPredict = 30;</pre> 
  * @param {{date:(String|Date), label:String}[]} [settings.markers] - Highlight specific dates 
  * inside of the diagram with markers. 
- * Each marker is an object with a date for the marker and an optional label. Example:
+ * Each marker is an object with a date for the marker and an optional label. It can as well have an optional color. 
+ * Example:
  * <pre>settings.markers = [
- * { date: '2018-09-03', label: 'M1' },
+ * { date: '2018-09-03', label: 'M1', color: 'green' },
  * { date: '2018-09-10', label: 'M2' }];</pre>
  * @param {String[]} [settings.drawOptions] - An array to determine the parts to be drawn. Possible options:
  * <pre>'title' - draw the title

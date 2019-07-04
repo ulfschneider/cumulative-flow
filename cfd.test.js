@@ -834,7 +834,7 @@ test('image 11 with pattern for progress', () => {
 
 });
 
-test('image 12 with reduced done count', () => {
+test('image 12 with reduced done count and colored marker', () => {
     let settings = makeTestSettings();
     settings.data = makeTestData();
     settings.data.entries[settings.data.entries.length -1].new = 0;
@@ -842,13 +842,14 @@ test('image 12 with reduced done count', () => {
     settings.data.entries[settings.data.entries.length -1].done = 2;
 
     settings.shortTermPredict = 2;
-    settings.title = 'Testing CFD with reduced done count';
+    settings.title = 'Testing CFD with reduced done count and colored marker';
     settings.markers = [{
         date: settings.data.entries[1].date
     }, {
-        date: settings.data.entries[3].date
+        date: settings.data.entries[3].date        
     }, {
-        date: settings.data.entries[settings.data.entries.length - 1].date
+        date: settings.data.entries[settings.data.entries.length - 1].date,
+        color: 'red'
     }, {
         date: settings.toDate
     }]
@@ -856,7 +857,7 @@ test('image 12 with reduced done count', () => {
     let diagram = cfd(settings);
     let actual = diagram.svgSource();
     actuals.push(actual);
-    expect(actuals[11]).toBe(expected[11]);
+    expect(actuals[12]).toBe(expected[12]);
 });
 
 

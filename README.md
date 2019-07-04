@@ -75,8 +75,9 @@ let diagram = cfd(settings);
         short term prediction line is drawn. Default is 0. Example:<pre>settings.shortTermPredict = 30;</pre>
     -   `settings.markers` **[Array][16]&lt;{date: ([String][13] \| [Date][15]), label: [String][13]}>?** Highlight specific dates 
         inside of the diagram with markers. 
-        Each marker is an object with a date for the marker and an optional label. Example:<pre>settings.markers = [
-        { date: '2018-09-03', label: 'M1' },
+        Each marker is an object with a date for the marker and an optional label. It can as well have an optional color. 
+        Example:<pre>settings.markers = [
+        { date: '2018-09-03', label: 'M1', color: 'green' },
         { date: '2018-09-10', label: 'M2' }];</pre>
     -   `settings.drawOptions` **[Array][16]&lt;[String][13]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
         'axis' - draw the x and y axis
