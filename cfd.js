@@ -15,6 +15,22 @@ const LEGEND_PAD = 3;
 
 //Helper functions
 
+function minDate(dates) {
+    let min;
+    for (let d of dates) {
+
+        if (moment.isMoment(d)) {
+            if (!min) {
+                min = d;
+            }
+            if (min.diff(d) > 0) {
+                min = d;
+            }
+        }
+    }
+    return min;
+}
+
 function validateSettings(settings) {
     if (!settings) {
         throw "No settings";
@@ -365,6 +381,7 @@ function prepareDataFunctions(settings) {
 
     settings.fromDate = settings.fromDate ? getStartOfDay(settings.fromDate) : settings.fromDate;
     settings.toDate = settings.toDate ? getStartOfDay(settings.toDate) : settings.toDate;
+    settings.predictTarget = settings.predictTarget ? getStartOfDay(settings.predictTarget) : settings.predictTarget;
 
     let xRange = d3.extent(settings.data.entries, function (d) {
         return getStartOfDay(d.date);
@@ -733,24 +750,13 @@ function drawPrediction(settings) {
             let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
 
             let backgroundColor = settings.style.predict.backgroundColor;
-            let color = settings.style.predict.goodColor;
 
-            if (shortTerm) {
-                if (futureHint && settings.toDate) {
-                    color = settings.style.shortTermPredict.troubleColor;
-                } else if (settings.toDate) {
-                    color = settings.style.shortTermPredict.goodColor;
-                } else {
-                    color = settings.style.predict.color;
-                }
+            if ((settings.predictTarget || settings.toDate) && date.isAfter(minDate([settings.predictTarget, settings.toDate]))) {
+                color = shortTerm ? settings.style.shortTermPredict.troubleColor : settings.style.predict.troubleColor;
+            } else if ((settings.predictTarget || settings.toDate) && date.isSameOrBefore(minDate([settings.predictTarget, settings.toDate]))) {
+                color = shortTerm ? settings.style.shortTermPredict.goodColor : settings.style.predict.goodColor;
             } else {
-                if (futureHint && settings.toDate) {
-                    color = settings.style.predict.troubleColor;
-                } else if (settings.toDate) {
-                    color = settings.style.predict.goodColor;
-                } else {
-                    color = settings.style.predict.color;
-                }
+                color = settings.style.predict.color;
             }
 
 
@@ -1218,6 +1224,8 @@ function drawFocus(settings) {
  * <pre>settings.predict = '2018-09-01';</pre>
  * If no date is provided but the drawOptions allow to draw a prediction line, an automatic
  * start date for that line will be calculated based on the first date something went to done.
+ * @param {String|Date} [settings.predictTarget] - Provide a predict target that differs from 
+ * the end date of the diagram (is before the end date)
  * @param {Number} [settings.shortTermPredict] - Indicate the number of days to go back from current date to 
  * determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
  * short term prediction line is drawn. Default is 0. Example:
