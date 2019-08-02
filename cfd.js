@@ -36,6 +36,10 @@ function validateSettings(settings) {
         throw "No settings";
     }
 
+    if (!settings.svg && settings.id) {
+        settings.svg = document.getElementById(settings.id);
+    }
+
     if (!settings.svg || settings.svg.tagName.toLowerCase() !== 'svg') {
         throw "No svg";
     }
@@ -306,6 +310,7 @@ function validateDrawOptions(settings) {
 }
 
 function prepareSVG(settings) {
+
     settings.d3svg = d3.select(settings.svg);
 
     settings.d3svg
@@ -1205,6 +1210,8 @@ function drawFocus(settings) {
  * The diagram will be attached to this DOM tree element. Example:
  * <pre>settings.svg = document.getElementById('cfdDiagram');</pre>
  * <code>'cfdDiagram'</code> is the id of a svg tag.
+ * @param {String} [settings.id] - The id of a domtree svg element, to which the diagram will be bound to. 
+ * The id will only be used in case settings.svg is not provided.
  * @param {Number} [settings.width] - The width of the diagram in pixels, the margin settings have to be included in that width.
  * @param {Number} [settings.height] - The height of the diagram in pixels, the margin settings have to be included in that height.
  * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margin for the diagram.
@@ -1306,9 +1313,14 @@ function CFD(settings) {
 CFD[Symbol.species] = CFD;
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element.
+ * Draw the Cumulative Flow Diagram.
+ * @param {Object} [settings] - The configuration object for the diagram. Optional.
+ * If provided, will overwrite the settings object already given to the constructor.
  */
-CFD.prototype.draw = function () {
+CFD.prototype.draw = function (settings) {
+    if (settings) {
+        this.settings = settings;
+    }
     validateSettings(this.settings);
     this.remove();
     prepareSVG(this.settings);
@@ -1324,7 +1336,7 @@ CFD.prototype.draw = function () {
 
 /**
  * Calculate the predict date and the short term predict date
- * @returns {Object} with  <code>predict</code> and <code>shortTermPredict</code> dates as strings
+ * @returns {Object} with <code>predict</code> and <code>shortTermPredict</code> dates as strings
  */
 CFD.prototype.prediction = function () {
     validateData(this.settings);
@@ -1359,7 +1371,7 @@ CFD.prototype.prediction = function () {
 }
 
 /**
- * Clear the diagram from the provided <code>settings.svg</code> DOM tree element
+ * Clear the diagram.
  */
 CFD.prototype.remove = function () {
     if (this.settings.svg) {
@@ -1371,8 +1383,7 @@ CFD.prototype.remove = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+ * Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @deprecated use imageSource instead
  * @returns {String}
  */
@@ -1381,8 +1392,7 @@ CFD.prototype.image = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+ * Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @returns {String}
  */
 CFD.prototype.imageSource = function () {
@@ -1392,8 +1402,7 @@ CFD.prototype.imageSource = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a SVG tag string.
+ * Draw the Cumulative Flow Diagram and return the result as a SVG tag string.
  * @returns {String}
  */
 CFD.prototype.svgSource = function () {

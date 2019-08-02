@@ -20323,9 +20323,29 @@ const LEGEND_PAD = 3;
 
 //Helper functions
 
+function minDate(dates) {
+    let min;
+    for (let d of dates) {
+
+        if (moment.isMoment(d)) {
+            if (!min) {
+                min = d;
+            }
+            if (min.diff(d) > 0) {
+                min = d;
+            }
+        }
+    }
+    return min;
+}
+
 function validateSettings(settings) {
     if (!settings) {
         throw "No settings";
+    }
+
+    if (!settings.svg && settings.id) {
+        settings.svg = document.getElementById(settings.id);
     }
 
     if (!settings.svg || settings.svg.tagName.toLowerCase() !== 'svg') {
@@ -20598,6 +20618,7 @@ function validateDrawOptions(settings) {
 }
 
 function prepareSVG(settings) {
+
     settings.d3svg = d3.select(settings.svg);
 
     settings.d3svg
@@ -20673,6 +20694,7 @@ function prepareDataFunctions(settings) {
 
     settings.fromDate = settings.fromDate ? getStartOfDay(settings.fromDate) : settings.fromDate;
     settings.toDate = settings.toDate ? getStartOfDay(settings.toDate) : settings.toDate;
+    settings.predictTarget = settings.predictTarget ? getStartOfDay(settings.predictTarget) : settings.predictTarget;
 
     let xRange = d3.extent(settings.data.entries, function (d) {
         return getStartOfDay(d.date);
@@ -21041,24 +21063,13 @@ function drawPrediction(settings) {
             let futureHint = predictData.x - X_TRIM > x3 ? ' →' : '';
 
             let backgroundColor = settings.style.predict.backgroundColor;
-            let color = settings.style.predict.goodColor;
 
-            if (shortTerm) {
-                if (futureHint && settings.toDate) {
-                    color = settings.style.shortTermPredict.troubleColor;
-                } else if (settings.toDate) {
-                    color = settings.style.shortTermPredict.goodColor;
-                } else {
-                    color = settings.style.predict.color;
-                }
+            if ((settings.predictTarget || settings.toDate) && date.isAfter(minDate([settings.predictTarget, settings.toDate]))) {
+                color = shortTerm ? settings.style.shortTermPredict.troubleColor : settings.style.predict.troubleColor;
+            } else if ((settings.predictTarget || settings.toDate) && date.isSameOrBefore(minDate([settings.predictTarget, settings.toDate]))) {
+                color = shortTerm ? settings.style.shortTermPredict.goodColor : settings.style.predict.goodColor;
             } else {
-                if (futureHint && settings.toDate) {
-                    color = settings.style.predict.troubleColor;
-                } else if (settings.toDate) {
-                    color = settings.style.predict.goodColor;
-                } else {
-                    color = settings.style.predict.color;
-                }
+                color = settings.style.predict.color;
             }
 
 
@@ -21507,6 +21518,8 @@ function drawFocus(settings) {
  * The diagram will be attached to this DOM tree element. Example:
  * <pre>settings.svg = document.getElementById('cfdDiagram');</pre>
  * <code>'cfdDiagram'</code> is the id of a svg tag.
+ * @param {String} [settings.id] - The id of a domtree svg element, to which the diagram will be bound to. 
+ * The id will only be used in case settings.svg is not provided.
  * @param {Number} [settings.width] - The width of the diagram in pixels, the margin settings have to be included in that width.
  * @param {Number} [settings.height] - The height of the diagram in pixels, the margin settings have to be included in that height.
  * @param {{top: Number, right: Number, bottom: Number, right: Number}} [settings.margin] - The margin for the diagram.
@@ -21526,6 +21539,8 @@ function drawFocus(settings) {
  * <pre>settings.predict = '2018-09-01';</pre>
  * If no date is provided but the drawOptions allow to draw a prediction line, an automatic
  * start date for that line will be calculated based on the first date something went to done.
+ * @param {String|Date} [settings.predictTarget] - Provide a predict target that differs from 
+ * the end date of the diagram (is before the end date)
  * @param {Number} [settings.shortTermPredict] - Indicate the number of days to go back from current date to 
  * determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
  * short term prediction line is drawn. Default is 0. Example:
@@ -21606,9 +21621,14 @@ function CFD(settings) {
 CFD[Symbol.species] = CFD;
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element.
+ * Draw the Cumulative Flow Diagram.
+ * @param {Object} [settings] - The configuration object for the diagram. Optional.
+ * If provided, will overwrite the settings object already given to the constructor.
  */
-CFD.prototype.draw = function () {
+CFD.prototype.draw = function (settings) {
+    if (settings) {
+        this.settings = settings;
+    }
     validateSettings(this.settings);
     this.remove();
     prepareSVG(this.settings);
@@ -21624,7 +21644,7 @@ CFD.prototype.draw = function () {
 
 /**
  * Calculate the predict date and the short term predict date
- * @returns {Object} with  <code>predict</code> and <code>shortTermPredict</code> dates as strings
+ * @returns {Object} with <code>predict</code> and <code>shortTermPredict</code> dates as strings
  */
 CFD.prototype.prediction = function () {
     validateData(this.settings);
@@ -21659,7 +21679,7 @@ CFD.prototype.prediction = function () {
 }
 
 /**
- * Clear the diagram from the provided <code>settings.svg</code> DOM tree element
+ * Clear the diagram.
  */
 CFD.prototype.remove = function () {
     if (this.settings.svg) {
@@ -21671,8 +21691,7 @@ CFD.prototype.remove = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+ * Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @deprecated use imageSource instead
  * @returns {String}
  */
@@ -21681,8 +21700,7 @@ CFD.prototype.image = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+ * Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
  * @returns {String}
  */
 CFD.prototype.imageSource = function () {
@@ -21692,8 +21710,7 @@ CFD.prototype.imageSource = function () {
 }
 
 /**
- * Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
- * and return the result as a SVG tag string.
+ * Draw the Cumulative Flow Diagram and return the result as a SVG tag string.
  * @returns {String}
  */
 CFD.prototype.svgSource = function () {

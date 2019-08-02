@@ -5,11 +5,12 @@
 -   [CFD][1]
     -   [Parameters][2]
     -   [draw][3]
-    -   [prediction][4]
-    -   [remove][5]
-    -   [image][6]
-    -   [imageSource][7]
-    -   [svgSource][8]
+        -   [Parameters][4]
+    -   [prediction][5]
+    -   [remove][6]
+    -   [image][7]
+    -   [imageSource][8]
+    -   [svgSource][9]
 
 ## CFD
 
@@ -47,46 +48,50 @@ let diagram = cfd(settings);
 
 ### Parameters
 
--   `settings` **[Object][9]** The configuration object for the diagram. 
+-   `settings` **[Object][10]** The configuration object for the diagram. 
     All data for the diagram is provided with this object. 
     In this configuration object, whenever a date is to be given, 
-    it can be an [ISO 8601 String][10]
-    or a JavaScript [Date][11] object.
-    A [Moment][12] object is also fine.
-    -   `settings.title` **[String][13]?** The title for the diagram.
-    -   `settings.svg` **[Object][9]** The DOM tree element, wich must be an svg tag.
+    it can be an [ISO 8601 String][11]
+    or a JavaScript [Date][12] object.
+    A [Moment][13] object is also fine.
+    -   `settings.title` **[String][14]?** The title for the diagram.
+    -   `settings.svg` **[Object][10]** The DOM tree element, wich must be an svg tag.
         The diagram will be attached to this DOM tree element. Example:<pre>settings.svg = document.getElementById('cfdDiagram');</pre><code>'cfdDiagram'</code> is the id of a svg tag.
-    -   `settings.width` **[Number][14]?** The width of the diagram in pixels, the margin settings have to be included in that width.
-    -   `settings.height` **[Number][14]?** The height of the diagram in pixels, the margin settings have to be included in that height.
-    -   `settings.margin` **{top: [Number][14], right: [Number][14], bottom: [Number][14], right: [Number][14]}?** The margin for the diagram.
+    -   `settings.id` **[String][14]?** The id of a domtree svg element, to which the diagram will be bound to. 
+        The id will only be used in case settings.svg is not provided.
+    -   `settings.width` **[Number][15]?** The width of the diagram in pixels, the margin settings have to be included in that width.
+    -   `settings.height` **[Number][15]?** The height of the diagram in pixels, the margin settings have to be included in that height.
+    -   `settings.margin` **{top: [Number][15], right: [Number][15], bottom: [Number][15], right: [Number][15]}?** The margin for the diagram.
         Default values are:<pre>settings.margin = {
         top: 75,
         right: 210,
         bottom: 30,
         left: 40 }
         </pre>
-    -   `settings.fromDate` **([String][13] \| [Date][15])?** The start date for the diagram. Example:<pre>settings.fromDate = '2018-09-01';</pre>
-    -   `settings.toDate` **([String][13] \| [Date][15])?** The end date for the diagram. Example:<pre>settings.toDate = '2018-09-05';</pre>
-    -   `settings.predict` **([String][13] \| [Date][15])?** To draw an indication line for the completion of work.
+    -   `settings.fromDate` **([String][14] \| [Date][16])?** The start date for the diagram. Example:<pre>settings.fromDate = '2018-09-01';</pre>
+    -   `settings.toDate` **([String][14] \| [Date][16])?** The end date for the diagram. Example:<pre>settings.toDate = '2018-09-05';</pre>
+    -   `settings.predict` **([String][14] \| [Date][16])?** To draw an indication line for the completion of work.
         The predict argument determines at what date to start drawing the line. Example:<pre>settings.predict = '2018-09-01';</pre>If no date is provided but the drawOptions allow to draw a prediction line, an automatic
         start date for that line will be calculated based on the first date something went to done.
-    -   `settings.shortTermPredict` **[Number][14]?** Indicate the number of days to go back from current date to 
+    -   `settings.predictTarget` **([String][14] \| [Date][16])?** Provide a predict target that differs from 
+        the end date of the diagram (is before the end date)
+    -   `settings.shortTermPredict` **[Number][15]?** Indicate the number of days to go back from current date to 
         determine a short term predict start date. This will be used to draw a second prediction line. If 0, no
         short term prediction line is drawn. Default is 0. Example:<pre>settings.shortTermPredict = 30;</pre>
-    -   `settings.markers` **[Array][16]&lt;{date: ([String][13] \| [Date][15]), label: [String][13]}>?** Highlight specific dates 
+    -   `settings.markers` **[Array][17]&lt;{date: ([String][14] \| [Date][16]), label: [String][14]}>?** Highlight specific dates 
         inside of the diagram with markers. 
         Each marker is an object with a date for the marker and an optional label. It can as well have an optional color. 
         Example:<pre>settings.markers = [
         { date: '2018-09-03', label: 'M1', color: 'green' },
         { date: '2018-09-10', label: 'M2' }];</pre>
-    -   `settings.drawOptions` **[Array][16]&lt;[String][13]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
+    -   `settings.drawOptions` **[Array][17]&lt;[String][14]>?** An array to determine the parts to be drawn. Possible options:<pre>'title' - draw the title
         'axis' - draw the x and y axis
         'legend' - draw the legend information
         'markers' - draw the markers
         'predict' - draw the predict line
         'focus' - draw detailed data when hovering the diagram
         </pre> By default all of these draw options are on.
-    -   `settings.style` **[Object][9]?** Influence the appearance of the diagram with typeface and colors. 
+    -   `settings.style` **[Object][10]?** Influence the appearance of the diagram with typeface and colors. 
         The defaults are:<pre>settings.style = {
         fontSize: 12,
         fontFamily: 'sans-serif',
@@ -104,7 +109,7 @@ let diagram = cfd(settings);
         For the prediction, a <code>goodColor</code> is used whenever the workload can be completed within
         the scheduled amount of time and the <code>troubleColor</code> is used in case there is 
         not sufficient time to complete all work.
-    -   `settings.data` **{toDo: [Array][16]&lt;[String][13]>, progress: [Array][16]&lt;[String][13]>, done: [Array][16]&lt;[String][13]>, unit: [String][13], entries: [Array][16]&lt;[Object][9]>}** The data for the diagram. Example:<pre>settings.data = {
+    -   `settings.data` **{toDo: [Array][17]&lt;[String][14]>, progress: [Array][17]&lt;[String][14]>, done: [Array][17]&lt;[String][14]>, unit: [String][14], entries: [Array][17]&lt;[Object][10]>}** The data for the diagram. Example:<pre>settings.data = {
         toDo: ['new'],
         progress: ['test', 'dev'],
         done: ['done'],
@@ -136,24 +141,28 @@ let diagram = cfd(settings);
 
 ### draw
 
-Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element.
+Draw the Cumulative Flow Diagram.
+
+#### Parameters
+
+-   `settings` **[Object][10]?** The configuration object for the diagram. Optional.
+    If provided, will overwrite the settings object already given to the constructor.
 
 ### prediction
 
 Calculate the predict date and the short term predict date
 
-Returns **[Object][9]** with  <code>predict</code> and <code>shortTermPredict</code> dates as strings
+Returns **[Object][10]** with <code>predict</code> and <code>shortTermPredict</code> dates as strings
 
 ### remove
 
-Clear the diagram from the provided <code>settings.svg</code> DOM tree element
+Clear the diagram.
 
 ### image
 
-Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
-and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[String][13]** 
+Returns **[String][14]** 
 
 **Meta**
 
@@ -162,17 +171,15 @@ Returns **[String][13]**
 
 ### imageSource
 
-Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
-and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
+Draw the Cumulative Flow Diagram and return the result as a string which can be assigned to the SRC attribute of an HTML IMG tag.
 
-Returns **[String][13]** 
+Returns **[String][14]** 
 
 ### svgSource
 
-Draw the Cumulative Flow Diagram inside of the provided <code>settings.svg</code> DOM tree element 
-and return the result as a SVG tag string.
+Draw the Cumulative Flow Diagram and return the result as a SVG tag string.
 
-Returns **[String][13]** 
+Returns **[String][14]** 
 
 [1]: #cfd
 
@@ -180,28 +187,30 @@ Returns **[String][13]**
 
 [3]: #draw
 
-[4]: #prediction
+[4]: #parameters-1
 
-[5]: #remove
+[5]: #prediction
 
-[6]: #image
+[6]: #remove
 
-[7]: #imagesource
+[7]: #image
 
-[8]: #svgsource
+[8]: #imagesource
 
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[9]: #svgsource
 
-[10]: https://en.wikipedia.org/wiki/ISO_8601
+[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[11]: https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date
+[11]: https://en.wikipedia.org/wiki/ISO_8601
 
-[12]: https://momentjs.com
+[12]: https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Date
 
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[13]: https://momentjs.com
 
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
