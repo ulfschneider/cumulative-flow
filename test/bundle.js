@@ -20806,19 +20806,19 @@ function drawTextWithBackground({
         .text(text);
 
     try {
-        let bbx = txt.node().getBBox();
+        let length = txt.node().getComputedTextLength()
         if (textAnchor == 'middle') {
-            bkg.attr('x', x - bbx.width / 2);
+            bkg.attr('x', x - length / 2);
         } else if (textAnchor == 'end') {
-            bkg.attr('x', x - bbx.width);
+            bkg.attr('x', x - length);
         } else {
             bkg.attr('x', x);
         }
         bkg.attr('y', y - settings.style.fontSize / 2)
-            .attr('width', bbx.width)
+            .attr('width', length)
             .attr('height', settings.style.fontSize);
     } catch (e) {
-        //JSDOM is not able to operate with bbox
+        //JSDOM is not able to operate with getComputedTextLength
         //therefore this code is not going to run in the tests
     }
 }
@@ -21318,10 +21318,10 @@ function drawLegend(settings) {
         //and use progress because it has the most length of 
         //To Do, In Progress and Done
         try {
-            let bbox = progress.node().getBBox();
-            background.attr('width', bbox.width + 2.6 * lineHeight);
+            let length = progress.node().getComputedTextLength();
+            background.attr('width', length + 2.6 * lineHeight);
         } catch (e) {
-            //JSDOM is not able to operate with bbox
+            //JSDOM is not able to operate with getComputedTextLength
             //therefore this code is not going to run in the tests
         }
 
@@ -21386,8 +21386,8 @@ function drawFocus(settings) {
                         .style('display', null)
                         .text(key == 'date' ? getMoment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)
                     try {
-                        let bbx = focusItems[count].node().getBBox();
-                        width = Math.max(width, bbx.width + 2 * LEGEND_PAD);
+                        let length = focusItems[count].node().getComputedTextLength();
+                        width = Math.max(width, length + 2 * LEGEND_PAD);
                     } catch (e) { }
                     row++;
                     count++;
