@@ -125,7 +125,7 @@ let diagram = cfd(settings);
         { date: '2018-09-10', new: 1, dev: 1, test: 0, done: 5 }
         ]}</pre>Each entry object must contain a date and the status counts for the
         <code>toDo</code>, <code>progress</code> and <code>done</code> status categories.
-        The unit is the unit of measurement for the status counts.
+        The unit is the unit of measurement for the status counts and can hold any value.
         A value of <code>'points'</code> indicates story points.
         An omitted unit will lead to interpreting the status counts as item counts.
         The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
@@ -138,6 +138,12 @@ let diagram = cfd(settings);
         For the above example: The <code>done</code> status layer is at the bottom, followed by
         the <code>test</code> and <code>dev</code> layer
         and finally the <code>new</code> layer is getting rendered.
+    -   `settings.legend` **[Object][10]?** Influence  the appearance of the legend
+        The defaults are:<pre>settings.legend = {
+        toDo: 'To Do',
+        progress: 'In Progress',
+        done: 'Done'
+        }</pre>
 
 ### draw
 

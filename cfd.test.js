@@ -4,7 +4,7 @@ const fs = require('fs');
 const cfd = require('cumulative-flow');
 const moment = require('moment');
 const NOW = '2018-09-11T12:00:00';
-const NUMBER_OF_TEST_IMAGES = 13;
+const NUMBER_OF_TEST_IMAGES = 14;
 let actuals = [];
 let expected = [];
 let settings;
@@ -47,52 +47,53 @@ function makeTestData() {
         test: 0,
         done: 0,
     }, {
-            date: moment(now).subtract(7, 'days'),
-            new: 1,
-            dev: 0,
-            test: 0,
-            done: 0,
-        }, {
-            date: moment(now).subtract(6, 'days'),
-            new: 1,
-            dev: 1,
-            test: 0,
-            done: 0
-        }, {
-            date: moment(now).subtract(5, 'days'),
-            new: 1,
-            dev: 0,
-            test: 1,
-            done: 1
-        }, {
-            date: moment(now).subtract(4, 'days'),
-            new: 2,
-            dev: 1,
-            test: 0,
-            done: 2
-        }, {
-            date: moment(now).subtract(3, 'days'),
-            new: 1,
-            dev: 1,
-            test: 2,
-            done: 2
-        }, {
-            date: moment(now).subtract(2, 'days'),
-            new: 0,
-            dev: 0,
-            test: 1,
-            done: 5
-        }, {
-            date: moment(now).subtract(1, 'days'),
-            new: 1,
-            dev: 1,
-            test: 0,
-            done: 5
-        }
+        date: moment(now).subtract(7, 'days'),
+        new: 1,
+        dev: 0,
+        test: 0,
+        done: 0,
+    }, {
+        date: moment(now).subtract(6, 'days'),
+        new: 1,
+        dev: 1,
+        test: 0,
+        done: 0
+    }, {
+        date: moment(now).subtract(5, 'days'),
+        new: 1,
+        dev: 0,
+        test: 1,
+        done: 1
+    }, {
+        date: moment(now).subtract(4, 'days'),
+        new: 2,
+        dev: 1,
+        test: 0,
+        done: 2
+    }, {
+        date: moment(now).subtract(3, 'days'),
+        new: 1,
+        dev: 1,
+        test: 2,
+        done: 2
+    }, {
+        date: moment(now).subtract(2, 'days'),
+        new: 0,
+        dev: 0,
+        test: 1,
+        done: 5
+    }, {
+        date: moment(now).subtract(1, 'days'),
+        new: 1,
+        dev: 1,
+        test: 0,
+        done: 5
+    }
 
     );
     return testData;
 }
+
 
 function makeArrayOfArraysTestData() {
     let testData = {};
@@ -837,16 +838,16 @@ test('image 11 with pattern for progress', () => {
 test('image 12 with reduced done count and colored marker', () => {
     let settings = makeTestSettings();
     settings.data = makeTestData();
-    settings.data.entries[settings.data.entries.length -1].new = 0;
-    settings.data.entries[settings.data.entries.length -1].dev = 0;
-    settings.data.entries[settings.data.entries.length -1].done = 2;
+    settings.data.entries[settings.data.entries.length - 1].new = 0;
+    settings.data.entries[settings.data.entries.length - 1].dev = 0;
+    settings.data.entries[settings.data.entries.length - 1].done = 2;
 
     settings.shortTermPredict = 2;
     settings.title = 'Testing CFD with reduced done count and colored marker';
     settings.markers = [{
         date: settings.data.entries[1].date
     }, {
-        date: settings.data.entries[3].date        
+        date: settings.data.entries[3].date
     }, {
         date: settings.data.entries[settings.data.entries.length - 1].date,
         color: 'red'
@@ -860,7 +861,67 @@ test('image 12 with reduced done count and colored marker', () => {
     expect(actuals[12]).toBe(expected[12]);
 });
 
+function makeEffortTestData() {
+    let testData = {};
+    let now = moment(NOW);
+    testData.toDo = ['days remain'];
+    testData.progress = [];
+    testData.done = ['days logged'];
+    testData.unit = 'Effort';
+    testData.entries = [];
+    testData.entries.push({
+        date: moment(now).subtract(8, 'days'),
+        'days remain': 0,
+        'days logged': 0,
+    }, {
+        date: moment(now).subtract(7, 'days'),
+        'days remain': 1.2,
+        'days logged': 0,
+    }, {
+        date: moment(now).subtract(6, 'days'),
+        'days remain': 1,
+        'days logged': 0
+    }, {
+        date: moment(now).subtract(5, 'days'),
+        'days remain': 1,
+        'days logged': 1
+    }, {
+        date: moment(now).subtract(4, 'days'),
+        'days remain': 2,
+        'days logged': 2
+    }, {
+        date: moment(now).subtract(3, 'days'),
+        'days remain': 1,
+        'days logged': 2
+    }, {
+        date: moment(now).subtract(2, 'days'),
+        'days remain': 0,
+        'days logged': 5
+    }, {
+        date: moment(now).subtract(1, 'days'),
+        'days remain': 1,
+        'days logged': 5.9
+    }
 
+    );
+    return testData;
+}
+
+test('image 13 with logged effort', () => {
+    let settings = makeTestSettings();
+    settings.data = makeEffortTestData();
+    settings.legend = {
+        toDo: 'Days remain',
+        done: 'Days logged'
+    }
+    settings.shortTermPredict = 2;
+    settings.title = 'Testing CFD logged effort';
+
+    let diagram = cfd(settings);
+    let actual = diagram.svgSource();
+    actuals.push(actual);
+    expect(actuals[13]).toBe(expected[13]);
+});
 
 
 test('remove image', () => {

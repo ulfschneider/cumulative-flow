@@ -15,6 +15,14 @@ const LEGEND_PAD = 3;
 
 //Helper functions
 
+function equalsIgnoreCase(a, b) {
+    if (a && b) {
+        return String(a).toLowerCase() == String(b).toLowerCase();
+    } else {
+        return false;
+    }
+}
+
 function minDate(dates) {
     let min;
     for (let d of dates) {
@@ -83,6 +91,7 @@ function validateData(settings) {
     settings.data.reverseKeys = [...settings.data.keys].reverse();
 
     transformData(settings);
+    indicateCategories(settings);
 }
 
 function transformData(settings) {
@@ -98,7 +107,6 @@ function transformData(settings) {
 
             //the following entries must be the values in order of the given keys
             let i = 1;
-
             for (let key of settings.data.keys) {
                 transformedEntry[key] = entry[i];
                 i++;
@@ -106,6 +114,22 @@ function transformData(settings) {
             transformedEntries.push(transformedEntry);
         }
         settings.data.entries = transformedEntries;
+    }
+}
+
+function indicateCategories(settings) {
+    for (let entry of settings.data.entries) {
+        for (let key of settings.data.keys) {
+            if (!settings.data.toDo.hasValue && isToDoStatus(key, settings) && entry[key]) {
+                settings.data.toDo.hasValue = true;
+            }
+            if (!settings.data.progress.hasValue && isProgressStatus(key, settings) && entry[key]) {
+                settings.data.progress.hasValue = true;
+            }
+            if (!settings.data.done.hasValue && isDoneStatus(key, settings) && entry[key]) {
+                settings.data.done.hasValue = true;
+            }
+        }
     }
 }
 
@@ -299,6 +323,9 @@ function validateStyles(settings) {
                 settings.style.markers.color = settings.style.color;
             }
         }
+    }
+    if (settings.style.progress.pattern) {
+        settings.style.progress.pattern = equalsIgnoreCase(settings.style.progress.pattern, 'false') ? false : true;
     }
 }
 
@@ -951,79 +978,109 @@ function drawLegend(settings) {
     }
 
     if (settings.drawOptions.includes('legend')) {
+        let line = 0;
+        let categoryCount = 0;
+        let toDo, progress, done;
 
-        let background = drawRectangle({
-            x: LEGEND_X - LEGEND_PAD,
-            y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,
-            width: settings.style.fontSize * 8,
-            height: 3.5 * lineHeight,
-            stroke: settings.style.color
-        });
+        if (settings.data.toDo.hasValue) {
+            categoryCount++;
+        }
+        if (settings.data.progress.hasValue) {
+            categoryCount++;
+        }
+        if (settings.data.done.hasValue) {
+            categoryCount++;
+        }
 
-        //toDo legend
-        drawRectangle({
-            x: LEGEND_X,
-            y: LEGEND_Y + 0.5 * lineHeight,
-            width: lineHeight,
-            height: lineHeight,
-            fill: settings.style.toDo.color
-        });
-        drawLegendItem({
-            text: 'To Do',
-            x: LEGEND_X + lineHeight * 1.62,
-            y: LEGEND_Y + lineHeight,
-            fill: settings.style.color
-        });
-
-        //progress legend
-        drawRectangle({
-            x: LEGEND_X,
-            y: LEGEND_Y + 1.5 * lineHeight,
-            width: lineHeight,
-            height: lineHeight,
-            fill: settings.style.progress.pattern ? 'url(#pattern-checkers)' : settings.style.progress.color
-        });
-        let progress = drawLegendItem({
-            text: 'In Progress',
-            x: LEGEND_X + lineHeight * 1.62,
-            y: LEGEND_Y + 2 * lineHeight,
-            fill: settings.style.color,
-        });
-
-        //done legend
-        drawRectangle({
-            x: LEGEND_X,
-            y: LEGEND_Y + 2.5 * lineHeight,
-            width: lineHeight,
-            height: lineHeight,
-            fill: settings.style.done.color
-        });
-        drawLegendItem({
-            text: 'Done',
-            x: LEGEND_X + lineHeight * 1.62,
-            y: LEGEND_Y + LEGEND_PAD * lineHeight,
-            fill: settings.style.color
-        });
+        if (categoryCount) {
+            let background = drawRectangle({
+                x: LEGEND_X - LEGEND_PAD,
+                y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,
+                width: settings.style.fontSize * 8,
+                height: (categoryCount + .5) * lineHeight,
+                stroke: settings.style.color
+            });
 
 
-        //adjust background width
-        //and use progress because it has the most length of 
-        //To Do, In Progress and Done
-        try {
-            let length = progress.node().getComputedTextLength();
-            background.attr('width', length + 2.6 * lineHeight);
-        } catch (e) {
-            //JSDOM is not able to operate with getComputedTextLength
-            //therefore this code is not going to run in the tests
+            if (settings.data.toDo.hasValue) {
+                drawRectangle({
+                    x: LEGEND_X,
+                    y: LEGEND_Y + (line + 0.5) * lineHeight,
+                    width: lineHeight,
+                    height: lineHeight,
+                    fill: settings.style.toDo.color
+                });
+                toDo = drawLegendItem({
+                    text: settings.legend && settings.legend.toDo ? settings.legend.toDo : 'To Do',
+                    x: LEGEND_X + lineHeight * 1.62,
+                    y: LEGEND_Y + (line + 1) * lineHeight,
+                    fill: settings.style.color
+                });
+                line++;
+            }
+
+            if (settings.data.progress.hasValue) {
+                drawRectangle({
+                    x: LEGEND_X,
+                    y: LEGEND_Y + (line + .5) * lineHeight,
+                    width: lineHeight,
+                    height: lineHeight,
+                    fill: settings.style.progress.pattern ? 'url(#pattern-checkers)' : settings.style.progress.color
+                });
+                progress = drawLegendItem({
+                    text: settings.legend && settings.legend.progress ? settings.legend.progress : 'In Progress',
+                    x: LEGEND_X + lineHeight * 1.62,
+                    y: LEGEND_Y + (line + 1) * lineHeight,
+                    fill: settings.style.color,
+                });
+                line++;
+            }
+
+            if (settings.data.done.hasValue) {
+                drawRectangle({
+                    x: LEGEND_X,
+                    y: LEGEND_Y + (line + .5) * lineHeight,
+                    width: lineHeight,
+                    height: lineHeight,
+                    fill: settings.style.done.color
+                });
+                done = drawLegendItem({
+                    text: settings.legend && settings.legend.done ? settings.legend.done : 'Done',
+                    x: LEGEND_X + lineHeight * 1.62,
+                    y: LEGEND_Y + (line + 1) * lineHeight,
+                    fill: settings.style.color
+                });
+            }
+
+
+            //adjust background width
+            try {
+                let toDoLength = toDo ? toDo.node().getComputedTextLength() : 0;
+                let progressLength = progress ? progress.node().getComputedTextLength() : 0;
+                let doneLength = done ? done.node().getComputedTextLength() : 0;
+
+                let length = _.max(toDoLength, progressLength, doneLength);
+                background.attr('width', length + 2.6 * lineHeight);
+            } catch (e) {
+                //JSDOM is not able to operate with getComputedTextLength
+                //therefore this code is not going to run in the tests
+            }
         }
 
         //unit
+        let unit;
+        if (settings.data.unit == 'points') {
+            unit = 'Story Points';
+        } else if (!settings.data.unit) {
+            unit = 'Item Count';
+        } else {
+            unit = settings.data.unit;
+        }
         drawLegendItem({
-            text: settings.data.unit == 'points' ? 'Story Points' : 'Item Count',
+            text: unit,
             x: settings.innerWidth + 50,
             y: -35,
             fill: settings.style.color
-
         });
     }
 }
@@ -1290,7 +1347,7 @@ function drawFocus(settings) {
  * ]}</pre>
  * Each entry object must contain a date and the status counts for the
  * <code>toDo</code>, <code>progress</code> and <code>done</code> status categories.
- * The unit is the unit of measurement for the status counts.
+ * The unit is the unit of measurement for the status counts and can hold any value.
  * A value of <code>'points'</code> indicates story points.
  * An omitted unit will lead to interpreting the status counts as item counts.
  * The status categories <code>toDo</code>, <code>progress</code> and <code>done</code>
@@ -1303,6 +1360,13 @@ function drawFocus(settings) {
  * For the above example: The <code>done</code> status layer is at the bottom, followed by
  * the <code>test</code> and <code>dev</code> layer
  * and finally the <code>new</code> layer is getting rendered.
+ * @param {Object} [settings.legend] - Influence  the appearance of the legend
+ * The defaults are:
+ * <pre>settings.legend = {
+ * toDo: 'To Do',
+ * progress: 'In Progress',
+ * done: 'Done'
+ * }</pre>
  */
 function CFD(settings) {
     this.settings = settings;
