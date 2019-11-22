@@ -979,25 +979,25 @@ function drawLegend(settings) {
 
     if (settings.drawOptions.includes('legend')) {
         let line = 0;
-        let categoryCount = 0;
+        let lineCount = 0;
         let toDo, progress, done;
 
         if (settings.data.toDo.hasValue) {
-            categoryCount++;
+            lineCount++;
         }
         if (settings.data.progress.hasValue) {
-            categoryCount++;
+            lineCount++;
         }
         if (settings.data.done.hasValue) {
-            categoryCount++;
+            lineCount++;
         }
 
-        if (categoryCount) {
+        if (lineCount) {
             let background = drawRectangle({
                 x: LEGEND_X - LEGEND_PAD,
                 y: LEGEND_Y + lineHeight / 2 - LEGEND_PAD,
                 width: settings.style.fontSize * 8,
-                height: (categoryCount + .5) * lineHeight,
+                height: (lineCount + .5) * lineHeight,
                 stroke: settings.style.color
             });
 
@@ -1059,7 +1059,7 @@ function drawLegend(settings) {
                 let progressLength = progress ? progress.node().getComputedTextLength() : 0;
                 let doneLength = done ? done.node().getComputedTextLength() : 0;
 
-                let length = _.max(toDoLength, progressLength, doneLength);
+                let length = _.max([toDoLength, progressLength, doneLength]);
                 background.attr('width', length + 2.6 * lineHeight);
             } catch (e) {
                 //JSDOM is not able to operate with getComputedTextLength
