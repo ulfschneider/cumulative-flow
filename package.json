@@ -1,6 +1,6 @@
 {
     "name": "cumulative-flow",
-    "version": "1.21.1",
+    "version": "1.21.2",
     "description": "Draw SVG Cumulative Flow Diagrams",
     "keywords": [
         "cumulative",
@@ -30,7 +30,7 @@
     "bugs": {
         "url": "https://github.com/ulfschneider/cumulative-flow/issues"
     },
-    "homepage": "https://github.com/ulfschneider/cumulative-flow#readme",
+    "homepage": "https://ulf.codes/cumulative-flow",
     "dependencies": {
         "d3": "^5.7.0",
         "js-base64": "^2.5.0",

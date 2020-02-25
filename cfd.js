@@ -16,11 +16,7 @@ const LEGEND_PAD = 3;
 //Helper functions
 
 function equalsIgnoreCase(a, b) {
-    if (a && b) {
-        return String(a).toLowerCase() == String(b).toLowerCase();
-    } else {
-        return false;
-    }
+    return String(a).toLowerCase() == String(b).toLowerCase();
 }
 
 function minDate(dates) {
