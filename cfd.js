@@ -460,14 +460,14 @@ function getDataSet(date, settings) {
             //sort the result
             let result = {
                 date: getStartOfDay(entry.date),
-                __sum: 0,
-                __count: 1
+                Total: 0,
+                __count: 1+1 //+1  for Total
             }
             for (let key of settings.data.reverseKeys) {
                 if (_.isNumber(entry[key]) && entry[key] > 0) {
                     //count only positive numbers
                     result[key] = entry[key];
-                    result.__sum += entry[key];
+                    result.Total += entry[key];
                     result.__count += 1;
                 }
             }
@@ -1130,6 +1130,11 @@ function drawFocus(settings) {
                         .attr('y', key == 'date' ? y + row * lineHeight : y + (0.5 + row) * lineHeight)
                         .style('display', null)
                         .text(key == 'date' ? getMoment(dataSet[key]).format(DATE_FORMAT) : round(dataSet[key]) + ' ' + key)
+                        //making the total bold
+                        if (key.startsWith('Total')){
+
+                            focusItems[count].attr("font-weight", "bold")
+                        }
                     try {
                         let length = focusItems[count].node().getComputedTextLength();
                         width = Math.max(width, length + 2 * LEGEND_PAD);
@@ -1137,6 +1142,7 @@ function drawFocus(settings) {
                     row++;
                     count++;
                 }
+
             }
             focus.attr('width', width);
 
