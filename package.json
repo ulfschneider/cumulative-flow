@@ -32,7 +32,7 @@
     },
     "homepage": "https://ulf.codes/cumulative-flow",
     "dependencies": {
-        "d3": "^5.7.0",
+        "d3": "^7.6.1",
         "js-base64": "^2.5.0",
         "moment": "^2.23.0",
         "underscore": "^1.9.1"
