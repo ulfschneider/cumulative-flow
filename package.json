@@ -41,7 +41,7 @@
         "acorn": "^6.0.4",
         "browserify": "^16.2.3",
         "coveralls": "^3.0.2",
-        "documentation": "^9.1.1",
+        "documentation": "^14.0.2",
         "fs": "0.0.1-security",
         "jest": "^24.8.0"
     }
